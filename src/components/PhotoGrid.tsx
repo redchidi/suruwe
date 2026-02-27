@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { CameraIcon, XIcon } from './Icons';
 import { ProfilePhoto } from '@/types';
 import { uploadImage } from '@/lib/upload';
@@ -15,11 +15,14 @@ interface PhotoGridProps {
 
 export default function PhotoGrid({ photos, profileId, onPhotosChange, editable = true }: PhotoGridProps) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    setUploading(true);
     for (const file of Array.from(files)) {
       const url = await uploadImage(file, `profiles/${profileId}`);
       if (url) {
@@ -38,11 +41,13 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
         }
       }
     }
+    setUploading(false);
     // Reset input
     if (fileRef.current) fileRef.current.value = '';
   };
 
-  const handleDelete = async (photoId: string) => {
+  const handleDelete = async (e: React.MouseEvent, photoId: string) => {
+    e.stopPropagation();
     await supabase.from('profile_photos').delete().eq('id', photoId);
     onPhotosChange(photos.filter((p) => p.id !== photoId));
   };
@@ -60,7 +65,7 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
         />
         <div className="photo-add" onClick={() => fileRef.current?.click()}>
           <CameraIcon size={32} />
-          <span>Add a photo of yourself so your tailor can see your frame</span>
+          <span>{uploading ? 'Uploading...' : 'Add a photo of yourself so your tailor can see your frame'}</span>
         </div>
       </>
     );
@@ -80,15 +85,16 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
       />
       <div className={`photos-grid ${gridClass}`}>
         {photos.map((photo) => (
-          <div key={photo.id} className="photo-item">
+          <div
+            key={photo.id}
+            className="photo-item"
+            onClick={() => setLightboxUrl(photo.url)}
+          >
             <img src={photo.url} alt="Profile photo" loading="lazy" />
             {editable && (
               <button
                 className="photo-delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(photo.id);
-                }}
+                onClick={(e) => handleDelete(e, photo.id)}
               >
                 <XIcon size={14} />
               </button>
@@ -103,6 +109,7 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
+              border: '1px dashed var(--border)',
             }}
             onClick={() => fileRef.current?.click()}
           >
@@ -110,6 +117,23 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
           </div>
         )}
       </div>
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div className="photo-lightbox" onClick={() => setLightboxUrl(null)}>
+          <button
+            className="photo-lightbox-close"
+            onClick={() => setLightboxUrl(null)}
+          >
+            <XIcon size={20} />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Full size photo"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }
