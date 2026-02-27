@@ -23,8 +23,8 @@ export function generateOrderMessage(profile: Profile, order: Order): string {
 
 export function openWhatsApp(message: string, phone?: string): void {
   const encoded = encodeURIComponent(message);
-  const phoneParam = phone ? `phone=${phone}&` : '';
-  window.open(`https://wa.me/?${phoneParam}text=${encoded}`, '_blank');
+  const phonePath = phone ? `/${phone}` : '';
+  window.open(`https://wa.me${phonePath}?text=${encoded}`, '_blank');
 }
 
 export function generateCompletedOrderMessage(
