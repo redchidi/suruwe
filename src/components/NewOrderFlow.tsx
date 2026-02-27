@@ -39,6 +39,7 @@ export default function NewOrderFlow({
 }: NewOrderFlowProps) {
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState('');
+  const [tailorPhone, setTailorPhone] = useState('');
   const [tailorCity, setTailorCity] = useState('');
   const [description, setDescription] = useState('');
   const [fitNotes, setFitNotes] = useState('');
@@ -110,6 +111,7 @@ export default function NewOrderFlow({
       .insert({
         profile_id: profile.id,
         tailor_name: tailorName,
+        tailor_phone: tailorPhone || null,
         tailor_city: tailorCity,
         description,
         fit_notes: fitNotes,
@@ -141,7 +143,8 @@ export default function NewOrderFlow({
     // Generate and send WhatsApp message
     const updatedProfile = { ...profile, measurements: localMeasurements };
     const message = generateOrderMessage(updatedProfile, order as Order);
-    openWhatsApp(message);
+    const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
+    openWhatsApp(message, phone);
 
     onOrderCreated(order as Order);
     setSaving(false);
@@ -154,6 +157,7 @@ export default function NewOrderFlow({
       id: '',
       profile_id: profile.id,
       tailor_name: tailorName,
+      tailor_phone: tailorPhone || null,
       tailor_city: tailorCity,
       description,
       fit_notes: fitNotes,
@@ -205,7 +209,18 @@ export default function NewOrderFlow({
             </div>
 
             <div className="input-group">
-              <label>City</label>
+              <label>Tailor's WhatsApp number (optional)</label>
+              <input
+                className="input"
+                type="tel"
+                placeholder="e.g. +234 801 234 5678"
+                value={tailorPhone}
+                onChange={(e) => setTailorPhone(e.target.value)}
+              />
+            </div>
+
+            <div className="input-group">
+              <label>City (optional)</label>
               <input
                 className="input"
                 placeholder="e.g. Lagos"

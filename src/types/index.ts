@@ -17,6 +17,7 @@ export interface Order {
   id: string;
   profile_id: string;
   tailor_name: string;
+  tailor_phone: string | null;
   tailor_city: string;
   description: string;
   fit_notes: string;

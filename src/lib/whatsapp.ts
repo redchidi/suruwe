@@ -26,3 +26,16 @@ export function openWhatsApp(message: string, phone?: string): void {
   const phoneParam = phone ? `phone=${phone}&` : '';
   window.open(`https://wa.me/?${phoneParam}text=${encoded}`, '_blank');
 }
+
+export function generateCompletedOrderMessage(
+  order: Order,
+  tailorPhone: string | null
+): string {
+  let message = `Check out what ${order.tailor_name}`;
+  if (order.tailor_city) message += ` in ${order.tailor_city}`;
+  message += ` made for me! ${order.description}.`;
+  if (tailorPhone) {
+    message += `\n\nYou can reach them at ${tailorPhone} if you want something similar.`;
+  }
+  return message;
+}

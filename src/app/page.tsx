@@ -21,7 +21,7 @@ import {
   ArrowLeftIcon,
 } from '@/components/Icons';
 
-type View = 'onboarding' | 'home' | 'new-order' | 'order-detail' | 'edit-measurements' | 'edit-style-notes';
+type View = 'onboarding' | 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
 
 const PROFILE_KEY = 'suruwe_profile_id';
 
@@ -38,10 +38,6 @@ export default function OwnerPage() {
   // Onboarding state
   const [nameInput, setNameInput] = useState('');
   const [creating, setCreating] = useState(false);
-
-  // Style notes editing
-  const [styleNotesInput, setStyleNotesInput] = useState('');
-  const [savingNotes, setSavingNotes] = useState(false);
 
   // Load profile on mount
   useEffect(() => {
@@ -77,8 +73,6 @@ export default function OwnerPage() {
     const p = profileData as Profile;
     setProfile(p);
     setTheme(p.theme as Theme);
-    setStyleNotesInput(p.style_notes || '');
-
     // Load photos
     const { data: photoData } = await supabase
       .from('profile_photos')
@@ -173,18 +167,6 @@ export default function OwnerPage() {
 
   const handleProfileUpdate = (updated: Profile) => {
     setProfile(updated);
-  };
-
-  const handleSaveStyleNotes = async () => {
-    if (!profile) return;
-    setSavingNotes(true);
-    await supabase
-      .from('profiles')
-      .update({ style_notes: styleNotesInput })
-      .eq('id', profile.id);
-    setProfile({ ...profile, style_notes: styleNotesInput });
-    setSavingNotes(false);
-    setView('home');
   };
 
   const handleSaveMeasurements = async (
@@ -304,39 +286,6 @@ export default function OwnerPage() {
     );
   }
 
-  // Edit Style Notes
-  if (view === 'edit-style-notes') {
-    return (
-      <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
-        <div className="flex items-center gap-12 mb-24">
-          <button className="back-btn" onClick={() => setView('home')}>
-            <ArrowLeftIcon size={18} />
-            <span>Back</span>
-          </button>
-        </div>
-        <h2 className="mb-8">Style Notes</h2>
-        <p className="text-secondary mb-24" style={{ fontSize: 14, lineHeight: 1.5 }}>
-          Tell your tailors about your preferences. What fits do you like? Any style details they should know?
-        </p>
-        <textarea
-          className="textarea"
-          value={styleNotesInput}
-          onChange={(e) => setStyleNotesInput(e.target.value)}
-          placeholder="e.g. I prefer a slim, modern fit. I like higher armholes. For agbada, I want the sleeves to fall just below the wrist."
-          style={{ minHeight: 160 }}
-          autoFocus
-        />
-        <button
-          className="btn btn-primary btn-full mt-20"
-          onClick={handleSaveStyleNotes}
-          disabled={savingNotes}
-        >
-          {savingNotes ? 'Saving...' : 'Save Notes'}
-        </button>
-      </div>
-    );
-  }
-
   // Home
   const hasMeasurements = profile.measurements && Object.keys(profile.measurements).length > 0;
   const hasPhotos = photos.length > 0;
@@ -378,15 +327,19 @@ export default function OwnerPage() {
         New Order
       </button>
 
-      {/* Share profile CTA */}
-      <button
-        className="btn btn-whatsapp btn-full btn-sm"
-        onClick={handleShareProfile}
-        style={{ marginBottom: 36 }}
-      >
-        <WhatsAppIcon size={18} />
-        Send to My Tailor
-      </button>
+      {/* Share profile CTA - only show when there's content to share */}
+      {(hasPhotos || hasMeasurements || orders.length > 0) ? (
+        <button
+          className="btn btn-whatsapp btn-full btn-sm"
+          onClick={handleShareProfile}
+          style={{ marginBottom: 36 }}
+        >
+          <WhatsAppIcon size={18} />
+          Send to My Tailor
+        </button>
+      ) : (
+        <div style={{ marginBottom: 36 }} />
+      )}
 
       {/* Photos Section */}
       <div className="section">
@@ -430,35 +383,6 @@ export default function OwnerPage() {
             <RulerIcon size={18} />
             Add Measurements
           </button>
-        )}
-      </div>
-
-      {/* Style Notes Section */}
-      <div className="section">
-        <div className="section-header">
-          <div className="section-title">Style Notes</div>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => {
-              setStyleNotesInput(profile.style_notes || '');
-              setView('edit-style-notes');
-            }}
-            style={{ padding: '6px 12px', minHeight: 36 }}
-          >
-            <EditIcon size={14} />
-            {profile.style_notes ? 'Edit' : 'Add'}
-          </button>
-        </div>
-        {profile.style_notes ? (
-          <div className="card-flat">
-            <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text)' }}>
-              {profile.style_notes}
-            </p>
-          </div>
-        ) : (
-          <p className="text-muted" style={{ fontSize: 14 }}>
-            Tell your tailors about your style preferences.
-          </p>
         )}
       </div>
 

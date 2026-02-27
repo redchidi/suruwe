@@ -5,6 +5,7 @@ import { Order, OrderAttachment } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
 import { formatDate } from '@/lib/utils';
+import { generateCompletedOrderMessage, openWhatsApp } from '@/lib/whatsapp';
 import { ArrowLeftIcon, CameraIcon, WhatsAppIcon } from './Icons';
 
 interface OrderDetailProps {
@@ -96,12 +97,27 @@ export default function OrderDetail({ order, onBack, onOrderUpdate }: OrderDetai
       <div className="section">
         <div className="section-title">Completed Piece</div>
         {completedPhoto ? (
-          <div style={{ borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-            <img
-              src={completedPhoto}
-              alt="Completed piece"
-              style={{ width: '100%', display: 'block' }}
-            />
+          <div>
+            <div style={{ borderRadius: 'var(--radius)', overflow: 'hidden', marginBottom: 12 }}>
+              <img
+                src={completedPhoto}
+                alt="Completed piece"
+                style={{ width: '100%', display: 'block' }}
+              />
+            </div>
+            <button
+              className="btn btn-whatsapp btn-full btn-sm"
+              onClick={() => {
+                const message = generateCompletedOrderMessage(
+                  order,
+                  order.tailor_phone || null
+                );
+                openWhatsApp(message);
+              }}
+            >
+              <WhatsAppIcon size={16} />
+              Share this on WhatsApp
+            </button>
           </div>
         ) : (
           <>
