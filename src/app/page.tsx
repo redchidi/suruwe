@@ -254,6 +254,7 @@ export default function OwnerPage() {
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <OrderDetail
           order={selectedOrder}
+          profile={profile}
           onBack={() => {
             setSelectedOrder(null);
             setView('home');

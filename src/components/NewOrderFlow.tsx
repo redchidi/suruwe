@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Profile, Order, OrderAttachment, getMeasurementFields } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
@@ -31,6 +31,12 @@ interface AttachmentLocal {
   preview: string;
 }
 
+interface TailorHistory {
+  name: string;
+  phone: string | null;
+  city: string;
+}
+
 export default function NewOrderFlow({
   profile,
   onClose,
@@ -48,6 +54,10 @@ export default function NewOrderFlow({
   const [measurementsSaving, setMeasurementsSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Tailor history
+  const [tailorHistory, setTailorHistory] = useState<TailorHistory[]>([]);
+  const [showTailorSuggestions, setShowTailorSuggestions] = useState(false);
+
   // Local measurements state for step 3
   const [localMeasurements, setLocalMeasurements] = useState(profile.measurements);
   const [localGender, setLocalGender] = useState(profile.gender);
@@ -60,6 +70,47 @@ export default function NewOrderFlow({
   const measurementsStale = profile.measurements_updated_at
     ? (Date.now() - new Date(profile.measurements_updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000
     : false;
+
+  // Load tailor history on mount
+  useEffect(() => {
+    loadTailorHistory();
+  }, []);
+
+  const loadTailorHistory = async () => {
+    const { data } = await supabase
+      .from('orders')
+      .select('tailor_name, tailor_phone, tailor_city')
+      .eq('profile_id', profile.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      const seen = new Set<string>();
+      const unique: TailorHistory[] = [];
+      for (const row of data) {
+        const key = row.tailor_name.toLowerCase().trim();
+        if (!seen.has(key)) {
+          seen.add(key);
+          unique.push({
+            name: row.tailor_name,
+            phone: row.tailor_phone || null,
+            city: row.tailor_city || '',
+          });
+        }
+      }
+      setTailorHistory(unique);
+    }
+  };
+
+  const selectTailor = (tailor: TailorHistory) => {
+    setTailorName(tailor.name);
+    setTailorPhone(tailor.phone || '');
+    setTailorCity(tailor.city);
+    setShowTailorSuggestions(false);
+  };
+
+  const filteredTailors = tailorHistory.filter((t) =>
+    t.name.toLowerCase().includes(tailorName.toLowerCase().trim())
+  );
 
   const handleAttachmentAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -189,15 +240,40 @@ export default function NewOrderFlow({
           <h2 className="mb-24">Who is making this?</h2>
 
           <div className="flex flex-col gap-16">
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <label>Tailor name</label>
               <input
                 className="input"
                 placeholder="e.g. Baba Tailor"
                 value={tailorName}
-                onChange={(e) => setTailorName(e.target.value)}
+                onChange={(e) => {
+                  setTailorName(e.target.value);
+                  setShowTailorSuggestions(e.target.value.length > 0 && tailorHistory.length > 0);
+                }}
+                onFocus={() => {
+                  if (tailorHistory.length > 0) setShowTailorSuggestions(true);
+                }}
+                onBlur={() => {
+                  setTimeout(() => setShowTailorSuggestions(false), 200);
+                }}
                 autoFocus
               />
+              {showTailorSuggestions && filteredTailors.length > 0 && (
+                <div className="tailor-suggestions">
+                  {filteredTailors.map((tailor, i) => (
+                    <div
+                      key={i}
+                      className="tailor-suggestion-item"
+                      onClick={() => selectTailor(tailor)}
+                    >
+                      <div style={{ fontWeight: 500, color: 'var(--text)' }}>{tailor.name}</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                        {[tailor.city, tailor.phone].filter(Boolean).join(' · ') || 'No details'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="input-group">
@@ -328,10 +404,7 @@ export default function NewOrderFlow({
                 </button>
                 <button
                   className="btn btn-secondary btn-full"
-                  onClick={() => {
-                    // Show editor inline
-                    setStep(3.5 as any);
-                  }}
+                  onClick={() => setStep(3.5 as any)}
                 >
                   Update measurements
                 </button>
@@ -401,27 +474,28 @@ export default function NewOrderFlow({
       {step === 4 && (
         <div>
           <h2 className="mb-24">Review and send</h2>
+          <p className="text-muted mb-16" style={{ fontSize: 13 }}>
+            Tap any section to edit
+          </p>
 
           <div className="card mb-24">
-            <div className="review-item">
+            <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
               <div className="review-label">Tailor</div>
               <div className="review-value">
                 {tailorName}
                 {tailorCity ? `, ${tailorCity}` : ''}
               </div>
             </div>
-            <div className="review-item">
+            <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
               <div className="review-label">Making</div>
               <div className="review-value">{description}</div>
             </div>
-            {fitNotes && (
-              <div className="review-item">
-                <div className="review-label">Fit notes</div>
-                <div className="review-value">{fitNotes}</div>
-              </div>
-            )}
+            <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
+              <div className="review-label">Fit notes</div>
+              <div className="review-value">{fitNotes || 'None'}</div>
+            </div>
             {attachments.length > 0 && (
-              <div className="review-item">
+              <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
                 <div className="review-label">
                   Attachments ({attachments.filter((a) => a.visible).length} visible to tailor)
                 </div>

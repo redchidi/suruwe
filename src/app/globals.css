@@ -779,6 +779,45 @@ h3 { font-size: 18px; }
   font-size: 15px;
   color: var(--text);
 }
+.review-item-tappable {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  margin: 0 -8px;
+  transition: background var(--transition);
+}
+.review-item-tappable:active {
+  background: var(--accent-muted);
+}
+
+/* Tailor suggestions dropdown */
+.tailor-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  z-index: 50;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.tailor-suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.tailor-suggestion-item:last-child {
+  border-bottom: none;
+}
+.tailor-suggestion-item:hover,
+.tailor-suggestion-item:active {
+  background: var(--accent-muted);
+}
 
 /* Tailor view */
 .tailor-header {
