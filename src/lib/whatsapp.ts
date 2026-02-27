@@ -8,23 +8,23 @@ export function generateProfileShareMessage(profile: Profile): string {
 }
 
 export function generateOrderMessage(profile: Profile, order: Order): string {
-  const url = `${APP_URL}/${profile.slug}`;
+  const url = `${APP_URL}/${profile.slug}/order/${order.id}`;
   
-  let message = `${order.tailor_name}, looking to get something made. ${order.description}.`;
+  let message = `Hi ${order.tailor_name}, I'd like to get something made. ${order.description}.`;
   
   if (order.fit_notes) {
-    message += ` A few notes on fit: ${order.fit_notes}.`;
+    message += `\n\nFit notes: ${order.fit_notes}`;
   }
   
-  message += `\n\nHere is my full profile with measurements and photos: ${url}`;
+  message += `\n\nHere are my measurements, photos, and order details: ${url}`;
   
   return message;
 }
 
 export function openWhatsApp(message: string, phone?: string): void {
   const encoded = encodeURIComponent(message);
-  const phonePath = phone ? `/${phone}` : '';
-  window.open(`https://wa.me${phonePath}?text=${encoded}`, '_blank');
+  const phoneParam = phone ? `phone=${phone}&` : '';
+  window.open(`https://wa.me/?${phoneParam}text=${encoded}`, '_blank');
 }
 
 export function generateCompletedOrderMessage(

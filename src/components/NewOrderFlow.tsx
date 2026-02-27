@@ -151,22 +151,14 @@ export default function NewOrderFlow({
   };
 
   const canProceedStep1 = tailorName.trim() && description.trim();
-  const message = generateOrderMessage(
-    { ...profile, measurements: localMeasurements },
-    {
-      id: '',
-      profile_id: profile.id,
-      tailor_name: tailorName,
-      tailor_phone: tailorPhone || null,
-      tailor_city: tailorCity,
-      description,
-      fit_notes: fitNotes,
-      status: 'draft',
-      completed_photo_url: null,
-      created_at: '',
-      updated_at: '',
+  const previewMessage = (() => {
+    let msg = `Hi ${tailorName}, I'd like to get something made. ${description}.`;
+    if (fitNotes) {
+      msg += `\n\nFit notes: ${fitNotes}`;
     }
-  );
+    msg += `\n\nHere are my measurements, photos, and order details: [link will be generated]`;
+    return msg;
+  })();
 
   return (
     <div>
@@ -444,7 +436,7 @@ export default function NewOrderFlow({
             )}
           </div>
 
-          <div className="wa-preview mb-24">{message}</div>
+          <div className="wa-preview mb-24">{previewMessage}</div>
 
           <button
             className="btn btn-whatsapp btn-full"
