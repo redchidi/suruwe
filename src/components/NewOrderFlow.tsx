@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Profile, Order, OrderAttachment, getMeasurementFields } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
-import { generateOrderMessage, openWhatsApp } from '@/lib/whatsapp';
+import { generateOrderMessage, generateOrderShareMessage, openWhatsApp } from '@/lib/whatsapp';
 import { formatRelativeDate } from '@/lib/utils';
 import MeasurementsEditor from './MeasurementsEditor';
 import {
@@ -158,7 +158,7 @@ export default function NewOrderFlow({
     }
   };
 
-  const handleSendOrder = async () => {
+  const createOrder = async () => {
     setSaving(true);
 
     // Create order
@@ -166,7 +166,7 @@ export default function NewOrderFlow({
       .from('orders')
       .insert({
         profile_id: profile.id,
-        tailor_name: tailorName,
+        tailor_name: tailorName || 'My Tailor',
         tailor_phone: tailorPhone || null,
         tailor_city: tailorCity,
         description,
@@ -178,7 +178,7 @@ export default function NewOrderFlow({
 
     if (error || !order) {
       setSaving(false);
-      return;
+      return null;
     }
 
     // Upload attachments
@@ -196,19 +196,42 @@ export default function NewOrderFlow({
       }
     }
 
-    // Generate and send WhatsApp message
+    return order as Order;
+  };
+
+  const handleSendOrder = async () => {
+    const order = await createOrder();
+    if (!order) return;
+
     const updatedProfile = { ...profile, measurements: localMeasurements };
-    const message = generateOrderMessage(updatedProfile, order as Order);
+    const message = generateOrderMessage(updatedProfile, order);
     const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
     openWhatsApp(message, phone);
 
-    onOrderCreated(order as Order);
+    onOrderCreated(order);
     setSaving(false);
   };
 
-  const canProceedStep1 = tailorName.trim() && description.trim();
+  const handleShareOrder = async () => {
+    const order = await createOrder();
+    if (!order) return;
+
+    const updatedProfile = { ...profile, measurements: localMeasurements };
+    const message = generateOrderShareMessage(updatedProfile, order);
+    openWhatsApp(message);
+
+    onOrderCreated(order);
+    setSaving(false);
+  };
+
+  const canProceedStep1 = description.trim();
   const previewMessage = (() => {
-    let msg = `Hi ${tailorName}, I'd like to get something made. ${description}.`;
+    let msg = '';
+    if (tailorName.trim()) {
+      msg = `Hi ${tailorName}, I'd like to get something made. ${description}.`;
+    } else {
+      msg = `I'd like to get something made. ${description}.`;
+    }
     if (fitNotes) {
       msg += `\n\nFit notes: ${fitNotes}`;
     }
@@ -242,11 +265,22 @@ export default function NewOrderFlow({
       {/* Step 1: Tailor details */}
       {step === 1 && (
         <div>
-          <h2 className="mb-24">Who is making this?</h2>
+          <h2 className="mb-24">What are you making?</h2>
 
           <div className="flex flex-col gap-16">
+            <div className="input-group">
+              <label>What are you making?</label>
+              <input
+                className="input"
+                placeholder="e.g. Agbada for a wedding"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                autoFocus
+              />
+            </div>
+
             <div className="input-group" style={{ position: 'relative' }}>
-              <label>Tailor name</label>
+              <label>Tailor name (optional)</label>
               <input
                 className="input"
                 placeholder="e.g. Baba Tailor"
@@ -261,7 +295,6 @@ export default function NewOrderFlow({
                 onBlur={() => {
                   setTimeout(() => setShowTailorSuggestions(false), 200);
                 }}
-                autoFocus
               />
               {showTailorSuggestions && filteredTailors.length > 0 && (
                 <div className="tailor-suggestions">
@@ -299,16 +332,6 @@ export default function NewOrderFlow({
                 placeholder="e.g. Lagos"
                 value={tailorCity}
                 onChange={(e) => setTailorCity(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label>What are you making?</label>
-              <input
-                className="input"
-                placeholder="e.g. Agbada for a wedding"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           </div>
@@ -496,16 +519,18 @@ export default function NewOrderFlow({
 
           <div className="card mb-24">
             <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
-              <div className="review-label">Tailor</div>
-              <div className="review-value">
-                {tailorName}
-                {tailorCity ? `, ${tailorCity}` : ''}
-              </div>
-            </div>
-            <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
               <div className="review-label">Making</div>
               <div className="review-value">{description}</div>
             </div>
+            {tailorName.trim() && (
+              <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
+                <div className="review-label">Tailor</div>
+                <div className="review-value">
+                  {tailorName}
+                  {tailorCity ? `, ${tailorCity}` : ''}
+                </div>
+              </div>
+            )}
             <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
               <div className="review-label">Fit notes</div>
               <div className="review-value">{fitNotes || 'None'}</div>
@@ -528,14 +553,27 @@ export default function NewOrderFlow({
 
           <div className="wa-preview mb-24">{previewMessage}</div>
 
-          <button
-            className="btn btn-whatsapp btn-full"
-            onClick={handleSendOrder}
-            disabled={saving}
-          >
-            <WhatsAppIcon size={20} />
-            {saving ? 'Sending...' : `Send to ${tailorName}`}
-          </button>
+          <div className="flex flex-col gap-12">
+            {tailorName.trim() && tailorPhone.trim() ? (
+              <button
+                className="btn btn-whatsapp btn-full"
+                onClick={handleSendOrder}
+                disabled={saving}
+              >
+                <WhatsAppIcon size={20} />
+                {saving ? 'Sending...' : `Send to ${tailorName}`}
+              </button>
+            ) : null}
+            <button
+              className="btn btn-whatsapp btn-full"
+              onClick={tailorName.trim() && !tailorPhone.trim() ? handleSendOrder : handleShareOrder}
+              disabled={saving}
+              style={tailorName.trim() && tailorPhone.trim() ? { opacity: 0.85, background: 'var(--bg-secondary)' } : {}}
+            >
+              <WhatsAppIcon size={20} />
+              {saving ? 'Sending...' : 'Share on WhatsApp'}
+            </button>
+          </div>
         </div>
       )}
     </div>

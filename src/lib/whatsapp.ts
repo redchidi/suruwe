@@ -10,7 +10,12 @@ export function generateProfileShareMessage(profile: Profile): string {
 export function generateOrderMessage(profile: Profile, order: Order): string {
   const url = `${APP_URL}/${profile.slug}/order/${order.id}`;
   
-  let message = `Hi ${order.tailor_name}, I'd like to get something made. ${order.description}.`;
+  let message = '';
+  if (order.tailor_name) {
+    message = `Hi ${order.tailor_name}, I'd like to get something made. ${order.description}.`;
+  } else {
+    message = `I'd like to get something made. ${order.description}.`;
+  }
   
   if (order.fit_notes) {
     message += `\n\nFit notes: ${order.fit_notes}`;
@@ -19,6 +24,11 @@ export function generateOrderMessage(profile: Profile, order: Order): string {
   message += `\n\nHere are my measurements, photos, and order details: ${url}`;
   
   return message;
+}
+
+export function generateOrderShareMessage(profile: Profile, order: Order): string {
+  const url = `${APP_URL}/${profile.slug}/order/${order.id}`;
+  return `Here are my order details and measurements on Suruwe: ${url}`;
 }
 
 export function openWhatsApp(message: string, phone?: string): void {
