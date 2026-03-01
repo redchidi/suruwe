@@ -13,6 +13,7 @@ interface MeasurementsEditorProps {
   onMeasurementsChange: (measurements: Record<string, number>) => void;
   onSave: () => void;
   saving?: boolean;
+  saveLabel?: string;
 }
 
 export default function MeasurementsEditor({
@@ -24,6 +25,7 @@ export default function MeasurementsEditor({
   onMeasurementsChange,
   onSave,
   saving,
+  saveLabel,
 }: MeasurementsEditorProps) {
   const sections = getMeasurementSections(gender);
 
@@ -103,7 +105,7 @@ export default function MeasurementsEditor({
         onClick={onSave}
         disabled={saving}
       >
-        {saving ? 'Saving...' : 'Save Measurements'}
+        {saving ? 'Saving...' : (saveLabel || 'Save Measurements')}
       </button>
     </div>
   );

@@ -136,23 +136,26 @@ export default function NewOrderFlow({
 
   const saveMeasurements = async () => {
     setMeasurementsSaving(true);
-    const { data } = await supabase
-      .from('profiles')
-      .update({
-        measurements: localMeasurements,
-        gender: localGender,
-        measurement_unit: localUnit,
-        measurements_updated_at: new Date().toISOString(),
-      })
-      .eq('id', profile.id)
-      .select()
-      .single();
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .update({
+          measurements: localMeasurements,
+          gender: localGender,
+          measurement_unit: localUnit,
+          measurements_updated_at: new Date().toISOString(),
+        })
+        .eq('id', profile.id)
+        .select()
+        .single();
 
-    if (data) {
-      onProfileUpdate(data as Profile);
+      if (data) {
+        onProfileUpdate(data as Profile);
+      }
+    } finally {
+      setMeasurementsSaving(false);
+      setStep(4);
     }
-    setMeasurementsSaving(false);
-    setStep(4);
   };
 
   const handleSendOrder = async () => {
@@ -446,6 +449,7 @@ export default function NewOrderFlow({
                 onMeasurementsChange={setLocalMeasurements}
                 onSave={saveMeasurements}
                 saving={measurementsSaving}
+                saveLabel="Save and Continue"
               />
               <button className="btn btn-ghost btn-full mt-8" onClick={() => setStep(4)}>
                 Skip for now
@@ -468,6 +472,7 @@ export default function NewOrderFlow({
             onMeasurementsChange={setLocalMeasurements}
             onSave={saveMeasurements}
             saving={measurementsSaving}
+            saveLabel="Save and Continue"
           />
         </div>
       )}
