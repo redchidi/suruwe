@@ -240,6 +240,7 @@ export default function OwnerPage() {
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <NewOrderFlow
           profile={profile}
+          hasPhotos={photos.length > 0}
           onClose={() => setView('home')}
           onOrderCreated={handleOrderCreated}
           onProfileUpdate={handleProfileUpdate}

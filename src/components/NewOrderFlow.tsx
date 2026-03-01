@@ -19,6 +19,7 @@ import {
 
 interface NewOrderFlowProps {
   profile: Profile;
+  hasPhotos: boolean;
   onClose: () => void;
   onOrderCreated: (order: Order) => void;
   onProfileUpdate: (profile: Profile) => void;
@@ -39,6 +40,7 @@ interface TailorHistory {
 
 export default function NewOrderFlow({
   profile,
+  hasPhotos,
   onClose,
   onOrderCreated,
   onProfileUpdate,
@@ -474,6 +476,22 @@ export default function NewOrderFlow({
       {step === 4 && (
         <div>
           <h2 className="mb-24">Review and send</h2>
+
+          {!hasPhotos && (
+            <div className="card mb-16" style={{ padding: '14px 16px', border: '1px dashed var(--border)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text-secondary)', margin: 0 }}>
+                You have not added a photo of yourself yet. A photo helps your tailor see your frame and get the fit right.
+              </p>
+              <button
+                className="btn btn-secondary btn-sm"
+                style={{ marginTop: 12 }}
+                onClick={onClose}
+              >
+                Add a photo
+              </button>
+            </div>
+          )}
+
           <p className="text-muted mb-16" style={{ fontSize: 13 }}>
             Tap any section to edit
           </p>
