@@ -38,6 +38,20 @@ export default function OwnerPage() {
   // Onboarding state
   const [nameInput, setNameInput] = useState('');
   const [creating, setCreating] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<'name' | 'pin'>('name');
+  const [pinInput, setPinInput] = useState('');
+
+  // Recovery state
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoverySlug, setRecoverySlug] = useState('');
+  const [recoveryPin, setRecoveryPin] = useState('');
+  const [recoveryError, setRecoveryError] = useState('');
+  const [recovering, setRecovering] = useState(false);
+
+  // PIN prompt for existing users
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [pinSetupInput, setPinSetupInput] = useState('');
+  const [savingPin, setSavingPin] = useState(false);
 
   // Load profile on mount
   useEffect(() => {
@@ -91,10 +105,21 @@ export default function OwnerPage() {
 
     setView('home');
     setLoading(false);
+
+    // Prompt existing users to set a PIN if they don't have one
+    if (!p.pin) {
+      setShowPinSetup(true);
+    }
+  };
+
+  const handleNameSubmit = () => {
+    if (!nameInput.trim()) return;
+    setOnboardingStep('pin');
   };
 
   const createProfile = async () => {
-    if (!nameInput.trim() || creating) return;
+    if (!nameInput.trim() || !pinInput.trim() || creating) return;
+    if (pinInput.length < 4 || pinInput.length > 6) return;
     setCreating(true);
 
     const slug = generateSlug(nameInput.trim());
@@ -103,6 +128,7 @@ export default function OwnerPage() {
       .insert({
         slug,
         name: nameInput.trim(),
+        pin: pinInput,
         gender: 'male',
         theme: 'dark',
         measurements: {},
@@ -120,6 +146,65 @@ export default function OwnerPage() {
       setView('home');
     }
     setCreating(false);
+  };
+
+  const handleRecovery = async () => {
+    if (!recoverySlug.trim() || !recoveryPin.trim() || recovering) return;
+    setRecovering(true);
+    setRecoveryError('');
+
+    // Extract slug from URL or use as-is
+    let slug = recoverySlug.trim();
+    // Handle full URLs like suruwe.vercel.app/chidi-ozzc or suruwe.com/chidi-ozzc
+    if (slug.includes('/')) {
+      const parts = slug.split('/');
+      slug = parts[parts.length - 1];
+    }
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('slug', slug)
+      .eq('pin', recoveryPin)
+      .single();
+
+    if (data) {
+      const p = data as Profile;
+      localStorage.setItem(PROFILE_KEY, p.id);
+      setProfile(p);
+      setTheme(p.theme as Theme);
+
+      // Load photos
+      const { data: photoData } = await supabase
+        .from('profile_photos')
+        .select('*')
+        .eq('profile_id', p.id)
+        .order('sort_order', { ascending: true });
+      if (photoData) setPhotos(photoData);
+
+      // Load orders
+      const { data: orderData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('profile_id', p.id)
+        .order('created_at', { ascending: false });
+      if (orderData) setOrders(orderData);
+
+      setView('home');
+    } else {
+      setRecoveryError('No profile found with that link and PIN. Please check and try again.');
+    }
+    setRecovering(false);
+  };
+
+  const handleSavePin = async () => {
+    if (!profile || !pinSetupInput.trim() || savingPin) return;
+    if (pinSetupInput.length < 4 || pinSetupInput.length > 6) return;
+    setSavingPin(true);
+    await supabase.from('profiles').update({ pin: pinSetupInput }).eq('id', profile.id);
+    setProfile({ ...profile, pin: pinSetupInput });
+    setShowPinSetup(false);
+    setSavingPin(false);
   };
 
   const toggleTheme = async () => {
@@ -206,6 +291,100 @@ export default function OwnerPage() {
 
   // Onboarding
   if (view === 'onboarding') {
+    // Recovery flow
+    if (showRecovery) {
+      return (
+        <div className="onboarding">
+          <div className="onboarding-logo">Suruwe</div>
+          <div className="onboarding-tagline">
+            Enter your profile link and PIN to access your profile on this device.
+          </div>
+          <input
+            className="onboarding-input"
+            type="text"
+            placeholder="Your profile link or slug (e.g. chidi-ozzc)"
+            value={recoverySlug}
+            onChange={(e) => setRecoverySlug(e.target.value)}
+            autoFocus
+          />
+          <input
+            className="onboarding-input"
+            type="number"
+            inputMode="numeric"
+            placeholder="Your PIN"
+            value={recoveryPin}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setRecoveryPin(val);
+            }}
+            style={{ marginTop: 12 }}
+          />
+          {recoveryError && (
+            <p style={{ color: '#e74c3c', fontSize: 14, marginTop: 8, textAlign: 'center' }}>
+              {recoveryError}
+            </p>
+          )}
+          <button
+            className="btn btn-primary onboarding-btn"
+            onClick={handleRecovery}
+            disabled={!recoverySlug.trim() || recoveryPin.length < 4 || recovering}
+          >
+            {recovering ? 'Looking up...' : 'Access My Profile'}
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={() => {
+              setShowRecovery(false);
+              setRecoveryError('');
+            }}
+            style={{ marginTop: 12, fontSize: 14 }}
+          >
+            Back
+          </button>
+        </div>
+      );
+    }
+
+    // Step 2: Set PIN
+    if (onboardingStep === 'pin') {
+      return (
+        <div className="onboarding">
+          <div className="onboarding-logo">Suruwe</div>
+          <div className="onboarding-tagline">
+            Choose a 4 to 6 digit PIN. You will need this to access your profile on other devices.
+          </div>
+          <input
+            className="onboarding-input"
+            type="number"
+            inputMode="numeric"
+            placeholder="Enter a PIN (4-6 digits)"
+            value={pinInput}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setPinInput(val);
+            }}
+            onKeyDown={(e) => e.key === 'Enter' && createProfile()}
+            autoFocus
+          />
+          <button
+            className="btn btn-primary onboarding-btn"
+            onClick={createProfile}
+            disabled={pinInput.length < 4 || creating}
+          >
+            {creating ? 'Setting up...' : 'Create Profile'}
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={() => setOnboardingStep('name')}
+            style={{ marginTop: 12, fontSize: 14 }}
+          >
+            Back
+          </button>
+        </div>
+      );
+    }
+
+    // Step 1: Enter name
     return (
       <div className="onboarding">
         <div className="onboarding-logo">Suruwe</div>
@@ -218,15 +397,22 @@ export default function OwnerPage() {
           placeholder="Your name"
           value={nameInput}
           onChange={(e) => setNameInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && createProfile()}
+          onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
           autoFocus
         />
         <button
           className="btn btn-primary onboarding-btn"
-          onClick={createProfile}
-          disabled={!nameInput.trim() || creating}
+          onClick={handleNameSubmit}
+          disabled={!nameInput.trim()}
         >
-          {creating ? 'Setting up...' : 'Get Started'}
+          Get Started
+        </button>
+        <button
+          className="btn btn-ghost"
+          onClick={() => setShowRecovery(true)}
+          style={{ marginTop: 16, fontSize: 14 }}
+        >
+          I already have a profile
         </button>
       </div>
     );
@@ -430,6 +616,39 @@ export default function OwnerPage() {
 
       {/* Bottom padding */}
       <div style={{ height: 60 }} />
+
+      {/* PIN setup prompt for existing users */}
+      {showPinSetup && (
+        <div className="modal-overlay">
+          <div className="modal-sheet">
+            <h3 style={{ marginBottom: 8 }}>Secure your profile</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
+              Set a 4 to 6 digit PIN so you can access your profile on other devices.
+            </p>
+            <input
+              className="input"
+              type="number"
+              inputMode="numeric"
+              placeholder="Enter a PIN (4-6 digits)"
+              value={pinSetupInput}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setPinSetupInput(val);
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()}
+              autoFocus
+            />
+            <button
+              className="btn btn-primary btn-full"
+              onClick={handleSavePin}
+              disabled={pinSetupInput.length < 4 || savingPin}
+              style={{ marginTop: 16 }}
+            >
+              {savingPin ? 'Saving...' : 'Save PIN'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Phone prompt modal */}
       {showPhonePrompt && (

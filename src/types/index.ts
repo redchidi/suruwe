@@ -3,6 +3,7 @@ export interface Profile {
   slug: string;
   name: string;
   phone: string | null;
+  pin: string | null;
   gender: 'male' | 'female';
   measurements: Record<string, number>;
   measurement_unit: 'inches' | 'cm';
