@@ -29,6 +29,17 @@ export default function OrderViewClient({
     applyTheme(theme);
   }, [theme]);
 
+  // Record tailor view
+  useEffect(() => {
+    if (order?.id) {
+      supabase
+        .from('orders')
+        .update({ viewed_at: new Date().toISOString() })
+        .eq('id', order.id)
+        .then(() => {});
+    }
+  }, [order?.id]);
+
   const loadData = async () => {
     // Load profile by slug
     const { data: profileData } = await supabase
