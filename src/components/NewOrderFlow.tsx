@@ -482,13 +482,6 @@ export default function NewOrderFlow({
               <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text-secondary)', margin: 0 }}>
                 You have not added a photo of yourself yet. A photo helps your tailor see your frame and get the fit right.
               </p>
-              <button
-                className="btn btn-secondary btn-sm"
-                style={{ marginTop: 12 }}
-                onClick={onClose}
-              >
-                Add a photo
-              </button>
             </div>
           )}
 
