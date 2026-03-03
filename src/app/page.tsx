@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Profile, Order, ProfilePhoto } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { applyTheme, Theme } from '@/lib/theme';
@@ -19,10 +19,10 @@ import {
   EditIcon,
   RulerIcon,
   ArrowLeftIcon,
+  CameraIcon,
 } from '@/components/Icons';
 
 type View = 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
-type PendingAction = 'upload-photo' | 'edit-measurements' | 'new-order' | null;
 
 const PROFILE_KEY = 'suruwe_profile_id';
 
@@ -37,11 +37,12 @@ export default function OwnerPage() {
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
 
-  // Name prompt (replaces onboarding)
+  // Name prompt state
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [creating, setCreating] = useState(false);
-  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  // Callback to run after profile creation
+  const pendingCallback = useRef<((profile: Profile) => void) | null>(null);
 
   // Recovery state
   const [showRecovery, setShowRecovery] = useState(false);
@@ -50,17 +51,19 @@ export default function OwnerPage() {
   const [recoveryError, setRecoveryError] = useState('');
   const [recovering, setRecovering] = useState(false);
 
-  // PIN prompt for existing users (second visit)
+  // PIN prompt for returning users
   const [showPinSetup, setShowPinSetup] = useState(false);
   const [pinSetupInput, setPinSetupInput] = useState('');
   const [savingPin, setSavingPin] = useState(false);
 
-  // Load profile on mount
+  // Photo upload for guests: hold selected files until profile exists
+  const guestFileRef = useRef<HTMLInputElement>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
   useEffect(() => {
     loadProfile();
   }, []);
 
-  // Apply theme whenever it changes
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
@@ -68,7 +71,6 @@ export default function OwnerPage() {
   const loadProfile = async () => {
     const profileId = localStorage.getItem(PROFILE_KEY);
     if (!profileId) {
-      // No profile yet, show home as guest
       setLoading(false);
       return;
     }
@@ -88,7 +90,7 @@ export default function OwnerPage() {
     const p = profileData as Profile;
     setProfile(p);
     setTheme(p.theme as Theme);
-    // Load photos
+
     const { data: photoData } = await supabase
       .from('profile_photos')
       .select('*')
@@ -96,7 +98,6 @@ export default function OwnerPage() {
       .order('sort_order', { ascending: true });
     if (photoData) setPhotos(photoData);
 
-    // Load orders
     const { data: orderData } = await supabase
       .from('orders')
       .select('*')
@@ -106,21 +107,24 @@ export default function OwnerPage() {
 
     setLoading(false);
 
-    // Prompt existing users to set a PIN if they don't have one (second visit)
     if (!p.pin) {
       setShowPinSetup(true);
     }
   };
 
-  // Gate: check for profile before allowing an action
-  const requireProfile = (action: PendingAction): boolean => {
-    if (profile) return true;
-    setPendingAction(action);
+  /**
+   * Ensures a profile exists. If it does, calls the callback immediately.
+   * If not, shows the name prompt and calls the callback after creation.
+   */
+  const ensureProfile = (callback: (p: Profile) => void) => {
+    if (profile) {
+      callback(profile);
+      return;
+    }
+    pendingCallback.current = callback;
     setShowNamePrompt(true);
-    return false;
   };
 
-  // Create profile from name prompt
   const createProfileFromName = async () => {
     if (!nameInput.trim() || creating) return;
     setCreating(true);
@@ -147,23 +151,49 @@ export default function OwnerPage() {
       setShowNamePrompt(false);
       setNameInput('');
 
-      // Resume the pending action
-      if (pendingAction === 'upload-photo') {
-        // PhotoGrid will now have a valid profileId, trigger file input
-        // We set a flag so PhotoGrid auto-opens the file picker
-        setTriggerPhotoUpload(true);
-      } else if (pendingAction === 'edit-measurements') {
-        setView('edit-measurements');
-      } else if (pendingAction === 'new-order') {
-        setView('new-order');
+      // Run the pending callback
+      if (pendingCallback.current) {
+        pendingCallback.current(p);
+        pendingCallback.current = null;
       }
-      setPendingAction(null);
     }
     setCreating(false);
   };
 
-  // Auto-trigger photo upload after profile creation
-  const [triggerPhotoUpload, setTriggerPhotoUpload] = useState(false);
+  // Guest photo flow: user selects files, then we ask for name, then upload
+  const handleGuestFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const fileList = Array.from(files);
+    setPendingFiles(fileList);
+    if (guestFileRef.current) guestFileRef.current.value = '';
+
+    // Now ask for name, and upload after profile creation
+    ensureProfile(async (p) => {
+      // Upload the files that were selected
+      const { uploadImage } = await import('@/lib/upload');
+      const newPhotos: ProfilePhoto[] = [];
+      for (const file of fileList) {
+        const url = await uploadImage(file, `profiles/${p.id}`);
+        if (url) {
+          const { data } = await supabase
+            .from('profile_photos')
+            .insert({
+              profile_id: p.id,
+              url,
+              sort_order: photos.length + newPhotos.length,
+            })
+            .select()
+            .single();
+          if (data) newPhotos.push(data);
+        }
+      }
+      if (newPhotos.length > 0) {
+        setPhotos((prev) => [...prev, ...newPhotos]);
+      }
+      setPendingFiles([]);
+    });
+  };
 
   const handleRecovery = async () => {
     if (!recoverySlug.trim() || !recoveryPin.trim() || recovering) return;
@@ -214,7 +244,7 @@ export default function OwnerPage() {
     if (!profile || !pinSetupInput.trim() || savingPin) return;
     if (pinSetupInput.length < 4 || pinSetupInput.length > 6) return;
     setSavingPin(true);
-    await supabase.from('profiles').update({ pin: pinSetupInput }).eq('id', profile.id);
+    await supabase.from('profiles').update({ pin: pinSetupInput }).eq('id', profile!.id);
     setProfile({ ...profile, pin: pinSetupInput });
     setShowPinSetup(false);
     setSavingPin(false);
@@ -224,14 +254,14 @@ export default function OwnerPage() {
     const newTheme: Theme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     if (profile) {
-      await supabase.from('profiles').update({ theme: newTheme }).eq('id', profile.id);
+      await supabase.from('profiles').update({ theme: newTheme }).eq('id', profile!.id);
       setProfile({ ...profile, theme: newTheme });
     }
   };
 
   const handleShareProfile = () => {
     if (!profile) return;
-    if (!profile.phone) {
+    if (!profile!.phone) {
       setShowPhonePrompt(true);
       return;
     }
@@ -246,7 +276,7 @@ export default function OwnerPage() {
 
   const handlePhoneSubmit = async (phone: string) => {
     if (!profile) return;
-    await supabase.from('profiles').update({ phone }).eq('id', profile.id);
+    await supabase.from('profiles').update({ phone }).eq('id', profile!.id);
     setProfile({ ...profile, phone });
     setShowPhonePrompt(false);
     doShare();
@@ -300,33 +330,13 @@ export default function OwnerPage() {
         measurement_notes: notes,
         measurements_updated_at: new Date().toISOString(),
       })
-      .eq('id', profile.id)
+      .eq('id', profile!.id)
       .select()
       .single();
     if (data) {
       setProfile(data as Profile);
     }
     setView('home');
-  };
-
-  // Gated action handlers
-  const handleNewOrder = () => {
-    if (requireProfile('new-order')) {
-      setView('new-order');
-    }
-  };
-
-  const handleEditMeasurements = () => {
-    if (requireProfile('edit-measurements')) {
-      setView('edit-measurements');
-    }
-  };
-
-  const handlePhotoUpload = () => {
-    if (requireProfile('upload-photo')) {
-      // If profile exists, PhotoGrid handles it directly
-      setTriggerPhotoUpload(true);
-    }
   };
 
   // -------------------------------------------------------
@@ -341,7 +351,7 @@ export default function OwnerPage() {
     );
   }
 
-  // Recovery flow (standalone screen)
+  // Recovery flow
   if (showRecovery) {
     return (
       <div className="onboarding">
@@ -395,8 +405,8 @@ export default function OwnerPage() {
     );
   }
 
-  // New Order Flow (requires profile)
-  if (view === 'new-order' && profile) {
+  // New Order Flow
+  if (view === 'new-order') {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <NewOrderFlow
@@ -405,12 +415,13 @@ export default function OwnerPage() {
           onClose={() => setView('home')}
           onOrderCreated={handleOrderCreated}
           onProfileUpdate={handleProfileUpdate}
+          ensureProfile={ensureProfile}
         />
       </div>
     );
   }
 
-  // Order Detail (requires profile)
+  // Order Detail
   if (view === 'order-detail' && selectedOrder && profile) {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
@@ -430,8 +441,8 @@ export default function OwnerPage() {
     );
   }
 
-  // Edit Measurements (requires profile)
-  if (view === 'edit-measurements' && profile) {
+  // Edit Measurements
+  if (view === 'edit-measurements') {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <div className="flex items-center gap-12 mb-24">
@@ -443,7 +454,9 @@ export default function OwnerPage() {
         <h2 className="mb-24">Measurements</h2>
         <MeasurementsEditorWrapper
           profile={profile}
+          ensureProfile={ensureProfile}
           onSave={handleSaveMeasurements}
+          onProfileCreated={(p) => setProfile(p)}
         />
       </div>
     );
@@ -489,10 +502,10 @@ export default function OwnerPage() {
         ) : (
           <>
             <h1 style={{ fontSize: 24, marginBottom: 4 }}>
-              {profile.name}
+              {profile!.name}
             </h1>
             <p className="text-secondary" style={{ fontSize: 14 }}>
-              suruwe.vercel.app/{profile.slug}
+              suruwe.vercel.app/{profile!.slug}
             </p>
           </>
         )}
@@ -501,7 +514,7 @@ export default function OwnerPage() {
       {/* Hero CTA: New Order */}
       <button
         className="btn btn-primary btn-full"
-        onClick={handleNewOrder}
+        onClick={() => setView('new-order')}
         style={{
           fontSize: 17,
           padding: '18px 24px',
@@ -515,7 +528,7 @@ export default function OwnerPage() {
         New Order
       </button>
 
-      {/* Nudge card for new/incomplete profiles */}
+      {/* Nudge card */}
       {!profileReady && (
         <div
           style={{
@@ -547,20 +560,25 @@ export default function OwnerPage() {
         {profile ? (
           <PhotoGrid
             photos={photos}
-            profileId={profile.id}
+            profileId={profile!.id}
             onPhotosChange={setPhotos}
             editable
-            autoTriggerUpload={triggerPhotoUpload}
-            onAutoTriggerConsumed={() => setTriggerPhotoUpload(false)}
           />
         ) : (
-          <div className="photo-add-compact" onClick={handlePhotoUpload}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-            <span>Add photos</span>
-          </div>
+          <>
+            <input
+              ref={guestFileRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGuestFileSelect}
+              style={{ display: 'none' }}
+            />
+            <div className="photo-add-compact" onClick={() => guestFileRef.current?.click()}>
+              <CameraIcon size={24} />
+              <span>{pendingFiles.length > 0 ? 'Uploading...' : 'Add photos'}</span>
+            </div>
+          </>
         )}
       </div>
 
@@ -571,7 +589,7 @@ export default function OwnerPage() {
           {hasMeasurements && (
             <button
               className="btn btn-ghost btn-sm"
-              onClick={handleEditMeasurements}
+              onClick={() => setView('edit-measurements')}
               style={{ padding: '6px 12px', minHeight: 36 }}
             >
               <EditIcon size={14} />
@@ -582,11 +600,10 @@ export default function OwnerPage() {
         {hasMeasurements && profile ? (
           <>
             <MeasurementsPreview
-              measurements={profile.measurements}
-              gender={profile.gender}
-              unit={profile.measurement_unit}
+              measurements={profile!.measurements}
+              gender={profile!.gender}
+              unit={profile!.measurement_unit}
             />
-            {/* Share profile button */}
             <button
               className="btn btn-whatsapp btn-full btn-sm"
               onClick={handleShareProfile}
@@ -599,7 +616,7 @@ export default function OwnerPage() {
         ) : (
           <button
             className="btn btn-secondary btn-full"
-            onClick={handleEditMeasurements}
+            onClick={() => setView('edit-measurements')}
           >
             <RulerIcon size={18} />
             Add Measurements
@@ -630,9 +647,7 @@ export default function OwnerPage() {
                 <div className="order-tailor">{order.tailor_name}</div>
                 <div className="order-desc">{order.description}</div>
                 <div className="order-date">{formatDate(order.created_at)}</div>
-                <span
-                  className={`order-status ${order.status}`}
-                >
+                <span className={`order-status ${order.status}`}>
                   {order.status === 'sent'
                     ? 'Sent'
                     : order.status === 'completed'
@@ -647,7 +662,7 @@ export default function OwnerPage() {
         )}
       </div>
 
-      {/* "I already have a profile" link for guests */}
+      {/* Recovery link for guests */}
       {isGuest && (
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <button
@@ -663,7 +678,7 @@ export default function OwnerPage() {
       {/* Bottom padding */}
       <div style={{ height: 60 }} />
 
-      {/* PIN setup prompt for returning users without PIN */}
+      {/* PIN setup for returning users */}
       {showPinSetup && profile && (
         <div className="modal-overlay">
           <div className="modal">
@@ -698,7 +713,7 @@ export default function OwnerPage() {
 
       {/* Name prompt modal */}
       {showNamePrompt && (
-        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); }}>
+        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); pendingCallback.current = null; }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: 8 }}>What's your name?</h3>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
@@ -765,24 +780,33 @@ export default function OwnerPage() {
   );
 }
 
-// Wrapper component for standalone measurements editing
+// Wrapper for standalone measurements editing
+// Gate is on Save: user fills in everything freely, name prompt on submit
 function MeasurementsEditorWrapper({
   profile,
+  ensureProfile,
   onSave,
+  onProfileCreated,
 }: {
-  profile: Profile;
+  profile: Profile | null;
+  ensureProfile: (callback: (p: Profile) => void) => void;
   onSave: (m: Record<string, number>, g: 'male' | 'female', u: 'inches' | 'cm', notes: string) => void;
+  onProfileCreated: (p: Profile) => void;
 }) {
-  const [measurements, setMeasurements] = useState(profile.measurements || {});
-  const [gender, setGender] = useState(profile.gender);
-  const [unit, setUnit] = useState(profile.measurement_unit);
-  const [measurementNotes, setMeasurementNotes] = useState(profile.measurement_notes || '');
+  const [measurements, setMeasurements] = useState(profile?.measurements || {});
+  const [gender, setGender] = useState(profile?.gender || 'male');
+  const [unit, setUnit] = useState(profile?.measurement_unit || 'inches');
+  const [measurementNotes, setMeasurementNotes] = useState(profile?.measurement_notes || '');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(measurements, gender, unit, measurementNotes);
-    setSaving(false);
+    ensureProfile(async (p) => {
+      // If profile was just created, parent needs to know
+      onProfileCreated(p);
+      await onSave(measurements, gender, unit, measurementNotes);
+      setSaving(false);
+    });
   };
 
   return (

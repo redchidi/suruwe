@@ -18,11 +18,12 @@ import {
 } from './Icons';
 
 interface NewOrderFlowProps {
-  profile: Profile;
+  profile: Profile | null;
   hasPhotos: boolean;
   onClose: () => void;
   onOrderCreated: (order: Order) => void;
   onProfileUpdate: (profile: Profile) => void;
+  ensureProfile: (callback: (p: Profile) => void) => void;
 }
 
 interface AttachmentLocal {
@@ -44,6 +45,7 @@ export default function NewOrderFlow({
   onClose,
   onOrderCreated,
   onProfileUpdate,
+  ensureProfile,
 }: NewOrderFlowProps) {
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState('');
@@ -64,28 +66,28 @@ export default function NewOrderFlow({
   const [showTailorSuggestions, setShowTailorSuggestions] = useState(false);
 
   // Local measurements state for step 3
-  const [localMeasurements, setLocalMeasurements] = useState(profile.measurements);
-  const [localGender, setLocalGender] = useState(profile.gender);
-  const [localUnit, setLocalUnit] = useState(profile.measurement_unit);
+  const [localMeasurements, setLocalMeasurements] = useState(profile?.measurements || {});
+  const [localGender, setLocalGender] = useState(profile?.gender || 'male');
+  const [localUnit, setLocalUnit] = useState(profile?.measurement_unit || 'inches');
 
   const totalSteps = 4;
-  const hasMeasurements = Object.keys(profile.measurements).length > 0;
+  const hasMeasurements = profile ? Object.keys(profile.measurements).length > 0 : false;
 
   // Check if measurements are stale (older than 30 days)
-  const measurementsStale = profile.measurements_updated_at
-    ? (Date.now() - new Date(profile.measurements_updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000
+  const measurementsStale = profile?.measurements_updated_at
+    ? (Date.now() - new Date(profile?.measurements_updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000
     : false;
 
   // Load tailor history on mount
   useEffect(() => {
-    loadTailorHistory();
-  }, []);
+    if (profile) loadTailorHistory();
+  }, [profile]);
 
   const loadTailorHistory = async () => {
     const { data } = await supabase
       .from('orders')
       .select('tailor_name, tailor_phone, tailor_city')
-      .eq('profile_id', profile.id)
+      .eq('profile_id', profile!.id)
       .order('created_at', { ascending: false });
 
     if (data) {
@@ -139,36 +141,38 @@ export default function NewOrderFlow({
 
   const saveMeasurements = async () => {
     setMeasurementsSaving(true);
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .update({
-          measurements: localMeasurements,
-          gender: localGender,
-          measurement_unit: localUnit,
-          measurements_updated_at: new Date().toISOString(),
-        })
-        .eq('id', profile.id)
-        .select()
-        .single();
+    ensureProfile(async (p) => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .update({
+            measurements: localMeasurements,
+            gender: localGender,
+            measurement_unit: localUnit,
+            measurements_updated_at: new Date().toISOString(),
+          })
+          .eq('id', p.id)
+          .select()
+          .single();
 
-      if (data) {
-        onProfileUpdate(data as Profile);
+        if (data) {
+          onProfileUpdate(data as Profile);
+        }
+      } finally {
+        setMeasurementsSaving(false);
+        setStep(4);
       }
-    } finally {
-      setMeasurementsSaving(false);
-      setStep(4);
-    }
+    });
   };
 
-  const createOrder = async () => {
+  const createOrder = async (p: Profile) => {
     setSaving(true);
 
     // Create order
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
-        profile_id: profile.id,
+        profile_id: p.id,
         tailor_name: tailorName || 'My Tailor',
         tailor_phone: tailorPhone || null,
         tailor_city: tailorCity,
@@ -203,30 +207,34 @@ export default function NewOrderFlow({
   };
 
   const handleSendOrder = async () => {
-    const order = await createOrder();
-    if (!order) return;
+    ensureProfile(async (p) => {
+      const order = await createOrder(p);
+      if (!order) return;
 
-    const updatedProfile = { ...profile, measurements: localMeasurements };
-    const message = generateOrderMessage(updatedProfile, order);
-    const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
-    openWhatsApp(message, phone);
+      const updatedProfile = { ...p, measurements: localMeasurements };
+      const message = generateOrderMessage(updatedProfile, order);
+      const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
+      openWhatsApp(message, phone);
 
-    setSentOrder(order);
-    setSent(true);
-    setSaving(false);
+      setSentOrder(order);
+      setSent(true);
+      setSaving(false);
+    });
   };
 
   const handleShareOrder = async () => {
-    const order = await createOrder();
-    if (!order) return;
+    ensureProfile(async (p) => {
+      const order = await createOrder(p);
+      if (!order) return;
 
-    const updatedProfile = { ...profile, measurements: localMeasurements };
-    const message = generateOrderShareMessage(updatedProfile, order);
-    openWhatsApp(message);
+      const updatedProfile = { ...p, measurements: localMeasurements };
+      const message = generateOrderShareMessage(updatedProfile, order);
+      openWhatsApp(message);
 
-    setSentOrder(order);
-    setSent(true);
-    setSaving(false);
+      setSentOrder(order);
+      setSent(true);
+      setSaving(false);
+    });
   };
 
   const handleShareSuruwe = () => {
@@ -448,9 +456,9 @@ export default function NewOrderFlow({
           {hasMeasurements && !measurementsStale ? (
             <div>
               <h2 className="mb-16">Your measurements</h2>
-              {profile.measurements_updated_at && (
+              {profile?.measurements_updated_at && (
                 <p className="text-secondary mb-24" style={{ fontSize: 14 }}>
-                  Last updated {formatRelativeDate(profile.measurements_updated_at)}.
+                  Last updated {formatRelativeDate(profile?.measurements_updated_at)}.
                 </p>
               )}
               <div className="flex flex-col gap-12">
@@ -470,8 +478,8 @@ export default function NewOrderFlow({
               <h2 className="mb-16">Check your measurements</h2>
               <div className="stale-banner mb-24">
                 Your measurements were last updated{' '}
-                {profile.measurements_updated_at
-                  ? formatRelativeDate(profile.measurements_updated_at)
+                {profile?.measurements_updated_at
+                  ? formatRelativeDate(profile?.measurements_updated_at)
                   : 'a while ago'}
                 . Want to update before sending?
               </div>
