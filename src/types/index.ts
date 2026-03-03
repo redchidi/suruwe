@@ -93,6 +93,10 @@ export const FEMALE_MEASUREMENTS: MeasurementField[] = [
   { key: 'sleeve', label: 'R. Sleeve Length', section: 'Arms' },
   { key: 'bicep', label: 'T. Bicep', section: 'Arms' },
   { key: 'wrist', label: 'U. Wrist', section: 'Arms' },
+  // Full body (common for dresses, gowns, iro & buba)
+  { key: 'across_front', label: 'AF. Across Front', section: 'Full Body' },
+  { key: 'shoulder_to_waist', label: 'AG. Shoulder to Waist', section: 'Full Body' },
+  { key: 'shoulder_to_floor', label: 'AH. Shoulder to Floor', section: 'Full Body' },
   // Lower body (Female Bottom Guide)
   { key: 'waist', label: 'W. Waist', section: 'Lower Body' },
   { key: 'high_hip', label: 'X. High Hip', section: 'Lower Body' },

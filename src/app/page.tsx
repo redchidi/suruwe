@@ -21,6 +21,9 @@ import {
   ArrowLeftIcon,
 } from '@/components/Icons';
 
+// Share Suruwe referral message
+const SHARE_SURUWE_MESSAGE = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:\n\nhttps://suruwe.vercel.app`;
+
 type View = 'onboarding' | 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
 
 const PROFILE_KEY = 'suruwe_profile_id';
@@ -243,6 +246,19 @@ export default function OwnerPage() {
   const handlePhoneSkip = () => {
     setShowPhonePrompt(false);
     doShare();
+  };
+
+  const shareSuruwe = () => {
+    // Use Web Share API if available (mobile), fall back to WhatsApp
+    if (navigator.share) {
+      navigator.share({
+        title: 'Suruwe',
+        text: 'You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:',
+        url: 'https://suruwe.vercel.app',
+      }).catch(() => {});
+    } else {
+      openWhatsApp(SHARE_SURUWE_MESSAGE);
+    }
   };
 
   const handleOrderCreated = (order: Order) => {
@@ -634,6 +650,30 @@ export default function OwnerPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Share Suruwe */}
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '24px 0 8px',
+        }}
+      >
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
+          What you ordered vs what you got. Never again.
+        </p>
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={shareSuruwe}
+          style={{
+            padding: '10px 24px',
+            gap: 8,
+            borderRadius: 24,
+          }}
+        >
+          <span style={{ fontSize: 16 }}>&#x2764;&#xFE0F;</span>
+          Share Suruwe
+        </button>
       </div>
 
       {/* Bottom padding */}
