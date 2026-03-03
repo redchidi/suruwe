@@ -479,6 +479,7 @@ export default function OwnerPage() {
   // Home
   const hasMeasurements = profile.measurements && Object.keys(profile.measurements).length > 0;
   const hasPhotos = photos.length > 0;
+  const profileReady = hasMeasurements && hasPhotos;
 
   return (
     <div className="app-shell">
@@ -496,7 +497,7 @@ export default function OwnerPage() {
           {profile.name}
         </h1>
         <p className="text-secondary" style={{ fontSize: 14 }}>
-          suruwe.com/{profile.slug}
+          suruwe.vercel.app/{profile.slug}
         </p>
       </div>
 
@@ -507,7 +508,7 @@ export default function OwnerPage() {
         style={{
           fontSize: 17,
           padding: '18px 24px',
-          marginBottom: 12,
+          marginBottom: 36,
           fontFamily: 'var(--font-display)',
           fontWeight: 500,
           letterSpacing: '-0.01em',
@@ -517,18 +518,26 @@ export default function OwnerPage() {
         New Order
       </button>
 
-      {/* Share profile CTA - only show when there's content to share */}
-      {(hasPhotos || hasMeasurements || orders.length > 0) ? (
-        <button
-          className="btn btn-whatsapp btn-full btn-sm"
-          onClick={handleShareProfile}
-          style={{ marginBottom: 36 }}
+      {/* Nudge card for new users */}
+      {!profileReady && (
+        <div
+          style={{
+            padding: '16px 18px',
+            borderRadius: 10,
+            border: '1px solid var(--border)',
+            background: 'var(--card-bg)',
+            marginBottom: 28,
+            lineHeight: 1.6,
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+          }}
         >
-          <WhatsAppIcon size={18} />
-          Send to My Tailor
-        </button>
-      ) : (
-        <div style={{ marginBottom: 36 }} />
+          {!hasPhotos && !hasMeasurements
+            ? 'Add your photos and measurements below so your tailor has everything they need when you place an order.'
+            : !hasPhotos
+            ? 'Looking good! Add a photo so your tailor can see your build.'
+            : 'Almost there! Add your measurements to complete your profile.'}
+        </div>
       )}
 
       {/* Photos Section */}
@@ -560,11 +569,22 @@ export default function OwnerPage() {
           )}
         </div>
         {hasMeasurements ? (
-          <MeasurementsPreview
-            measurements={profile.measurements}
-            gender={profile.gender}
-            unit={profile.measurement_unit}
-          />
+          <>
+            <MeasurementsPreview
+              measurements={profile.measurements}
+              gender={profile.gender}
+              unit={profile.measurement_unit}
+            />
+            {/* Share profile button lives here now */}
+            <button
+              className="btn btn-whatsapp btn-full btn-sm"
+              onClick={handleShareProfile}
+              style={{ marginTop: 16 }}
+            >
+              <WhatsAppIcon size={16} />
+              Share My Profile
+            </button>
+          </>
         ) : (
           <button
             className="btn btn-secondary btn-full"
@@ -583,7 +603,7 @@ export default function OwnerPage() {
         </div>
         {orders.length === 0 ? (
           <div className="empty-state">
-            <p>No orders yet. Start by placing your first order above.</p>
+            <p>No orders yet. Tap New Order to get something made.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-8">
