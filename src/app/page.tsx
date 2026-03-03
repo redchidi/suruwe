@@ -37,6 +37,7 @@ export default function OwnerPage() {
   const [theme, setTheme] = useState<Theme>('dark');
   const [loading, setLoading] = useState(true);
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
 
   // Onboarding state
   const [nameInput, setNameInput] = useState('');
@@ -249,16 +250,21 @@ export default function OwnerPage() {
   };
 
   const shareSuruwe = () => {
-    // Use Web Share API if available (mobile), fall back to WhatsApp
+    setShowShareSheet(true);
+  };
+
+  const confirmShareSuruwe = () => {
+    const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
     if (navigator.share) {
       navigator.share({
         title: 'Suruwe',
-        text: 'You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:',
+        text,
         url: 'https://suruwe.vercel.app',
       }).catch(() => {});
     } else {
-      openWhatsApp(SHARE_SURUWE_MESSAGE);
+      openWhatsApp(`${text}\n\nhttps://suruwe.vercel.app`);
     }
+    setShowShareSheet(false);
   };
 
   const handleOrderCreated = (order: Order) => {
@@ -703,6 +709,38 @@ export default function OwnerPage() {
       {/* Phone prompt modal */}
       {showPhonePrompt && (
         <PhonePrompt onSubmit={handlePhoneSubmit} onSkip={handlePhoneSkip} />
+      )}
+
+      {/* Share Suruwe sheet */}
+      {showShareSheet && (
+        <div className="modal-overlay" onClick={() => setShowShareSheet(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 6, fontSize: 18 }}>
+              What you ordered vs what you got.
+            </h3>
+            <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--accent)', marginBottom: 20 }}>
+              Never again.
+            </p>
+
+            <div className="wa-preview" style={{ marginBottom: 24 }}>
+              You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
+            </div>
+
+            <button
+              className="btn btn-primary btn-full"
+              onClick={confirmShareSuruwe}
+              style={{ marginBottom: 8 }}
+            >
+              Share Suruwe
+            </button>
+            <button
+              className="btn btn-ghost btn-full btn-sm"
+              onClick={() => setShowShareSheet(false)}
+            >
+              Not now
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

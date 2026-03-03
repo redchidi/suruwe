@@ -56,6 +56,7 @@ export default function NewOrderFlow({
   const [measurementsSaving, setMeasurementsSaving] = useState(false);
   const [sent, setSent] = useState(false);
   const [sentOrder, setSentOrder] = useState<Order | null>(null);
+  const [showSharePreview, setShowSharePreview] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Tailor history
@@ -229,6 +230,10 @@ export default function NewOrderFlow({
   };
 
   const handleShareSuruwe = () => {
+    setShowSharePreview(true);
+  };
+
+  const confirmShareSuruwe = () => {
     const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
     if (navigator.share) {
       navigator.share({
@@ -239,6 +244,7 @@ export default function NewOrderFlow({
     } else {
       openWhatsApp(`${text}\n\nhttps://suruwe.vercel.app`);
     }
+    setShowSharePreview(false);
   };
 
   const canProceedStep1 = description.trim();
@@ -607,35 +613,58 @@ export default function NewOrderFlow({
             {tailorName.trim() ? ` to ${tailorName}` : ''} via WhatsApp.
           </p>
 
-          <div
-            style={{
-              padding: '20px',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border)',
-              background: 'var(--bg-raised)',
-              marginBottom: 32,
-            }}
-          >
-            <p style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.5, marginBottom: 16 }}>
-              Know someone who struggles with getting clothes made the way they want?
-            </p>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={handleShareSuruwe}
+          {!showSharePreview ? (
+            <div
               style={{
-                padding: '10px 24px',
-                gap: 8,
-                borderRadius: 24,
+                padding: '20px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-raised)',
+                marginBottom: 32,
               }}
             >
-              <span style={{ fontSize: 16 }}>&#x2764;&#xFE0F;</span>
-              Share Suruwe
-            </button>
-          </div>
+              <p style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.5, marginBottom: 16 }}>
+                Know someone who struggles with getting clothes made the way they want?
+              </p>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={handleShareSuruwe}
+                style={{
+                  padding: '10px 24px',
+                  gap: 8,
+                  borderRadius: 24,
+                }}
+              >
+                <span style={{ fontSize: 16 }}>&#x2764;&#xFE0F;</span>
+                Share Suruwe
+              </button>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'left', marginBottom: 32 }}>
+              <h3 style={{ marginBottom: 6, fontSize: 18 }}>
+                What you ordered vs what you got.
+              </h3>
+              <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--accent)', marginBottom: 20 }}>
+                Never again.
+              </p>
+
+              <div className="wa-preview" style={{ marginBottom: 20 }}>
+                You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
+              </div>
+
+              <button
+                className="btn btn-primary btn-full"
+                onClick={confirmShareSuruwe}
+              >
+                Share Suruwe
+              </button>
+            </div>
+          )}
 
           <button
             className="btn btn-primary btn-full"
             onClick={() => onOrderCreated(sentOrder)}
+            style={showSharePreview ? { background: 'transparent', color: 'var(--text-secondary)', border: 'none' } : {}}
           >
             Done
           </button>
