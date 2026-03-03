@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { applyTheme, Theme } from '@/lib/theme';
 import ThemeToggle from '@/components/ThemeToggle';
 import { XIcon } from '@/components/Icons';
+import { MeasurementGuides } from '@/components/MeasurementGuides';
 
 export default function ProfileViewClient({ params }: { params: { profileId: string } }) {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -14,6 +15,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [showGuides, setShowGuides] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -169,6 +171,34 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
+        {/* Measurement Guides toggle */}
+        {hasMeasurements && (
+          <div className="tailor-section">
+            <button
+              onClick={() => setShowGuides(!showGuides)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                fontSize: 14,
+                color: 'var(--accent)',
+                background: 'none',
+                border: '1px solid var(--accent)',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                opacity: 0.85,
+              }}
+            >
+              {showGuides ? 'Hide measurement guides' : 'Show measurement guides'}
+            </button>
+            {showGuides && (
+              <div style={{ marginTop: 16 }}>
+                <MeasurementGuides gender={profile.gender} />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Full Measurements */}
         {hasMeasurements && (
           <div>
@@ -199,6 +229,16 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
+        {/* Measurement Notes */}
+        {profile.measurement_notes && profile.measurement_notes.trim() && (
+          <div className="tailor-section">
+            <div className="tailor-section-title">Measurement Notes</div>
+            <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
+              {profile.measurement_notes}
+            </div>
+          </div>
+        )}
+
         {/* Style Notes */}
         {profile.style_notes && (
           <div className="tailor-section">
@@ -212,8 +252,13 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
 
       {/* Footer */}
       <div className="tailor-footer">
-        <div className="logo">Suruwe</div>
-        <p>Create your own measurement profile at suruwe.com</p>
+        <div className="logo">
+          <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
+        </div>
+        <p>
+          Create your own measurement profile at{' '}
+          <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.vercel.app</a>
+        </p>
       </div>
 
       {/* Lightbox */}

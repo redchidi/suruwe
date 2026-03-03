@@ -323,8 +323,13 @@ export default function OrderViewClient({
 
       {/* Footer */}
       <div className="tailor-footer">
-        <div className="logo">Suruwe</div>
-        <p>Create your own measurement profile at suruwe.com</p>
+        <div className="logo">
+          <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
+        </div>
+        <p>
+          Create your own measurement profile at{' '}
+          <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.vercel.app</a>
+        </p>
       </div>
 
       {/* Lightbox */}
