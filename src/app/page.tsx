@@ -21,15 +21,13 @@ import {
   ArrowLeftIcon,
 } from '@/components/Icons';
 
-// Share Suruwe referral message
-const SHARE_SURUWE_MESSAGE = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:\n\nhttps://suruwe.vercel.app`;
-
-type View = 'onboarding' | 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
+type View = 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
+type PendingAction = 'upload-photo' | 'edit-measurements' | 'new-order' | null;
 
 const PROFILE_KEY = 'suruwe_profile_id';
 
 export default function OwnerPage() {
-  const [view, setView] = useState<View>('onboarding');
+  const [view, setView] = useState<View>('home');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -39,11 +37,11 @@ export default function OwnerPage() {
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
 
-  // Onboarding state
+  // Name prompt (replaces onboarding)
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [creating, setCreating] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState<'name' | 'pin'>('name');
-  const [pinInput, setPinInput] = useState('');
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
   // Recovery state
   const [showRecovery, setShowRecovery] = useState(false);
@@ -52,7 +50,7 @@ export default function OwnerPage() {
   const [recoveryError, setRecoveryError] = useState('');
   const [recovering, setRecovering] = useState(false);
 
-  // PIN prompt for existing users
+  // PIN prompt for existing users (second visit)
   const [showPinSetup, setShowPinSetup] = useState(false);
   const [pinSetupInput, setPinSetupInput] = useState('');
   const [savingPin, setSavingPin] = useState(false);
@@ -70,8 +68,8 @@ export default function OwnerPage() {
   const loadProfile = async () => {
     const profileId = localStorage.getItem(PROFILE_KEY);
     if (!profileId) {
+      // No profile yet, show home as guest
       setLoading(false);
-      setView('onboarding');
       return;
     }
 
@@ -84,7 +82,6 @@ export default function OwnerPage() {
     if (!profileData) {
       localStorage.removeItem(PROFILE_KEY);
       setLoading(false);
-      setView('onboarding');
       return;
     }
 
@@ -107,23 +104,25 @@ export default function OwnerPage() {
       .order('created_at', { ascending: false });
     if (orderData) setOrders(orderData);
 
-    setView('home');
     setLoading(false);
 
-    // Prompt existing users to set a PIN if they don't have one
+    // Prompt existing users to set a PIN if they don't have one (second visit)
     if (!p.pin) {
       setShowPinSetup(true);
     }
   };
 
-  const handleNameSubmit = () => {
-    if (!nameInput.trim()) return;
-    setOnboardingStep('pin');
+  // Gate: check for profile before allowing an action
+  const requireProfile = (action: PendingAction): boolean => {
+    if (profile) return true;
+    setPendingAction(action);
+    setShowNamePrompt(true);
+    return false;
   };
 
-  const createProfile = async () => {
-    if (!nameInput.trim() || !pinInput.trim() || creating) return;
-    if (pinInput.length < 4 || pinInput.length > 6) return;
+  // Create profile from name prompt
+  const createProfileFromName = async () => {
+    if (!nameInput.trim() || creating) return;
     setCreating(true);
 
     const slug = generateSlug(nameInput.trim());
@@ -132,9 +131,8 @@ export default function OwnerPage() {
       .insert({
         slug,
         name: nameInput.trim(),
-        pin: pinInput,
         gender: 'male',
-        theme: 'dark',
+        theme: theme,
         measurements: {},
         measurement_unit: 'inches',
         style_notes: '',
@@ -146,20 +144,33 @@ export default function OwnerPage() {
       const p = data as Profile;
       localStorage.setItem(PROFILE_KEY, p.id);
       setProfile(p);
-      setTheme(p.theme as Theme);
-      setView('home');
+      setShowNamePrompt(false);
+      setNameInput('');
+
+      // Resume the pending action
+      if (pendingAction === 'upload-photo') {
+        // PhotoGrid will now have a valid profileId, trigger file input
+        // We set a flag so PhotoGrid auto-opens the file picker
+        setTriggerPhotoUpload(true);
+      } else if (pendingAction === 'edit-measurements') {
+        setView('edit-measurements');
+      } else if (pendingAction === 'new-order') {
+        setView('new-order');
+      }
+      setPendingAction(null);
     }
     setCreating(false);
   };
+
+  // Auto-trigger photo upload after profile creation
+  const [triggerPhotoUpload, setTriggerPhotoUpload] = useState(false);
 
   const handleRecovery = async () => {
     if (!recoverySlug.trim() || !recoveryPin.trim() || recovering) return;
     setRecovering(true);
     setRecoveryError('');
 
-    // Extract slug from URL or use as-is
     let slug = recoverySlug.trim();
-    // Handle full URLs like suruwe.vercel.app/chidi-ozzc or suruwe.com/chidi-ozzc
     if (slug.includes('/')) {
       const parts = slug.split('/');
       slug = parts[parts.length - 1];
@@ -178,7 +189,6 @@ export default function OwnerPage() {
       setProfile(p);
       setTheme(p.theme as Theme);
 
-      // Load photos
       const { data: photoData } = await supabase
         .from('profile_photos')
         .select('*')
@@ -186,7 +196,6 @@ export default function OwnerPage() {
         .order('sort_order', { ascending: true });
       if (photoData) setPhotos(photoData);
 
-      // Load orders
       const { data: orderData } = await supabase
         .from('orders')
         .select('*')
@@ -194,7 +203,7 @@ export default function OwnerPage() {
         .order('created_at', { ascending: false });
       if (orderData) setOrders(orderData);
 
-      setView('home');
+      setShowRecovery(false);
     } else {
       setRecoveryError('No profile found with that link and PIN. Please check and try again.');
     }
@@ -222,7 +231,6 @@ export default function OwnerPage() {
 
   const handleShareProfile = () => {
     if (!profile) return;
-    // Prompt for phone number on first share
     if (!profile.phone) {
       setShowPhonePrompt(true);
       return;
@@ -301,6 +309,26 @@ export default function OwnerPage() {
     setView('home');
   };
 
+  // Gated action handlers
+  const handleNewOrder = () => {
+    if (requireProfile('new-order')) {
+      setView('new-order');
+    }
+  };
+
+  const handleEditMeasurements = () => {
+    if (requireProfile('edit-measurements')) {
+      setView('edit-measurements');
+    }
+  };
+
+  const handlePhotoUpload = () => {
+    if (requireProfile('upload-photo')) {
+      // If profile exists, PhotoGrid handles it directly
+      setTriggerPhotoUpload(true);
+    }
+  };
+
   // -------------------------------------------------------
   // Render
   // -------------------------------------------------------
@@ -313,139 +341,62 @@ export default function OwnerPage() {
     );
   }
 
-  // Onboarding
-  if (view === 'onboarding') {
-    // Recovery flow
-    if (showRecovery) {
-      return (
-        <div className="onboarding">
-          <div className="onboarding-logo">Suruwe</div>
-          <div className="onboarding-tagline">
-            Enter your profile link and PIN to access your profile on this device.
-          </div>
-          <input
-            className="onboarding-input"
-            type="text"
-            placeholder="Your profile link or slug (e.g. chidi-ozzc)"
-            value={recoverySlug}
-            onChange={(e) => setRecoverySlug(e.target.value)}
-            autoFocus
-          />
-          <input
-            className="onboarding-input"
-            type="number"
-            inputMode="numeric"
-            placeholder="Your PIN"
-            value={recoveryPin}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
-              setRecoveryPin(val);
-            }}
-            style={{ marginTop: 12 }}
-          />
-          {recoveryError && (
-            <p style={{ color: '#e74c3c', fontSize: 14, marginTop: 8, textAlign: 'center' }}>
-              {recoveryError}
-            </p>
-          )}
-          <button
-            className="btn btn-primary onboarding-btn"
-            onClick={handleRecovery}
-            disabled={!recoverySlug.trim() || recoveryPin.length < 4 || recovering}
-          >
-            {recovering ? 'Looking up...' : 'Access My Profile'}
-          </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() => {
-              setShowRecovery(false);
-              setRecoveryError('');
-            }}
-            style={{ marginTop: 12, fontSize: 14 }}
-          >
-            Back
-          </button>
-        </div>
-      );
-    }
-
-    // Step 2: Set PIN
-    if (onboardingStep === 'pin') {
-      return (
-        <div className="onboarding">
-          <div className="onboarding-logo">Suruwe</div>
-          <div className="onboarding-tagline">
-            Choose a 4 to 6 digit PIN. You will need this to access your profile on other devices.
-          </div>
-          <input
-            className="onboarding-input"
-            type="number"
-            inputMode="numeric"
-            placeholder="Enter a PIN (4-6 digits)"
-            value={pinInput}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
-              setPinInput(val);
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && createProfile()}
-            autoFocus
-          />
-          <button
-            className="btn btn-primary onboarding-btn"
-            onClick={createProfile}
-            disabled={pinInput.length < 4 || creating}
-          >
-            {creating ? 'Setting up...' : 'Create Profile'}
-          </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() => setOnboardingStep('name')}
-            style={{ marginTop: 12, fontSize: 14 }}
-          >
-            Back
-          </button>
-        </div>
-      );
-    }
-
-    // Step 1: Enter name
+  // Recovery flow (standalone screen)
+  if (showRecovery) {
     return (
       <div className="onboarding">
         <div className="onboarding-logo">Suruwe</div>
         <div className="onboarding-tagline">
-          Your measurements, your photos, one link for your tailor.
+          Enter your profile link and PIN to access your profile on this device.
         </div>
         <input
           className="onboarding-input"
           type="text"
-          placeholder="Your name"
-          value={nameInput}
-          onChange={(e) => setNameInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
+          placeholder="Your profile link or slug (e.g. chidi-ozzc)"
+          value={recoverySlug}
+          onChange={(e) => setRecoverySlug(e.target.value)}
           autoFocus
         />
+        <input
+          className="onboarding-input"
+          type="number"
+          inputMode="numeric"
+          placeholder="Your PIN"
+          value={recoveryPin}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+            setRecoveryPin(val);
+          }}
+          style={{ marginTop: 12 }}
+        />
+        {recoveryError && (
+          <p style={{ color: '#e74c3c', fontSize: 14, marginTop: 8, textAlign: 'center' }}>
+            {recoveryError}
+          </p>
+        )}
         <button
           className="btn btn-primary onboarding-btn"
-          onClick={handleNameSubmit}
-          disabled={!nameInput.trim()}
+          onClick={handleRecovery}
+          disabled={!recoverySlug.trim() || recoveryPin.length < 4 || recovering}
         >
-          Get Started
+          {recovering ? 'Looking up...' : 'Access My Profile'}
         </button>
         <button
           className="btn btn-ghost"
-          onClick={() => setShowRecovery(true)}
-          style={{ marginTop: 16, fontSize: 14 }}
+          onClick={() => {
+            setShowRecovery(false);
+            setRecoveryError('');
+          }}
+          style={{ marginTop: 12, fontSize: 14 }}
         >
-          I already have a profile
+          Back
         </button>
       </div>
     );
   }
 
-  if (!profile) return null;
-
-  // New Order Flow
-  if (view === 'new-order') {
+  // New Order Flow (requires profile)
+  if (view === 'new-order' && profile) {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <NewOrderFlow
@@ -459,8 +410,8 @@ export default function OwnerPage() {
     );
   }
 
-  // Order Detail
-  if (view === 'order-detail' && selectedOrder) {
+  // Order Detail (requires profile)
+  if (view === 'order-detail' && selectedOrder && profile) {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <OrderDetail
@@ -479,8 +430,8 @@ export default function OwnerPage() {
     );
   }
 
-  // Edit Measurements
-  if (view === 'edit-measurements') {
+  // Edit Measurements (requires profile)
+  if (view === 'edit-measurements' && profile) {
     return (
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <div className="flex items-center gap-12 mb-24">
@@ -499,9 +450,10 @@ export default function OwnerPage() {
   }
 
   // Home
-  const hasMeasurements = profile.measurements && Object.keys(profile.measurements).length > 0;
+  const hasMeasurements = profile?.measurements && Object.keys(profile.measurements).length > 0;
   const hasPhotos = photos.length > 0;
   const profileReady = hasMeasurements && hasPhotos;
+  const isGuest = !profile;
 
   return (
     <div className="app-shell">
@@ -527,18 +479,29 @@ export default function OwnerPage() {
 
       {/* Greeting */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, marginBottom: 4 }}>
-          {profile.name}
-        </h1>
-        <p className="text-secondary" style={{ fontSize: 14 }}>
-          suruwe.vercel.app/{profile.slug}
-        </p>
+        {isGuest ? (
+          <>
+            <h1 style={{ fontSize: 24, marginBottom: 8 }}>Suruwe</h1>
+            <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5 }}>
+              Your measurements, photos, and fit notes. One link for your tailor.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 style={{ fontSize: 24, marginBottom: 4 }}>
+              {profile.name}
+            </h1>
+            <p className="text-secondary" style={{ fontSize: 14 }}>
+              suruwe.vercel.app/{profile.slug}
+            </p>
+          </>
+        )}
       </div>
 
       {/* Hero CTA: New Order */}
       <button
         className="btn btn-primary btn-full"
-        onClick={() => setView('new-order')}
+        onClick={handleNewOrder}
         style={{
           fontSize: 17,
           padding: '18px 24px',
@@ -552,7 +515,7 @@ export default function OwnerPage() {
         New Order
       </button>
 
-      {/* Nudge card for new users */}
+      {/* Nudge card for new/incomplete profiles */}
       {!profileReady && (
         <div
           style={{
@@ -566,7 +529,9 @@ export default function OwnerPage() {
             color: 'var(--text-secondary)',
           }}
         >
-          {!hasPhotos && !hasMeasurements
+          {isGuest
+            ? 'Add your photos and measurements below. When you save, we will create your profile.'
+            : !hasPhotos && !hasMeasurements
             ? 'Add your photos and measurements below so your tailor has everything they need when you place an order.'
             : !hasPhotos
             ? 'Looking good! Add a photo so your tailor can see your build.'
@@ -579,12 +544,24 @@ export default function OwnerPage() {
         <div className="section-header">
           <div className="section-title">Photos</div>
         </div>
-        <PhotoGrid
-          photos={photos}
-          profileId={profile.id}
-          onPhotosChange={setPhotos}
-          editable
-        />
+        {profile ? (
+          <PhotoGrid
+            photos={photos}
+            profileId={profile.id}
+            onPhotosChange={setPhotos}
+            editable
+            autoTriggerUpload={triggerPhotoUpload}
+            onAutoTriggerConsumed={() => setTriggerPhotoUpload(false)}
+          />
+        ) : (
+          <div className="photo-add-compact" onClick={handlePhotoUpload}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span>Add photos</span>
+          </div>
+        )}
       </div>
 
       {/* Measurements Section */}
@@ -594,7 +571,7 @@ export default function OwnerPage() {
           {hasMeasurements && (
             <button
               className="btn btn-ghost btn-sm"
-              onClick={() => setView('edit-measurements')}
+              onClick={handleEditMeasurements}
               style={{ padding: '6px 12px', minHeight: 36 }}
             >
               <EditIcon size={14} />
@@ -602,14 +579,14 @@ export default function OwnerPage() {
             </button>
           )}
         </div>
-        {hasMeasurements ? (
+        {hasMeasurements && profile ? (
           <>
             <MeasurementsPreview
               measurements={profile.measurements}
               gender={profile.gender}
               unit={profile.measurement_unit}
             />
-            {/* Share profile button lives here now */}
+            {/* Share profile button */}
             <button
               className="btn btn-whatsapp btn-full btn-sm"
               onClick={handleShareProfile}
@@ -622,7 +599,7 @@ export default function OwnerPage() {
         ) : (
           <button
             className="btn btn-secondary btn-full"
-            onClick={() => setView('edit-measurements')}
+            onClick={handleEditMeasurements}
           >
             <RulerIcon size={18} />
             Add Measurements
@@ -670,13 +647,26 @@ export default function OwnerPage() {
         )}
       </div>
 
+      {/* "I already have a profile" link for guests */}
+      {isGuest && (
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <button
+            className="btn btn-ghost"
+            onClick={() => setShowRecovery(true)}
+            style={{ fontSize: 14 }}
+          >
+            I already have a profile
+          </button>
+        </div>
+      )}
+
       {/* Bottom padding */}
       <div style={{ height: 60 }} />
 
-      {/* PIN setup prompt for existing users */}
-      {showPinSetup && (
+      {/* PIN setup prompt for returning users without PIN */}
+      {showPinSetup && profile && (
         <div className="modal-overlay">
-          <div className="modal-sheet">
+          <div className="modal">
             <h3 style={{ marginBottom: 8 }}>Secure your profile</h3>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
               Set a 4 to 6 digit PIN so you can access your profile on other devices.
@@ -701,6 +691,35 @@ export default function OwnerPage() {
               style={{ marginTop: 16 }}
             >
               {savingPin ? 'Saving...' : 'Save PIN'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Name prompt modal */}
+      {showNamePrompt && (
+        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 8 }}>What's your name?</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
+              We will create your profile so your work is saved.
+            </p>
+            <input
+              className="input"
+              type="text"
+              placeholder="Your name"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
+              autoFocus
+            />
+            <button
+              className="btn btn-primary btn-full"
+              onClick={createProfileFromName}
+              disabled={!nameInput.trim() || creating}
+              style={{ marginTop: 16 }}
+            >
+              {creating ? 'Creating...' : 'Continue'}
             </button>
           </div>
         </div>

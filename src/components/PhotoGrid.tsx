@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { CameraIcon, XIcon } from './Icons';
 import { ProfilePhoto } from '@/types';
 import { uploadImage } from '@/lib/upload';
@@ -11,12 +11,29 @@ interface PhotoGridProps {
   profileId: string;
   onPhotosChange: (photos: ProfilePhoto[]) => void;
   editable?: boolean;
+  autoTriggerUpload?: boolean;
+  onAutoTriggerConsumed?: () => void;
 }
 
-export default function PhotoGrid({ photos, profileId, onPhotosChange, editable = true }: PhotoGridProps) {
+export default function PhotoGrid({
+  photos,
+  profileId,
+  onPhotosChange,
+  editable = true,
+  autoTriggerUpload = false,
+  onAutoTriggerConsumed,
+}: PhotoGridProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Auto-trigger file picker when profile was just created
+  useEffect(() => {
+    if (autoTriggerUpload && fileRef.current) {
+      fileRef.current.click();
+      onAutoTriggerConsumed?.();
+    }
+  }, [autoTriggerUpload, onAutoTriggerConsumed]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -42,7 +59,6 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
       }
     }
     setUploading(false);
-    // Reset input
     if (fileRef.current) fileRef.current.value = '';
   };
 
