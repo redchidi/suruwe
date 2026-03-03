@@ -8,6 +8,7 @@ export interface Profile {
   measurements: Record<string, number>;
   measurement_unit: 'inches' | 'cm';
   measurements_updated_at: string | null;
+  measurement_notes: string;
   style_notes: string;
   theme: 'dark' | 'light';
   created_at: string;

@@ -257,7 +257,8 @@ export default function OwnerPage() {
   const handleSaveMeasurements = async (
     measurements: Record<string, number>,
     gender: 'male' | 'female',
-    unit: 'inches' | 'cm'
+    unit: 'inches' | 'cm',
+    notes: string = ''
   ) => {
     if (!profile) return;
     const { data } = await supabase
@@ -266,6 +267,7 @@ export default function OwnerPage() {
         measurements,
         gender,
         measurement_unit: unit,
+        measurement_notes: notes,
         measurements_updated_at: new Date().toISOString(),
       })
       .eq('id', profile.id)
@@ -664,16 +666,17 @@ function MeasurementsEditorWrapper({
   onSave,
 }: {
   profile: Profile;
-  onSave: (m: Record<string, number>, g: 'male' | 'female', u: 'inches' | 'cm') => void;
+  onSave: (m: Record<string, number>, g: 'male' | 'female', u: 'inches' | 'cm', notes: string) => void;
 }) {
   const [measurements, setMeasurements] = useState(profile.measurements || {});
   const [gender, setGender] = useState(profile.gender);
   const [unit, setUnit] = useState(profile.measurement_unit);
+  const [measurementNotes, setMeasurementNotes] = useState(profile.measurement_notes || '');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(measurements, gender, unit);
+    await onSave(measurements, gender, unit, measurementNotes);
     setSaving(false);
   };
 
@@ -682,9 +685,11 @@ function MeasurementsEditorWrapper({
       gender={gender}
       unit={unit}
       measurements={measurements}
+      measurementNotes={measurementNotes}
       onGenderChange={setGender}
       onUnitChange={setUnit}
       onMeasurementsChange={setMeasurements}
+      onNotesChange={setMeasurementNotes}
       onSave={handleSave}
       saving={saving}
     />
