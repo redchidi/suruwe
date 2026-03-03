@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-const OG_IMAGE = 'https://lkqiivozdscrwlexwigm.supabase.co/storage/v1/object/public/photos/og/suruwe-og.png';
+const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
 
 export const metadata: Metadata = {
   title: 'Suruwe: What you ordered vs what you got. Never again.',
