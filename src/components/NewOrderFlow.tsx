@@ -244,7 +244,7 @@ export default function NewOrderFlow({
   };
 
   const confirmShareSuruwe = () => {
-    const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
+    const text = `You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
     if (navigator.share) {
       navigator.share({
         title: 'Suruwe',
@@ -309,7 +309,7 @@ export default function NewOrderFlow({
               <label>What are you making?</label>
               <input
                 className="input"
-                placeholder="e.g. Agbada for a wedding"
+                placeholder="e.g. Kaftan, dress, trado pants..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 autoFocus
@@ -320,7 +320,7 @@ export default function NewOrderFlow({
               <label>Tailor name (optional)</label>
               <input
                 className="input"
-                placeholder="e.g. Baba Tailor"
+                placeholder="Your maker's name"
                 value={tailorName}
                 onChange={(e) => {
                   setTailorName(e.target.value);
@@ -366,7 +366,7 @@ export default function NewOrderFlow({
               <label>City (optional)</label>
               <input
                 className="input"
-                placeholder="e.g. Lagos"
+                placeholder="e.g. Accra, Lagos, Nairobi, London"
                 value={tailorCity}
                 onChange={(e) => setTailorCity(e.target.value)}
               />
@@ -498,7 +498,7 @@ export default function NewOrderFlow({
             <div>
               <h2 className="mb-8">Add your measurements</h2>
               <p className="text-secondary mb-24" style={{ fontSize: 14, lineHeight: 1.5 }}>
-                Your tailor needs these to get the fit right. You only have to do this once.
+                Your maker needs these to get the fit right. You only have to do this once.
               </p>
               <MeasurementsEditor
                 gender={localGender}
@@ -545,7 +545,7 @@ export default function NewOrderFlow({
           {!hasPhotos && (
             <div className="card mb-16" style={{ padding: '14px 16px', border: '1px dashed var(--border)' }}>
               <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text-secondary)', margin: 0 }}>
-                You have not added a photo of yourself yet. A photo helps your tailor see your frame and get the fit right.
+                You have not added a photo of yourself yet. A photo helps your maker see your frame and get the fit right.
               </p>
             </div>
           )}
@@ -659,7 +659,7 @@ export default function NewOrderFlow({
               </p>
 
               <div className="wa-preview" style={{ marginBottom: 20 }}>
-                You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
+                You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
               </div>
 
               <button

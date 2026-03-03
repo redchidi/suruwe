@@ -5,10 +5,10 @@ const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
 
 export const metadata: Metadata = {
   title: 'Suruwe: What you ordered vs what you got. Never again.',
-  description: 'Send your tailor your measurements, photos, and fit notes in one link. No more wahala.',
+  description: 'Send your maker your measurements, photos, and fit notes in one link. No more wahala.',
   openGraph: {
     title: 'Suruwe: What you ordered vs what you got. Never again.',
-    description: 'Send your tailor your measurements, photos, and fit notes in one link. No more wahala.',
+    description: 'Send your maker your measurements, photos, and fit notes in one link. No more wahala.',
     type: 'website',
     siteName: 'Suruwe',
     url: 'https://suruwe.vercel.app',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Suruwe: What you ordered vs what you got. Never again.',
-    description: 'Send your tailor your measurements, photos, and fit notes in one link. No more wahala.',
+    description: 'Send your maker your measurements, photos, and fit notes in one link. No more wahala.',
     images: [OG_IMAGE],
   },
 };

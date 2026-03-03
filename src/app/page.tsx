@@ -292,7 +292,7 @@ export default function OwnerPage() {
   };
 
   const confirmShareSuruwe = () => {
-    const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
+    const text = `You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
     if (navigator.share) {
       navigator.share({
         title: 'Suruwe',
@@ -496,7 +496,7 @@ export default function OwnerPage() {
           <>
             <h1 style={{ fontSize: 24, marginBottom: 8 }}>Suruwe</h1>
             <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5 }}>
-              Your measurements, photos, and fit notes. One link for your tailor.
+              Your measurements, photos, and fit notes. One link for your maker.
             </p>
           </>
         ) : (
@@ -545,9 +545,9 @@ export default function OwnerPage() {
           {isGuest
             ? 'Add your photos and measurements below. When you save, we will create your profile.'
             : !hasPhotos && !hasMeasurements
-            ? 'Add your photos and measurements below so your tailor has everything they need when you place an order.'
+            ? 'Add your photos and measurements below so your maker has everything they need when you place an order.'
             : !hasPhotos
-            ? 'Looking good! Add a photo so your tailor can see your build.'
+            ? 'Looking good! Add a photo so your maker can see your build.'
             : 'Almost there! Add your measurements to complete your profile.'}
         </div>
       )}
@@ -780,7 +780,7 @@ export default function OwnerPage() {
             </p>
 
             <div className="wa-preview" style={{ marginBottom: 24 }}>
-              You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
+              You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
             </div>
 
             <button
