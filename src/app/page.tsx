@@ -503,6 +503,18 @@ export default function OwnerPage() {
       <div className="header">
         <div className="header-logo">Suruwe</div>
         <div className="header-actions">
+          <button
+            className="theme-toggle"
+            onClick={shareSuruwe}
+            title="Share Suruwe"
+            style={{ fontSize: 14 }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+              <polyline points="16 6 12 2 8 6" />
+              <line x1="12" y1="2" x2="12" y2="15" />
+            </svg>
+          </button>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </div>
@@ -650,30 +662,6 @@ export default function OwnerPage() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Share Suruwe */}
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '24px 0 8px',
-        }}
-      >
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
-          What you ordered vs what you got. Never again.
-        </p>
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={shareSuruwe}
-          style={{
-            padding: '10px 24px',
-            gap: 8,
-            borderRadius: 24,
-          }}
-        >
-          <span style={{ fontSize: 16 }}>&#x2764;&#xFE0F;</span>
-          Share Suruwe
-        </button>
       </div>
 
       {/* Bottom padding */}

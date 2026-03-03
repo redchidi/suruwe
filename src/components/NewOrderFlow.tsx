@@ -54,6 +54,8 @@ export default function NewOrderFlow({
   const [attachments, setAttachments] = useState<AttachmentLocal[]>([]);
   const [saving, setSaving] = useState(false);
   const [measurementsSaving, setMeasurementsSaving] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [sentOrder, setSentOrder] = useState<Order | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Tailor history
@@ -208,7 +210,8 @@ export default function NewOrderFlow({
     const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
     openWhatsApp(message, phone);
 
-    onOrderCreated(order);
+    setSentOrder(order);
+    setSent(true);
     setSaving(false);
   };
 
@@ -220,8 +223,22 @@ export default function NewOrderFlow({
     const message = generateOrderShareMessage(updatedProfile, order);
     openWhatsApp(message);
 
-    onOrderCreated(order);
+    setSentOrder(order);
+    setSent(true);
     setSaving(false);
+  };
+
+  const handleShareSuruwe = () => {
+    const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Suruwe',
+        text,
+        url: 'https://suruwe.vercel.app',
+      }).catch(() => {});
+    } else {
+      openWhatsApp(`${text}\n\nhttps://suruwe.vercel.app`);
+    }
   };
 
   const canProceedStep1 = description.trim();
@@ -242,25 +259,29 @@ export default function NewOrderFlow({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-12 mb-24">
-        <button className="back-btn" onClick={step === 1 ? onClose : () => setStep(step - 1)}>
-          <ArrowLeftIcon size={18} />
-          <span>{step === 1 ? 'Cancel' : 'Back'}</span>
-        </button>
-        <span className="text-muted" style={{ fontSize: 14, marginLeft: 'auto' }}>
-          Step {step} of {totalSteps}
-        </span>
-      </div>
+      {!sent && (
+        <div className="flex items-center gap-12 mb-24">
+          <button className="back-btn" onClick={step === 1 ? onClose : () => setStep(step - 1)}>
+            <ArrowLeftIcon size={18} />
+            <span>{step === 1 ? 'Cancel' : 'Back'}</span>
+          </button>
+          <span className="text-muted" style={{ fontSize: 14, marginLeft: 'auto' }}>
+            Step {step} of {totalSteps}
+          </span>
+        </div>
+      )}
 
       {/* Progress dots */}
-      <div className="order-steps">
-        {Array.from({ length: totalSteps }).map((_, i) => (
-          <div
-            key={i}
-            className={`order-step-dot ${i + 1 === step ? 'active' : i + 1 < step ? 'done' : ''}`}
-          />
-        ))}
-      </div>
+      {!sent && (
+        <div className="order-steps">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div
+              key={i}
+              className={`order-step-dot ${i + 1 === step ? 'active' : i + 1 < step ? 'done' : ''}`}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Step 1: Tailor details */}
       {step === 1 && (
@@ -501,7 +522,7 @@ export default function NewOrderFlow({
       )}
 
       {/* Step 4: Review and send */}
-      {step === 4 && (
+      {step === 4 && !sent && (
         <div>
           <h2 className="mb-24">Review and send</h2>
 
@@ -574,6 +595,50 @@ export default function NewOrderFlow({
               {saving ? 'Sending...' : 'Share on WhatsApp'}
             </button>
           </div>
+        </div>
+      )}
+      {/* Post-send confirmation */}
+      {sent && sentOrder && (
+        <div style={{ textAlign: 'center', paddingTop: 40 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>&#x2714;&#xFE0F;</div>
+          <h2 style={{ marginBottom: 8 }}>Order sent!</h2>
+          <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 32 }}>
+            Your order for {sentOrder.description} has been sent
+            {tailorName.trim() ? ` to ${tailorName}` : ''} via WhatsApp.
+          </p>
+
+          <div
+            style={{
+              padding: '20px',
+              borderRadius: 'var(--radius)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-raised)',
+              marginBottom: 32,
+            }}
+          >
+            <p style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.5, marginBottom: 16 }}>
+              Know someone who struggles with getting clothes made the way they want?
+            </p>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={handleShareSuruwe}
+              style={{
+                padding: '10px 24px',
+                gap: 8,
+                borderRadius: 24,
+              }}
+            >
+              <span style={{ fontSize: 16 }}>&#x2764;&#xFE0F;</span>
+              Share Suruwe
+            </button>
+          </div>
+
+          <button
+            className="btn btn-primary btn-full"
+            onClick={() => onOrderCreated(sentOrder)}
+          >
+            Done
+          </button>
         </div>
       )}
     </div>
