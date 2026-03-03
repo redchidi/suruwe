@@ -63,15 +63,13 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
           onChange={handleUpload}
           style={{ display: 'none' }}
         />
-        <div className="photo-add" onClick={() => fileRef.current?.click()}>
-          <CameraIcon size={32} />
-          <span>{uploading ? 'Uploading...' : 'Add a photo of yourself so your tailor can see your frame'}</span>
+        <div className="photo-add-compact" onClick={() => fileRef.current?.click()}>
+          <CameraIcon size={24} />
+          <span>{uploading ? 'Uploading...' : 'Add photos'}</span>
         </div>
       </>
     );
   }
-
-  const gridClass = photos.length === 1 ? 'single' : photos.length === 2 ? 'two' : '';
 
   return (
     <>
@@ -83,11 +81,11 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
         onChange={handleUpload}
         style={{ display: 'none' }}
       />
-      <div className={`photos-grid ${gridClass}`}>
+      <div className="photos-grid-square">
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="photo-item"
+            className="photo-tile"
             onClick={() => setLightboxUrl(photo.url)}
           >
             <img src={photo.url} alt="Profile photo" loading="lazy" />
@@ -103,17 +101,14 @@ export default function PhotoGrid({ photos, profileId, onPhotosChange, editable 
         ))}
         {editable && photos.length < 6 && (
           <div
-            className="photo-item"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              border: '1px dashed var(--border)',
-            }}
+            className="photo-tile photo-tile-add"
             onClick={() => fileRef.current?.click()}
           >
-            <CameraIcon size={24} className="text-muted" />
+            {uploading ? (
+              <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />
+            ) : (
+              <CameraIcon size={20} />
+            )}
           </div>
         )}
       </div>

@@ -292,7 +292,77 @@ h3 { font-size: 18px; }
   letter-spacing: -0.01em;
 }
 
-/* Photos grid */
+/* Photos grid - square tiles, always 3 columns */
+.photos-grid-square {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.photo-tile {
+  aspect-ratio: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-input);
+  cursor: pointer;
+}
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 300ms ease;
+}
+.photo-tile:active img {
+  transform: scale(1.03);
+}
+.photo-tile-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1.5px dashed var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.photo-tile-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+/* Empty state add photos button */
+.photo-add-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+  padding: 20px;
+  min-height: 80px;
+  -webkit-tap-highlight-color: transparent;
+}
+.photo-add-compact:hover {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+}
+.photo-add-compact svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+}
+.photo-add-compact span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Legacy photos-grid kept for tailor views */
 .photos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -362,6 +432,7 @@ h3 { font-size: 18px; }
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Legacy photo-add (kept for compatibility) */
 .photo-add {
   display: flex;
   flex-direction: column;
@@ -375,7 +446,7 @@ h3 { font-size: 18px; }
   transition: all var(--transition);
   padding: 24px;
   text-align: center;
-  min-height: 160px;
+  min-height: 120px;
   -webkit-tap-highlight-color: transparent;
 }
 .photo-add:hover {
