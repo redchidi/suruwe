@@ -59,6 +59,8 @@ export default function NewOrderFlow({
   const [sent, setSent] = useState(false);
   const [sentOrder, setSentOrder] = useState<Order | null>(null);
   const [showSharePreview, setShowSharePreview] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Tailor history
@@ -667,6 +669,63 @@ export default function NewOrderFlow({
                 Share Suruwe
               </button>
             </div>
+          )}
+
+          {/* Micro-survey */}
+          {!feedbackSent ? (
+            <div
+              style={{
+                textAlign: 'left',
+                padding: '20px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-raised)',
+                marginBottom: 24,
+              }}
+            >
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 12 }}>
+                This is new. One thing that would make it better?
+              </p>
+              <textarea
+                rows={2}
+                placeholder="Be honest, it helps"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                style={{
+                  width: '100%',
+                  fontSize: 15,
+                  lineHeight: 1.5,
+                  padding: '10px 12px',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  color: 'var(--text)',
+                  resize: 'none',
+                  fontFamily: 'inherit',
+                  marginBottom: 12,
+                }}
+              />
+              <button
+                className="btn btn-secondary btn-sm btn-full"
+                onClick={async () => {
+                  if (!feedbackText.trim()) return;
+                  await supabase.from('feedback').insert({
+                    profile_id: profile?.id || null,
+                    context: 'post_order',
+                    message: feedbackText.trim(),
+                  });
+                  setFeedbackSent(true);
+                }}
+                disabled={!feedbackText.trim()}
+                style={{ padding: '10px 20px' }}
+              >
+                Send feedback
+              </button>
+            </div>
+          ) : (
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24, textAlign: 'center' }}>
+              Thanks, that helps a lot.
+            </p>
           )}
 
           <button
