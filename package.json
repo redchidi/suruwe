@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
+    "@vercel/analytics": "^1.6.1",
+    "browser-image-compression": "^2.0.2",
+    "nanoid": "^5.0.4",
     "next": "14.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "browser-image-compression": "^2.0.2",
-    "nanoid": "^5.0.4"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
