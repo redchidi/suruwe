@@ -41,8 +41,7 @@ export default function OwnerPage() {
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [creating, setCreating] = useState(false);
-  // Callback to run after profile creation
-  const pendingCallback = useRef<((profile: Profile) => void) | null>(null);
+  const [pendingAction, setPendingAction] = useState<'save-measurements' | 'send-order' | null>(null);
 
   // Recovery state
   const [showRecovery, setShowRecovery] = useState(false);
@@ -112,16 +111,9 @@ export default function OwnerPage() {
     }
   };
 
-  /**
-   * Ensures a profile exists. If it does, calls the callback immediately.
-   * If not, shows the name prompt and calls the callback after creation.
-   */
-  const ensureProfile = (callback: (p: Profile) => void) => {
-    if (profile) {
-      callback(profile);
-      return;
-    }
-    pendingCallback.current = callback;
+  // Show name prompt when a save/send action needs a profile
+  const requestProfile = (action?: 'save-measurements' | 'send-order') => {
+    if (action) setPendingAction(action);
     setShowNamePrompt(true);
   };
 
@@ -150,36 +142,33 @@ export default function OwnerPage() {
       setProfile(p);
       setShowNamePrompt(false);
       setNameInput('');
-
-      // Run the pending callback
-      if (pendingCallback.current) {
-        pendingCallback.current(p);
-        pendingCallback.current = null;
-      }
+      // pendingAction stays set - useEffect in child components will pick it up
     }
     setCreating(false);
   };
 
-  // Guest photo flow: user selects files, then we ask for name, then upload
+  // Guest photo flow: store files, ask for name, upload after profile exists
   const handleGuestFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const fileList = Array.from(files);
-    setPendingFiles(fileList);
+    setPendingFiles(Array.from(files));
     if (guestFileRef.current) guestFileRef.current.value = '';
+    requestProfile();
+  };
 
-    // Now ask for name, and upload after profile creation
-    ensureProfile(async (p) => {
-      // Upload the files that were selected
+  // Upload pending photos once profile exists
+  useEffect(() => {
+    if (!profile || pendingFiles.length === 0) return;
+    const doUpload = async () => {
       const { uploadImage } = await import('@/lib/upload');
       const newPhotos: ProfilePhoto[] = [];
-      for (const file of fileList) {
-        const url = await uploadImage(file, `profiles/${p.id}`);
+      for (const file of pendingFiles) {
+        const url = await uploadImage(file, `profiles/${profile.id}`);
         if (url) {
           const { data } = await supabase
             .from('profile_photos')
             .insert({
-              profile_id: p.id,
+              profile_id: profile.id,
               url,
               sort_order: photos.length + newPhotos.length,
             })
@@ -192,8 +181,9 @@ export default function OwnerPage() {
         setPhotos((prev) => [...prev, ...newPhotos]);
       }
       setPendingFiles([]);
-    });
-  };
+    };
+    doUpload();
+  }, [profile, pendingFiles]);
 
   const handleRecovery = async () => {
     if (!recoverySlug.trim() || !recoveryPin.trim() || recovering) return;
@@ -310,6 +300,17 @@ export default function OwnerPage() {
     setView('home');
   };
 
+  const handleDeleteOrder = async (orderId: string) => {
+    // Delete attachments first, then order
+    await supabase.from('order_attachments').delete().eq('order_id', orderId);
+    await supabase.from('orders').delete().eq('id', orderId);
+    setOrders(orders.filter((o) => o.id !== orderId));
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(null);
+      setView('home');
+    }
+  };
+
   const handleProfileUpdate = (updated: Profile) => {
     setProfile(updated);
   };
@@ -415,7 +416,9 @@ export default function OwnerPage() {
           onClose={() => setView('home')}
           onOrderCreated={handleOrderCreated}
           onProfileUpdate={handleProfileUpdate}
-          ensureProfile={ensureProfile}
+          requestProfile={requestProfile}
+          pendingAction={pendingAction}
+          onActionConsumed={() => setPendingAction(null)}
         />
       </div>
     );
@@ -436,6 +439,7 @@ export default function OwnerPage() {
             setOrders(orders.map((o) => (o.id === updated.id ? updated : o)));
             setSelectedOrder(updated);
           }}
+          onDelete={() => handleDeleteOrder(selectedOrder.id)}
         />
       </div>
     );
@@ -454,9 +458,10 @@ export default function OwnerPage() {
         <h2 className="mb-24">Measurements</h2>
         <MeasurementsEditorWrapper
           profile={profile}
-          ensureProfile={ensureProfile}
+          requestProfile={() => requestProfile('save-measurements')}
+          pendingAction={pendingAction}
+          onActionConsumed={() => setPendingAction(null)}
           onSave={handleSaveMeasurements}
-          onProfileCreated={(p) => setProfile(p)}
         />
       </div>
     );
@@ -636,27 +641,15 @@ export default function OwnerPage() {
         ) : (
           <div className="flex flex-col gap-8">
             {orders.map((order) => (
-              <div
+              <SwipeableOrderCard
                 key={order.id}
-                className="order-card"
-                onClick={() => {
+                order={order}
+                onTap={() => {
                   setSelectedOrder(order);
                   setView('order-detail');
                 }}
-              >
-                <div className="order-tailor">{order.tailor_name}</div>
-                <div className="order-desc">{order.description}</div>
-                <div className="order-date">{formatDate(order.created_at)}</div>
-                <span className={`order-status ${order.status}`}>
-                  {order.status === 'sent'
-                    ? 'Sent'
-                    : order.status === 'completed'
-                    ? 'Completed'
-                    : order.status === 'in_progress'
-                    ? 'In Progress'
-                    : 'Draft'}
-                </span>
-              </div>
+                onDelete={() => handleDeleteOrder(order.id)}
+              />
             ))}
           </div>
         )}
@@ -736,7 +729,7 @@ export default function OwnerPage() {
 
       {/* Name prompt modal */}
       {showNamePrompt && (
-        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); pendingCallback.current = null; }}>
+        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: 8 }}>What's your name?</h3>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
@@ -803,34 +796,191 @@ export default function OwnerPage() {
   );
 }
 
+// Swipeable order card with delete
+function SwipeableOrderCard({
+  order,
+  onTap,
+  onDelete,
+}: {
+  order: Order;
+  onTap: () => void;
+  onDelete: () => void;
+}) {
+  const [offsetX, setOffsetX] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [swiping, setSwiping] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const deleteThreshold = -80;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+    setSwiping(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!swiping) return;
+    const diff = e.touches[0].clientX - startX;
+    if (diff < 0) setOffsetX(Math.max(diff, -120));
+  };
+
+  const handleTouchEnd = () => {
+    setSwiping(false);
+    if (offsetX < deleteThreshold) {
+      setOffsetX(-120);
+    } else {
+      setOffsetX(0);
+    }
+  };
+
+  const confirmDelete = async () => {
+    setDeleting(true);
+    await onDelete();
+  };
+
+  if (showConfirm) {
+    return (
+      <div
+        className="order-card"
+        style={{ textAlign: 'center', padding: '16px 18px' }}
+      >
+        <p style={{ fontSize: 14, marginBottom: 12, color: 'var(--text-secondary)' }}>
+          Delete this order?
+        </p>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          <button
+            className="btn btn-sm"
+            onClick={() => setShowConfirm(false)}
+            style={{ padding: '8px 20px', fontSize: 13 }}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-sm"
+            onClick={confirmDelete}
+            disabled={deleting}
+            style={{
+              padding: '8px 20px',
+              fontSize: 13,
+              background: '#e74c3c',
+              color: '#fff',
+              border: 'none',
+            }}
+          >
+            {deleting ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius)' }}>
+      {/* Delete background */}
+      <div
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 120,
+          background: '#e74c3c',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 'var(--radius)',
+        }}
+      >
+        <button
+          onClick={() => setShowConfirm(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#fff',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            padding: '8px 16px',
+            fontFamily: 'inherit',
+          }}
+        >
+          Delete
+        </button>
+      </div>
+
+      {/* Card */}
+      <div
+        className="order-card"
+        onClick={() => { if (offsetX === 0) onTap(); else setOffsetX(0); }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: `translateX(${offsetX}px)`,
+          transition: swiping ? 'none' : 'transform 0.2s ease',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        <div className="order-tailor">{order.tailor_name}</div>
+        <div className="order-desc">{order.description}</div>
+        <div className="order-date">{formatDate(order.created_at)}</div>
+        <span className={`order-status ${order.status}`}>
+          {order.status === 'sent'
+            ? 'Sent'
+            : order.status === 'completed'
+            ? 'Completed'
+            : order.status === 'in_progress'
+            ? 'In Progress'
+            : 'Draft'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // Wrapper for standalone measurements editing
-// Gate is on Save: user fills in everything freely, name prompt on submit
+// User fills everything freely. Name prompt on save. useEffect auto-saves after profile creation.
 function MeasurementsEditorWrapper({
   profile,
-  ensureProfile,
+  requestProfile,
+  pendingAction,
+  onActionConsumed,
   onSave,
-  onProfileCreated,
 }: {
   profile: Profile | null;
-  ensureProfile: (callback: (p: Profile) => void) => void;
+  requestProfile: () => void;
+  pendingAction: 'save-measurements' | 'send-order' | null;
+  onActionConsumed: () => void;
   onSave: (m: Record<string, number>, g: 'male' | 'female', u: 'inches' | 'cm', notes: string) => void;
-  onProfileCreated: (p: Profile) => void;
 }) {
   const [measurements, setMeasurements] = useState(profile?.measurements || {});
-  const [gender, setGender] = useState(profile?.gender || 'male');
-  const [unit, setUnit] = useState(profile?.measurement_unit || 'inches');
+  const [gender, setGender] = useState<'male' | 'female'>(profile?.gender || 'male');
+  const [unit, setUnit] = useState<'inches' | 'cm'>(profile?.measurement_unit || 'inches');
   const [measurementNotes, setMeasurementNotes] = useState(profile?.measurement_notes || '');
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
+  const doSave = async () => {
     setSaving(true);
-    ensureProfile(async (p) => {
-      // If profile was just created, parent needs to know
-      onProfileCreated(p);
-      await onSave(measurements, gender, unit, measurementNotes);
-      setSaving(false);
-    });
+    await onSave(measurements, gender, unit, measurementNotes);
+    setSaving(false);
   };
+
+  const handleSave = () => {
+    if (!profile) {
+      requestProfile();
+      return;
+    }
+    doSave();
+  };
+
+  // Auto-save after profile creation
+  useEffect(() => {
+    if (profile && pendingAction === 'save-measurements') {
+      onActionConsumed();
+      doSave();
+    }
+  }, [profile, pendingAction]);
 
   return (
     <MeasurementsEditor

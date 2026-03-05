@@ -13,9 +13,10 @@ interface OrderDetailProps {
   profile: Profile;
   onBack: () => void;
   onOrderUpdate: (order: Order) => void;
+  onDelete: () => void;
 }
 
-export default function OrderDetail({ order, profile, onBack, onOrderUpdate }: OrderDetailProps) {
+export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onDelete }: OrderDetailProps) {
   const [attachments, setAttachments] = useState<OrderAttachment[]>([]);
   const [completedPhoto, setCompletedPhoto] = useState(order.completed_photo_url);
   const [uploading, setUploading] = useState(false);
@@ -29,6 +30,8 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate }: O
   const [editTailorCity, setEditTailorCity] = useState(order.tailor_city);
   const [editTailorPhone, setEditTailorPhone] = useState(order.tailor_phone || '');
   const [saving, setSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadAttachments();
@@ -219,6 +222,57 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate }: O
                 <WhatsAppIcon size={16} />
                 Resend to {order.tailor_name}
               </button>
+            </div>
+          )}
+
+          {/* Delete order */}
+          {!showDeleteConfirm ? (
+            <button
+              className="btn btn-ghost btn-full btn-sm"
+              onClick={() => setShowDeleteConfirm(true)}
+              style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}
+            >
+              Delete order
+            </button>
+          ) : (
+            <div
+              style={{
+                padding: '16px 18px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid #e74c3c',
+                marginBottom: 24,
+                textAlign: 'center',
+              }}
+            >
+              <p style={{ fontSize: 14, marginBottom: 12, color: 'var(--text-secondary)' }}>
+                Delete this order? This cannot be undone.
+              </p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                <button
+                  className="btn btn-sm"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{ padding: '8px 20px', fontSize: 13 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-sm"
+                  onClick={async () => {
+                    setDeleting(true);
+                    await onDelete();
+                  }}
+                  disabled={deleting}
+                  style={{
+                    padding: '8px 20px',
+                    fontSize: 13,
+                    background: '#e74c3c',
+                    color: '#fff',
+                    border: 'none',
+                  }}
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
             </div>
           )}
 

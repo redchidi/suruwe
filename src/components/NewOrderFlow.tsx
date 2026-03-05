@@ -23,7 +23,9 @@ interface NewOrderFlowProps {
   onClose: () => void;
   onOrderCreated: (order: Order) => void;
   onProfileUpdate: (profile: Profile) => void;
-  ensureProfile: (callback: (p: Profile) => void) => void;
+  requestProfile: (action?: 'save-measurements' | 'send-order') => void;
+  pendingAction: 'save-measurements' | 'send-order' | null;
+  onActionConsumed: () => void;
 }
 
 interface AttachmentLocal {
@@ -45,13 +47,16 @@ export default function NewOrderFlow({
   onClose,
   onOrderCreated,
   onProfileUpdate,
-  ensureProfile,
+  requestProfile,
+  pendingAction,
+  onActionConsumed,
 }: NewOrderFlowProps) {
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState('');
   const [tailorPhone, setTailorPhone] = useState('');
   const [tailorCity, setTailorCity] = useState('');
   const [description, setDescription] = useState('');
+  const [deadline, setDeadline] = useState('');
   const [fitNotes, setFitNotes] = useState('');
   const [attachments, setAttachments] = useState<AttachmentLocal[]>([]);
   const [saving, setSaving] = useState(false);
@@ -59,6 +64,7 @@ export default function NewOrderFlow({
   const [sent, setSent] = useState(false);
   const [sentOrder, setSentOrder] = useState<Order | null>(null);
   const [showSharePreview, setShowSharePreview] = useState(false);
+  const [sendMode, setSendMode] = useState<'direct' | 'share' | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -142,32 +148,39 @@ export default function NewOrderFlow({
   };
 
   const saveMeasurements = async () => {
-    setMeasurementsSaving(true);
-    ensureProfile(async (p) => {
-      try {
-        const { data } = await supabase
-          .from('profiles')
-          .update({
-            measurements: localMeasurements,
-            gender: localGender,
-            measurement_unit: localUnit,
-            measurements_updated_at: new Date().toISOString(),
-          })
-          .eq('id', p.id)
-          .select()
-          .single();
-
-        if (data) {
-          onProfileUpdate(data as Profile);
-        }
-      } finally {
-        setMeasurementsSaving(false);
-        setStep(4);
-      }
-    });
+    if (!profile) {
+      requestProfile('save-measurements');
+      return;
+    }
+    doSaveMeasurements();
   };
 
-  const createOrder = async (p: Profile) => {
+  const doSaveMeasurements = async () => {
+    if (!profile) return;
+    setMeasurementsSaving(true);
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .update({
+          measurements: localMeasurements,
+          gender: localGender,
+          measurement_unit: localUnit,
+          measurements_updated_at: new Date().toISOString(),
+        })
+        .eq('id', profile!.id)
+        .select()
+        .single();
+
+      if (data) {
+        onProfileUpdate(data as Profile);
+      }
+    } finally {
+      setMeasurementsSaving(false);
+      setStep(4);
+    }
+  };
+
+  const createOrder = async (p: Profile): Promise<Order | null> => {
     setSaving(true);
 
     // Create order
@@ -180,6 +193,7 @@ export default function NewOrderFlow({
         tailor_city: tailorCity,
         description,
         fit_notes: fitNotes,
+        deadline: deadline || null,
         status: 'sent',
       })
       .select()
@@ -209,35 +223,65 @@ export default function NewOrderFlow({
   };
 
   const handleSendOrder = async () => {
-    ensureProfile(async (p) => {
-      const order = await createOrder(p);
-      if (!order) return;
+    if (!profile) {
+      setSendMode('direct');
+      requestProfile('send-order');
+      return;
+    }
+    doSendOrder(profile);
+  };
 
-      const updatedProfile = { ...p, measurements: localMeasurements };
-      const message = generateOrderMessage(updatedProfile, order);
-      const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
-      openWhatsApp(message, phone);
+  const doSendOrder = async (p: Profile) => {
+    const order = await createOrder(p);
+    if (!order) return;
 
-      setSentOrder(order);
-      setSent(true);
-      setSaving(false);
-    });
+    const updatedProfile = { ...p, measurements: localMeasurements };
+    const message = generateOrderMessage(updatedProfile, order);
+    const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
+    openWhatsApp(message, phone);
+
+    setSentOrder(order);
+    setSent(true);
+    setSaving(false);
   };
 
   const handleShareOrder = async () => {
-    ensureProfile(async (p) => {
-      const order = await createOrder(p);
-      if (!order) return;
-
-      const updatedProfile = { ...p, measurements: localMeasurements };
-      const message = generateOrderShareMessage(updatedProfile, order);
-      openWhatsApp(message);
-
-      setSentOrder(order);
-      setSent(true);
-      setSaving(false);
-    });
+    if (!profile) {
+      setSendMode('share');
+      requestProfile('send-order');
+      return;
+    }
+    doShareOrder(profile);
   };
+
+  const doShareOrder = async (p: Profile) => {
+    const order = await createOrder(p);
+    if (!order) return;
+
+    const updatedProfile = { ...p, measurements: localMeasurements };
+    const message = generateOrderShareMessage(updatedProfile, order);
+    openWhatsApp(message);
+
+    setSentOrder(order);
+    setSent(true);
+    setSaving(false);
+  };
+
+  // Auto-replay after profile creation
+  useEffect(() => {
+    if (!profile || !pendingAction) return;
+    if (pendingAction === 'save-measurements') {
+      onActionConsumed();
+      doSaveMeasurements();
+    } else if (pendingAction === 'send-order') {
+      onActionConsumed();
+      if (sendMode === 'share') {
+        doShareOrder(profile);
+      } else {
+        doSendOrder(profile);
+      }
+    }
+  }, [profile, pendingAction]);
 
   const handleShareSuruwe = () => {
     setShowSharePreview(true);
@@ -267,6 +311,10 @@ export default function NewOrderFlow({
     }
     if (fitNotes) {
       msg += `\n\nFit notes: ${fitNotes}`;
+    }
+    if (deadline) {
+      const d = new Date(deadline + 'T00:00:00');
+      msg += `\n\nNeed it by: ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
     }
     msg += `\n\nHere are my measurements, photos, and order details: [link will be generated]`;
     return msg;
@@ -313,6 +361,18 @@ export default function NewOrderFlow({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 autoFocus
+              />
+            </div>
+
+            <div className="input-group">
+              <label>Need it by (optional)</label>
+              <input
+                className="input"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                style={{ colorScheme: 'dark' }}
               />
             </div>
 
@@ -559,6 +619,14 @@ export default function NewOrderFlow({
               <div className="review-label">Making</div>
               <div className="review-value">{description}</div>
             </div>
+            {deadline && (
+              <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
+                <div className="review-label">Need it by</div>
+                <div className="review-value">
+                  {new Date(deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </div>
+              </div>
+            )}
             {tailorName.trim() && (
               <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
                 <div className="review-label">Tailor</div>
