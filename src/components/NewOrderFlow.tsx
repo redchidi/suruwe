@@ -22,10 +22,12 @@ interface NewOrderFlowProps {
   hasPhotos: boolean;
   onClose: () => void;
   onOrderCreated: (order: Order) => void;
+  onDraftSaved: (order: Order) => void;
   onProfileUpdate: (profile: Profile) => void;
   requestProfile: (action?: 'save-measurements' | 'send-order') => void;
   pendingAction: 'save-measurements' | 'send-order' | null;
   onActionConsumed: () => void;
+  draftOrder?: Order | null;
 }
 
 interface AttachmentLocal {
@@ -46,18 +48,20 @@ export default function NewOrderFlow({
   hasPhotos,
   onClose,
   onOrderCreated,
+  onDraftSaved,
   onProfileUpdate,
   requestProfile,
   pendingAction,
   onActionConsumed,
+  draftOrder,
 }: NewOrderFlowProps) {
   const [step, setStep] = useState(1);
-  const [tailorName, setTailorName] = useState('');
-  const [tailorPhone, setTailorPhone] = useState('');
-  const [tailorCity, setTailorCity] = useState('');
-  const [description, setDescription] = useState('');
-  const [deadline, setDeadline] = useState('');
-  const [fitNotes, setFitNotes] = useState('');
+  const [tailorName, setTailorName] = useState(draftOrder?.tailor_name || '');
+  const [tailorPhone, setTailorPhone] = useState(draftOrder?.tailor_phone || '');
+  const [tailorCity, setTailorCity] = useState(draftOrder?.tailor_city || '');
+  const [description, setDescription] = useState(draftOrder?.description || '');
+  const [deadline, setDeadline] = useState(draftOrder?.deadline || '');
+  const [fitNotes, setFitNotes] = useState(draftOrder?.fit_notes || '');
   const [attachments, setAttachments] = useState<AttachmentLocal[]>([]);
   const [saving, setSaving] = useState(false);
   const [measurementsSaving, setMeasurementsSaving] = useState(false);
@@ -183,25 +187,52 @@ export default function NewOrderFlow({
   const createOrder = async (p: Profile): Promise<Order | null> => {
     setSaving(true);
 
-    // Create order
-    const { data: order, error } = await supabase
-      .from('orders')
-      .insert({
-        profile_id: p.id,
-        tailor_name: tailorName || 'My Tailor',
-        tailor_phone: tailorPhone || null,
-        tailor_city: tailorCity,
-        description,
-        fit_notes: fitNotes,
-        deadline: deadline || null,
-        status: 'sent',
-      })
-      .select()
-      .single();
+    let order: Order | null = null;
 
-    if (error || !order) {
-      setSaving(false);
-      return null;
+    if (draftOrder) {
+      // Update existing draft to sent
+      const { data, error } = await supabase
+        .from('orders')
+        .update({
+          tailor_name: tailorName || 'My Tailor',
+          tailor_phone: tailorPhone || null,
+          tailor_city: tailorCity,
+          description,
+          fit_notes: fitNotes,
+          deadline: deadline || null,
+          status: 'sent',
+        })
+        .eq('id', draftOrder.id)
+        .select()
+        .single();
+
+      if (error || !data) {
+        setSaving(false);
+        return null;
+      }
+      order = data as Order;
+    } else {
+      // Create new order
+      const { data, error } = await supabase
+        .from('orders')
+        .insert({
+          profile_id: p.id,
+          tailor_name: tailorName || 'My Tailor',
+          tailor_phone: tailorPhone || null,
+          tailor_city: tailorCity,
+          description,
+          fit_notes: fitNotes,
+          deadline: deadline || null,
+          status: 'sent',
+        })
+        .select()
+        .single();
+
+      if (error || !data) {
+        setSaving(false);
+        return null;
+      }
+      order = data as Order;
     }
 
     // Upload attachments
@@ -301,6 +332,58 @@ export default function NewOrderFlow({
     setShowSharePreview(false);
   };
 
+  const handleClose = async () => {
+    // Auto-save as draft if there's something worth saving
+    if (!description.trim()) {
+      // Nothing to save, just close
+      // If resuming a draft with no changes, keep it
+      onClose();
+      return;
+    }
+
+    if (!profile) {
+      // No profile, can't save to Supabase. Just close.
+      onClose();
+      return;
+    }
+
+    if (draftOrder) {
+      // Update existing draft
+      const { data } = await supabase
+        .from('orders')
+        .update({
+          tailor_name: tailorName || 'My Tailor',
+          tailor_phone: tailorPhone || null,
+          tailor_city: tailorCity,
+          description,
+          fit_notes: fitNotes,
+          deadline: deadline || null,
+        })
+        .eq('id', draftOrder.id)
+        .select()
+        .single();
+      if (data) onDraftSaved(data as Order);
+    } else {
+      // Create new draft
+      const { data } = await supabase
+        .from('orders')
+        .insert({
+          profile_id: profile.id,
+          tailor_name: tailorName || 'My Tailor',
+          tailor_phone: tailorPhone || null,
+          tailor_city: tailorCity,
+          description,
+          fit_notes: fitNotes,
+          deadline: deadline || null,
+          status: 'draft',
+        })
+        .select()
+        .single();
+      if (data) onDraftSaved(data as Order);
+    }
+    onClose();
+  };
+
   const canProceedStep1 = description.trim();
   const previewMessage = (() => {
     let msg = '';
@@ -325,7 +408,7 @@ export default function NewOrderFlow({
       {/* Header */}
       {!sent && (
         <div className="flex items-center gap-12 mb-24">
-          <button className="back-btn" onClick={step === 1 ? onClose : () => setStep(step - 1)}>
+          <button className="back-btn" onClick={step === 1 ? handleClose : () => setStep(step - 1)}>
             <ArrowLeftIcon size={18} />
             <span>{step === 1 ? 'Cancel' : 'Back'}</span>
           </button>

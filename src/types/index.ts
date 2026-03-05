@@ -23,6 +23,7 @@ export interface Order {
   tailor_city: string;
   description: string;
   fit_notes: string;
+  deadline: string | null;
   status: 'draft' | 'sent' | 'in_progress' | 'completed';
   completed_photo_url: string | null;
   created_at: string;

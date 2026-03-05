@@ -32,6 +32,7 @@ export default function OwnerPage() {
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [draftOrder, setDraftOrder] = useState<Order | null>(null);
   const [theme, setTheme] = useState<Theme>('dark');
   const [loading, setLoading] = useState(true);
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
@@ -296,8 +297,25 @@ export default function OwnerPage() {
   };
 
   const handleOrderCreated = (order: Order) => {
-    setOrders([order, ...orders]);
+    // If this was a draft being sent, replace it in the list
+    if (draftOrder) {
+      setOrders([order, ...orders.filter((o) => o.id !== draftOrder.id)]);
+      setDraftOrder(null);
+    } else {
+      setOrders([order, ...orders]);
+    }
     setView('home');
+  };
+
+  const handleDraftSaved = (draft: Order) => {
+    // Add or update draft in orders list
+    const exists = orders.find((o) => o.id === draft.id);
+    if (exists) {
+      setOrders(orders.map((o) => (o.id === draft.id ? draft : o)));
+    } else {
+      setOrders([draft, ...orders]);
+    }
+    setDraftOrder(null);
   };
 
   const handleDeleteOrder = async (orderId: string) => {
@@ -413,12 +431,14 @@ export default function OwnerPage() {
         <NewOrderFlow
           profile={profile}
           hasPhotos={photos.length > 0}
-          onClose={() => setView('home')}
+          onClose={() => { setDraftOrder(null); setView('home'); }}
           onOrderCreated={handleOrderCreated}
+          onDraftSaved={handleDraftSaved}
           onProfileUpdate={handleProfileUpdate}
           requestProfile={requestProfile}
           pendingAction={pendingAction}
           onActionConsumed={() => setPendingAction(null)}
+          draftOrder={draftOrder}
         />
       </div>
     );
@@ -519,7 +539,7 @@ export default function OwnerPage() {
       {/* Hero CTA: New Order */}
       <button
         className="btn btn-primary btn-full"
-        onClick={() => setView('new-order')}
+        onClick={() => { setDraftOrder(null); setView('new-order'); }}
         style={{
           fontSize: 17,
           padding: '18px 24px',
@@ -645,8 +665,13 @@ export default function OwnerPage() {
                 key={order.id}
                 order={order}
                 onTap={() => {
-                  setSelectedOrder(order);
-                  setView('order-detail');
+                  if (order.status === 'draft') {
+                    setDraftOrder(order);
+                    setView('new-order');
+                  } else {
+                    setSelectedOrder(order);
+                    setView('order-detail');
+                  }
                 }}
                 onDelete={() => handleDeleteOrder(order.id)}
               />
