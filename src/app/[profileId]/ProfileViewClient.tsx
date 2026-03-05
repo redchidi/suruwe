@@ -16,6 +16,11 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
   const [notFound, setNotFound] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [showGuides, setShowGuides] = useState(false);
+  const [showPinEntry, setShowPinEntry] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -51,11 +56,40 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
     if (photoData) setPhotos(photoData);
 
     setLoading(false);
+
+    // Check if this device already owns this profile
+    const storedId = localStorage.getItem('suruwe_profile_id');
+    if (storedId === p.id) {
+      setIsOwner(true);
+    }
   };
 
   const toggleTheme = () => {
     const newTheme: Theme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
+  };
+
+  const handlePinVerify = async () => {
+    if (!profile || pinInput.length < 4) return;
+    setVerifying(true);
+    setPinError('');
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', params.profileId)
+      .eq('pin', pinInput)
+      .single();
+
+    if (data) {
+      localStorage.setItem('suruwe_profile_id', data.id);
+      setIsOwner(true);
+      setShowPinEntry(false);
+      setPinInput('');
+    } else {
+      setPinError('Incorrect PIN. Please try again.');
+    }
+    setVerifying(false);
   };
 
   if (loading) {
@@ -104,6 +138,147 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </a>
         </div>
       </div>
+
+      {/* "This is me" bar */}
+      {!isOwner && !showPinEntry && (
+        <div
+          onClick={() => setShowPinEntry(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '14px 20px',
+            marginBottom: 24,
+            borderRadius: 10,
+            background: 'var(--accent)',
+            color: '#fff',
+            cursor: 'pointer',
+            fontSize: 15,
+            fontWeight: 500,
+            fontFamily: 'var(--font-display, inherit)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          This is my profile
+        </div>
+      )}
+
+      {/* PIN entry */}
+      {showPinEntry && !isOwner && (
+        <div
+          style={{
+            padding: '20px',
+            marginBottom: 24,
+            borderRadius: 10,
+            border: '1px solid var(--border)',
+            background: 'var(--card-bg)',
+          }}
+        >
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+            Enter your PIN to access your profile on this device.
+          </p>
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="Your PIN"
+            value={pinInput}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setPinInput(val);
+              setPinError('');
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && pinInput.length >= 4) {
+                handlePinVerify();
+              }
+            }}
+            autoFocus
+            style={{
+              width: '100%',
+              fontSize: 16,
+              padding: '12px 14px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              color: 'var(--text)',
+              fontFamily: 'inherit',
+              marginBottom: pinError ? 8 : 16,
+            }}
+          />
+          {pinError && (
+            <p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 12 }}>{pinError}</p>
+          )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => { setShowPinEntry(false); setPinInput(''); setPinError(''); }}
+              style={{
+                flex: 1,
+                padding: '12px',
+                fontSize: 14,
+                background: 'none',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handlePinVerify}
+              disabled={pinInput.length < 4 || verifying}
+              style={{
+                flex: 1,
+                padding: '12px',
+                fontSize: 14,
+                background: 'var(--accent)',
+                border: 'none',
+                borderRadius: 8,
+                color: '#fff',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                opacity: pinInput.length < 4 ? 0.5 : 1,
+              }}
+            >
+              {verifying ? 'Checking...' : 'Verify'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Owner banner */}
+      {isOwner && (
+        <a
+          href="/"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '14px 20px',
+            marginBottom: 24,
+            borderRadius: 10,
+            border: '1px solid var(--accent)',
+            color: 'var(--accent)',
+            textDecoration: 'none',
+            fontSize: 15,
+            fontWeight: 500,
+            fontFamily: 'var(--font-display, inherit)',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Go to my profile
+        </a>
+      )}
 
       {/* Top section: Photo + Key Measurements */}
       <div className="tailor-layout">
