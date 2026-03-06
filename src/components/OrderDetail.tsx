@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
 import { formatDate } from '@/lib/utils';
 import { generateCompletedOrderMessage, generateOrderMessage, openWhatsApp } from '@/lib/whatsapp';
-import { ArrowLeftIcon, CameraIcon, WhatsAppIcon, EditIcon } from './Icons';
+import { ArrowLeftIcon, CameraIcon, WhatsAppIcon, EditIcon, XIcon } from './Icons';
 
 interface OrderDetailProps {
   order: Order;
@@ -20,6 +20,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
   const [attachments, setAttachments] = useState<OrderAttachment[]>([]);
   const [completedPhoto, setCompletedPhoto] = useState(order.completed_photo_url);
   const [uploading, setUploading] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Edit mode
@@ -289,7 +290,12 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               <div className="section-title">Reference Images</div>
               <div className="attachment-grid">
                 {attachments.map((att) => (
-                  <div key={att.id} className="attachment-item">
+                  <div
+                    key={att.id}
+                    className="attachment-item"
+                    onClick={() => setLightboxUrl(att.url)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <img src={att.url} alt="Reference" loading="lazy" />
                   </div>
                 ))}
@@ -408,6 +414,23 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div className="photo-lightbox" onClick={() => setLightboxUrl(null)}>
+          <button
+            className="photo-lightbox-close"
+            onClick={() => setLightboxUrl(null)}
+          >
+            <XIcon size={20} />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Full size"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
