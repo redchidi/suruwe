@@ -192,7 +192,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
           {order.fit_notes && (
             <div className="section">
               <div className="section-title">Fit Notes</div>
-              <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+              <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>
                 {order.fit_notes}
               </p>
             </div>

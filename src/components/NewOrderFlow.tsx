@@ -388,18 +388,10 @@ export default function NewOrderFlow({
   const previewMessage = (() => {
     let msg = '';
     if (tailorName.trim()) {
-      msg = `Hi ${tailorName}, I'd like to get something made. ${description}.`;
+      msg = `Hi ${tailorName}, I'd like to get something made. Here are my details and measurements: [link will be generated]`;
     } else {
-      msg = `I'd like to get something made. ${description}.`;
+      msg = `I'd like to get something made. Here are my details and measurements: [link will be generated]`;
     }
-    if (fitNotes) {
-      msg += `\n\nFit notes: ${fitNotes}`;
-    }
-    if (deadline) {
-      const d = new Date(deadline + 'T00:00:00');
-      msg += `\n\nNeed it by: ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-    }
-    msg += `\n\nHere are my measurements, photos, and order details: [link will be generated]`;
     return msg;
   })();
 
@@ -536,10 +528,15 @@ export default function NewOrderFlow({
               <label>Fit notes (optional)</label>
               <textarea
                 className="textarea"
-                placeholder="e.g. I like a slim fit. Not too tight around the arms. Leave extra room in the chest."
+                rows={5}
+                placeholder={"e.g.\n- Slim fit, not too tight around the arms\n- Leave extra room in the chest\n- Knee length"}
                 value={fitNotes}
                 onChange={(e) => setFitNotes(e.target.value)}
+                style={{ whiteSpace: 'pre-wrap' }}
               />
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>
+                Use dashes or numbers for a list. Line breaks will be preserved.
+              </p>
             </div>
 
             <div>
@@ -721,7 +718,7 @@ export default function NewOrderFlow({
             )}
             <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
               <div className="review-label">Fit notes</div>
-              <div className="review-value">{fitNotes || 'None'}</div>
+              <div className="review-value" style={{ whiteSpace: 'pre-wrap' }}>{fitNotes || 'None'}</div>
             </div>
             {attachments.length > 0 && (
               <div className="review-item review-item-tappable" onClick={() => setStep(2)}>

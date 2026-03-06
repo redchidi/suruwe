@@ -161,8 +161,7 @@ export default function OrderViewClient({
                 <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
                   Fit notes
                 </div>
-                <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>
-                  {order.fit_notes}
+                <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
                 </div>
               </div>
             )}

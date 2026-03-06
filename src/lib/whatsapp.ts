@@ -12,16 +12,10 @@ export function generateOrderMessage(profile: Profile, order: Order): string {
   
   let message = '';
   if (order.tailor_name) {
-    message = `Hi ${order.tailor_name}, I'd like to get something made. ${order.description}.`;
+    message = `Hi ${order.tailor_name}, I'd like to get something made. Here are my details and measurements: ${url}`;
   } else {
-    message = `I'd like to get something made. ${order.description}.`;
+    message = `I'd like to get something made. Here are my details and measurements: ${url}`;
   }
-  
-  if (order.fit_notes) {
-    message += `\n\nFit notes: ${order.fit_notes}`;
-  }
-  
-  message += `\n\nHere are my measurements, photos, and order details: ${url}`;
   
   return message;
 }
