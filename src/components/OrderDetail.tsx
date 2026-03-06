@@ -30,6 +30,8 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
   const [editTailorCity, setEditTailorCity] = useState(order.tailor_city);
   const [editTailorPhone, setEditTailorPhone] = useState(order.tailor_phone || '');
   const [saving, setSaving] = useState(false);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const editAttachmentRef = useRef<HTMLInputElement>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -101,6 +103,38 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
     setEditing(false);
   };
 
+  const handleAddAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingAttachment(true);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const url = await uploadImage(file, `orders/${order.id}/attachments`);
+      if (url) {
+        const { data } = await supabase
+          .from('order_attachments')
+          .insert({
+            order_id: order.id,
+            url,
+            type: 'inspiration',
+            visible_to_tailor: true,
+          })
+          .select()
+          .single();
+        if (data) {
+          setAttachments((prev) => [...prev, data as OrderAttachment]);
+        }
+      }
+    }
+    setUploadingAttachment(false);
+    if (editAttachmentRef.current) editAttachmentRef.current.value = '';
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    await supabase.from('order_attachments').delete().eq('id', attachmentId);
+    setAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
+  };
+
   const isCompleted = order.status === 'completed';
 
   return (
@@ -155,6 +189,58 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                 value={editFitNotes}
                 onChange={(e) => setEditFitNotes(e.target.value)}
               />
+            </div>
+
+            {/* Reference images in edit mode */}
+            <div className="input-group">
+              <label>Reference Images</label>
+              {attachments.length > 0 && (
+                <div className="attachment-grid" style={{ marginBottom: 12 }}>
+                  {attachments.map((att) => (
+                    <div key={att.id} className="attachment-item" style={{ position: 'relative' }}>
+                      <img src={att.url} alt="Reference" loading="lazy" />
+                      <button
+                        onClick={() => handleDeleteAttachment(att.id)}
+                        style={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: 'rgba(0,0,0,0.7)',
+                          color: '#fff',
+                          border: 'none',
+                          fontSize: 14,
+                          lineHeight: 1,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input
+                ref={editAttachmentRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleAddAttachment}
+                style={{ display: 'none' }}
+              />
+              <button
+                className="btn btn-ghost btn-full btn-sm"
+                onClick={() => editAttachmentRef.current?.click()}
+                disabled={uploadingAttachment}
+                style={{ fontSize: 13 }}
+              >
+                {uploadingAttachment ? 'Uploading...' : '+ Add reference images'}
+              </button>
             </div>
           </div>
 
