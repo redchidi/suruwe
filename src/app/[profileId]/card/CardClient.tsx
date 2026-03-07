@@ -81,7 +81,7 @@ export default function CardClient({ params }: { params: { profileId: string } }
 
   const handleWhatsApp = () => {
     const url = window.location.href;
-    const text = `My measurements and fit profile are all here — ${url}`;
+    const text = `Here are my measurements and fit profile — everything you need to get my clothes right. Save or pin this link so you always have it handy: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 

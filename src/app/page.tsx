@@ -721,10 +721,11 @@ export default function OwnerPage() {
                 className="btn btn-secondary btn-full btn-sm"
                 onClick={() => {
                   const cardUrl = `${window.location.origin}/${profile!.slug}/card`;
+                  const text = `Here are my measurements and fit profile — everything you need to get my clothes right. Save or pin this link so you always have it handy: ${cardUrl}`;
                   if (navigator.share) {
-                    navigator.share({ title: `${profile!.name} on Suruwe`, url: cardUrl }).catch(() => {});
+                    navigator.share({ title: `${profile!.name} on Suruwe`, text, url: cardUrl }).catch(() => {});
                   } else {
-                    navigator.clipboard.writeText(cardUrl);
+                    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                   }
                 }}
               >
