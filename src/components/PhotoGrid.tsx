@@ -13,6 +13,7 @@ interface PhotoGridProps {
   editable?: boolean;
   autoTriggerUpload?: boolean;
   onAutoTriggerConsumed?: () => void;
+  maxPhotos?: number;
 }
 
 export default function PhotoGrid({
@@ -22,6 +23,7 @@ export default function PhotoGrid({
   editable = true,
   autoTriggerUpload = false,
   onAutoTriggerConsumed,
+  maxPhotos = 6,
 }: PhotoGridProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -75,13 +77,19 @@ export default function PhotoGrid({
           ref={fileRef}
           type="file"
           accept="image/*"
-          multiple
+          multiple={maxPhotos > 1}
           onChange={handleUpload}
           style={{ display: 'none' }}
         />
         <div className="photo-add-compact" onClick={() => fileRef.current?.click()}>
           <CameraIcon size={24} />
-          <span>{uploading ? 'Uploading...' : 'Add photos'}</span>
+          <span>
+            {uploading
+              ? 'Uploading...'
+              : maxPhotos === 1
+              ? 'Add a photo of yourself so your tailor can see your frame'
+              : 'Add photos'}
+          </span>
         </div>
       </>
     );
@@ -93,7 +101,7 @@ export default function PhotoGrid({
         ref={fileRef}
         type="file"
         accept="image/*"
-        multiple
+        multiple={maxPhotos > 1}
         onChange={handleUpload}
         style={{ display: 'none' }}
       />
@@ -115,7 +123,7 @@ export default function PhotoGrid({
             )}
           </div>
         ))}
-        {editable && photos.length < 6 && (
+        {editable && photos.length < maxPhotos && (
           <div
             className="photo-tile photo-tile-add"
             onClick={() => fileRef.current?.click()}

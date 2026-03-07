@@ -348,7 +348,7 @@ export default function OwnerPage() {
   };
 
   const confirmShareSuruwe = () => {
-    const text = `You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
+    const text = `You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:`;
     if (navigator.share) {
       navigator.share({
         title: 'Suruwe',
@@ -600,7 +600,13 @@ export default function OwnerPage() {
             <h1 style={{ fontSize: 24, marginBottom: 4 }}>
               {profile!.name}
             </h1>
-            <p className="text-secondary" style={{ fontSize: 14 }}>
+            <p style={{ fontSize: 16, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--text)', lineHeight: 1.4, marginBottom: 4 }}>
+              What you ordered is what you get.
+            </p>
+            <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 4 }}>
+              Share your measurements, photos, and fit notes with your tailor in one link.
+            </p>
+            <p className="text-secondary" style={{ fontSize: 12 }}>
               suruwe.vercel.app/{profile!.slug}
             </p>
           </>
@@ -639,26 +645,30 @@ export default function OwnerPage() {
           }}
         >
           {isGuest
-            ? 'Add your photos and measurements below. When you save, we will create your profile.'
+            ? 'Add your body photo and measurements below. When you save, we will create your profile.'
             : !hasPhotos && !hasMeasurements
-            ? 'Add your photos and measurements below so your maker has everything they need when you place an order.'
+            ? 'Add your body photo and measurements below so your tailor has everything they need when you place an order.'
             : !hasPhotos
-            ? 'Looking good! Add a photo so your maker can see your build.'
+            ? 'Looking good! Add a body photo so your tailor can see your build.'
             : 'Almost there! Add your measurements to complete your profile.'}
         </div>
       )}
 
-      {/* Photos Section */}
+      {/* Body Photo Section */}
       <div className="section">
         <div className="section-header">
-          <div className="section-title">Photos</div>
+          <div className="section-title">Body Photo</div>
         </div>
+        <p className="text-secondary" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
+          Add one photo so your tailor can see your body profile — how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.
+        </p>
         {profile ? (
           <PhotoGrid
             photos={photos}
             profileId={profile!.id}
             onPhotosChange={setPhotos}
             editable
+            maxPhotos={1}
           />
         ) : (
           <>
@@ -666,13 +676,12 @@ export default function OwnerPage() {
               ref={guestFileRef}
               type="file"
               accept="image/*"
-              multiple
               onChange={handleGuestFileSelect}
               style={{ display: 'none' }}
             />
             <div className="photo-add-compact" onClick={() => guestFileRef.current?.click()}>
               <CameraIcon size={24} />
-              <span>{pendingFiles.length > 0 ? 'Uploading...' : 'Add photos'}</span>
+              <span>{pendingFiles.length > 0 ? 'Uploading...' : 'Add a body photo'}</span>
             </div>
           </>
         )}
@@ -966,7 +975,7 @@ export default function OwnerPage() {
             </p>
 
             <div className="wa-preview" style={{ marginBottom: 24 }}>
-              You know that feeling when you send your maker a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
+              You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:{'\n\n'}https://suruwe.vercel.app
             </div>
 
             <button
