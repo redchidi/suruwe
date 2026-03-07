@@ -113,7 +113,7 @@ export default function CardClient({ params }: { params: { profileId: string } }
   const measurementCount = hasMeasurements
     ? Object.keys(profile.measurements).filter((k) => profile.measurements[k] != null).length
     : 0;
-  const tailors = [...new Set(orders.map((o) => o.tailor_name).filter(Boolean))];
+  const tailors = Array.from(new Set(orders.map((o) => o.tailor_name).filter(Boolean)));
 
   return (
     <div className="app-shell" style={{ paddingBottom: 60 }}>
