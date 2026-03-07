@@ -709,14 +709,28 @@ export default function OwnerPage() {
               gender={profile!.gender}
               unit={profile!.measurement_unit}
             />
-            <button
-              className="btn btn-whatsapp btn-full btn-sm"
-              onClick={handleShareProfile}
-              style={{ marginTop: 16 }}
-            >
-              <WhatsAppIcon size={16} />
-              Share My Profile
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
+              <button
+                className="btn btn-whatsapp btn-full btn-sm"
+                onClick={handleShareProfile}
+              >
+                <WhatsAppIcon size={16} />
+                Share My Profile
+              </button>
+              <button
+                className="btn btn-secondary btn-full btn-sm"
+                onClick={() => {
+                  const cardUrl = `${window.location.origin}/${profile!.slug}/card`;
+                  if (navigator.share) {
+                    navigator.share({ title: `${profile!.name} on Suruwe`, url: cardUrl }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(cardUrl);
+                  }
+                }}
+              >
+                Share My Card
+              </button>
+            </div>
           </>
         ) : (
           <button

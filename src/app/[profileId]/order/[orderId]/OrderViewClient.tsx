@@ -135,10 +135,13 @@ export default function OrderViewClient({
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
+        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', marginBottom: 6, fontWeight: 600 }}>
+          Order from
+        </div>
         <div className="name">{profile.name}</div>
         <div className="branding">
-          Order details on{' '}
-          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+          via{' '}
+          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
             Suruwe
           </a>
         </div>
@@ -147,25 +150,40 @@ export default function OrderViewClient({
       {/* Order details */}
       <div className="tailor-layout">
         <div className="tailor-section">
-          <div className="card">
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
-                Making
+          <div
+            style={{
+              borderRadius: 12,
+              border: '1px solid var(--border)',
+              background: 'var(--card-bg)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: 3,
+                background: 'var(--accent)',
+              }}
+            />
+            <div style={{ padding: '20px 18px' }}>
+              <div style={{ marginBottom: order.fit_notes ? 16 : 0 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6, fontWeight: 600 }}>
+                  Making
+                </div>
+                <div style={{ fontSize: 20, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--text)', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+                  {order.description}
+                </div>
               </div>
-              <div style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--text)' }}>
-                {order.description}
-              </div>
+              {order.fit_notes && (
+                <div style={{ paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, fontWeight: 600 }}>
+                    Fit notes
+                  </div>
+                  <div style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
+                    {order.fit_notes}
+                  </div>
+                </div>
+              )}
             </div>
-            {order.fit_notes && (
-              <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
-                  Fit notes
-                </div>
-                <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
-                  {order.fit_notes}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -327,8 +345,10 @@ export default function OrderViewClient({
           <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
         </div>
         <p>
-          Create your own measurement profile at{' '}
-          <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.vercel.app</a>
+          What you ordered is what you get.{' '}
+          <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            suruwe.vercel.app
+          </a>
         </p>
       </div>
 

@@ -19,6 +19,8 @@ interface OrderDetailProps {
 export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onDelete }: OrderDetailProps) {
   const [attachments, setAttachments] = useState<OrderAttachment[]>([]);
   const [completedPhoto, setCompletedPhoto] = useState(order.completed_photo_url);
+  const [completedNote, setCompletedNote] = useState(order.completed_note || '');
+  const [savingNote, setSavingNote] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -63,6 +65,17 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
       onOrderUpdate({ ...order, completed_photo_url: url, status: 'completed' });
     }
     setUploading(false);
+  };
+
+  const handleSaveNote = async () => {
+    if (savingNote) return;
+    setSavingNote(true);
+    await supabase
+      .from('orders')
+      .update({ completed_note: completedNote })
+      .eq('id', order.id);
+    onOrderUpdate({ ...order, completed_note: completedNote });
+    setSavingNote(false);
   };
 
   const handleResend = () => {
@@ -371,15 +384,38 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
           {/* Completed photo section */}
           <div className="section">
             <div className="section-title">Completed Piece</div>
+            <p className="text-secondary" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
+              Add a photo of the finished garment and a note on how the fit turned out. This builds your fit history over time.
+            </p>
             {completedPhoto ? (
               <div>
                 <div style={{ borderRadius: 'var(--radius)', overflow: 'hidden', marginBottom: 12 }}>
                   <img
                     src={completedPhoto}
                     alt="Completed piece"
-                    style={{ width: '100%', display: 'block' }}
+                    style={{ width: '100%', display: 'block', cursor: 'pointer' }}
+                    onClick={() => setLightboxUrl(completedPhoto)}
                   />
                 </div>
+                <textarea
+                  className="textarea"
+                  placeholder="How did the fit turn out? What worked, what needed adjusting..."
+                  value={completedNote}
+                  onChange={(e) => setCompletedNote(e.target.value)}
+                  onBlur={handleSaveNote}
+                  style={{ marginBottom: 12, fontSize: 14 }}
+                  rows={3}
+                />
+                {completedNote && (
+                  <button
+                    className="btn btn-ghost btn-full btn-sm"
+                    onClick={handleSaveNote}
+                    disabled={savingNote}
+                    style={{ marginBottom: 12, fontSize: 13 }}
+                  >
+                    {savingNote ? 'Saving...' : 'Save fit note'}
+                  </button>
+                )}
                 <button
                   className="btn btn-whatsapp btn-full btn-sm"
                   onClick={() => {

@@ -26,6 +26,7 @@ export interface Order {
   deadline: string | null;
   status: 'draft' | 'sent' | 'in_progress' | 'completed';
   completed_photo_url: string | null;
+  completed_note: string | null;
   created_at: string;
   updated_at: string;
 }
