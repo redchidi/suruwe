@@ -440,9 +440,12 @@ export default function OwnerPage() {
     return (
       <div className="onboarding">
         <div className="onboarding-logo">Suruwe</div>
-        <div className="onboarding-tagline">
-          Enter your username and PIN to access your profile on this device.
+        <div className="onboarding-tagline" style={{ marginBottom: 4 }}>
+          What you ordered is what you get.
         </div>
+        <p className="text-secondary" style={{ fontSize: 14, marginBottom: 20 }}>
+          Enter your username and PIN to access your profile on this device.
+        </p>
         <input
           className="onboarding-input"
           type="text"
@@ -584,9 +587,12 @@ export default function OwnerPage() {
       <div style={{ marginBottom: 28 }}>
         {isGuest ? (
           <>
-            <h1 style={{ fontSize: 24, marginBottom: 8 }}>Suruwe</h1>
+            <h1 style={{ fontSize: 24, marginBottom: 4, fontFamily: 'var(--font-display)' }}>Suruwe</h1>
+            <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--text)', lineHeight: 1.4, marginBottom: 6 }}>
+              What you ordered is what you get.
+            </p>
             <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5 }}>
-              Your measurements, photos, and fit notes. One link for your maker.
+              Share your measurements, photos, and fit notes with your tailor in one link.
             </p>
           </>
         ) : (
