@@ -46,7 +46,7 @@ export default function OwnerPage() {
 
   // Recovery state
   const [showRecovery, setShowRecovery] = useState(false);
-  const [recoverySlug, setRecoverySlug] = useState('');
+  const [recoveryUsername, setRecoveryUsername] = useState('');
   const [recoveryPin, setRecoveryPin] = useState('');
   const [recoveryError, setRecoveryError] = useState('');
   const [recovering, setRecovering] = useState(false);
@@ -55,6 +55,18 @@ export default function OwnerPage() {
   const [showPinSetup, setShowPinSetup] = useState(false);
   const [pinSetupInput, setPinSetupInput] = useState('');
   const [savingPin, setSavingPin] = useState(false);
+
+  // Username setup for existing users with auto-generated slugs
+  const [showUsernameSetup, setShowUsernameSetup] = useState(false);
+  const [usernameSetupInput, setUsernameSetupInput] = useState('');
+  const [usernameSetupError, setUsernameSetupError] = useState('');
+  const [savingUsername, setSavingUsername] = useState(false);
+
+  // Onboarding step: 'name' | 'username' | 'pin'
+  const [onboardingStep, setOnboardingStep] = useState<'name' | 'username' | 'pin'>('name');
+  const [onboardingUsername, setOnboardingUsername] = useState('');
+  const [onboardingUsernameError, setOnboardingUsernameError] = useState('');
+  const [checkingUsername, setCheckingUsername] = useState(false);
 
   // Photo upload for guests: hold selected files until profile exists
   const guestFileRef = useRef<HTMLInputElement>(null);
@@ -110,6 +122,10 @@ export default function OwnerPage() {
     if (!p.pin) {
       setShowPinSetup(true);
     }
+    // Auto-generated slugs match pattern: word-4chars (e.g. ama-4kx2)
+    if (/^.+-[a-z0-9]{4}$/.test(p.slug)) {
+      setShowUsernameSetup(true);
+    }
   };
 
   // Show name prompt when a save/send action needs a profile
@@ -118,16 +134,44 @@ export default function OwnerPage() {
     setShowNamePrompt(true);
   };
 
+  const handleOnboardingName = () => {
+    if (!nameInput.trim()) return;
+    setOnboardingStep('username');
+  };
+
+  const handleOnboardingUsername = async () => {
+    if (!onboardingUsername.trim() || checkingUsername) return;
+    setCheckingUsername(true);
+    setOnboardingUsernameError('');
+
+    const username = onboardingUsername.trim().toLowerCase();
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', username)
+      .maybeSingle();
+
+    if (data) {
+      setOnboardingUsernameError('That username is taken. Please try another.');
+      setCheckingUsername(false);
+      return;
+    }
+    setCheckingUsername(false);
+    setOnboardingStep('pin');
+  };
+
   const createProfileFromName = async () => {
-    if (!nameInput.trim() || creating) return;
+    if (!nameInput.trim() || !onboardingUsername.trim() || !pinSetupInput || creating) return;
+    if (pinSetupInput.length < 4) return;
     setCreating(true);
 
-    const slug = generateSlug(nameInput.trim());
+    const slug = onboardingUsername.trim().toLowerCase();
     const { data, error } = await supabase
       .from('profiles')
       .insert({
         slug,
         name: nameInput.trim(),
+        pin: pinSetupInput,
         gender: 'male',
         theme: theme,
         measurements: {},
@@ -143,9 +187,36 @@ export default function OwnerPage() {
       setProfile(p);
       setShowNamePrompt(false);
       setNameInput('');
+      setOnboardingUsername('');
+      setPinSetupInput('');
+      setOnboardingStep('name');
       // pendingAction stays set - useEffect in child components will pick it up
     }
     setCreating(false);
+  };
+
+  const handleSaveUsername = async () => {
+    if (!profile || !usernameSetupInput.trim() || savingUsername) return;
+    setSavingUsername(true);
+    setUsernameSetupError('');
+
+    const username = usernameSetupInput.trim().toLowerCase();
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', username)
+      .maybeSingle();
+
+    if (existing) {
+      setUsernameSetupError('That username is taken. Please try another.');
+      setSavingUsername(false);
+      return;
+    }
+
+    await supabase.from('profiles').update({ slug: username }).eq('id', profile.id);
+    setProfile({ ...profile, slug: username });
+    setShowUsernameSetup(false);
+    setSavingUsername(false);
   };
 
   // Guest photo flow: store files, ask for name, upload after profile exists
@@ -187,20 +258,14 @@ export default function OwnerPage() {
   }, [profile, pendingFiles]);
 
   const handleRecovery = async () => {
-    if (!recoverySlug.trim() || !recoveryPin.trim() || recovering) return;
+    if (!recoveryUsername.trim() || !recoveryPin.trim() || recovering) return;
     setRecovering(true);
     setRecoveryError('');
-
-    let slug = recoverySlug.trim();
-    if (slug.includes('/')) {
-      const parts = slug.split('/');
-      slug = parts[parts.length - 1];
-    }
 
     const { data } = await supabase
       .from('profiles')
       .select('*')
-      .eq('slug', slug)
+      .eq('slug', recoveryUsername.trim().toLowerCase())
       .eq('pin', recoveryPin)
       .single();
 
@@ -226,7 +291,7 @@ export default function OwnerPage() {
 
       setShowRecovery(false);
     } else {
-      setRecoveryError('No profile found with that link and PIN. Please check and try again.');
+      setRecoveryError('No profile found with that username and PIN. Please check and try again.');
     }
     setRecovering(false);
   };
@@ -376,14 +441,14 @@ export default function OwnerPage() {
       <div className="onboarding">
         <div className="onboarding-logo">Suruwe</div>
         <div className="onboarding-tagline">
-          Enter your profile link and PIN to access your profile on this device.
+          Enter your username and PIN to access your profile on this device.
         </div>
         <input
           className="onboarding-input"
           type="text"
-          placeholder="Your profile link or slug (e.g. chidi-ozzc)"
-          value={recoverySlug}
-          onChange={(e) => setRecoverySlug(e.target.value)}
+          placeholder="Your username"
+          value={recoveryUsername}
+          onChange={(e) => setRecoveryUsername(e.target.value)}
           autoFocus
         />
         <input
@@ -406,7 +471,7 @@ export default function OwnerPage() {
         <button
           className="btn btn-primary onboarding-btn"
           onClick={handleRecovery}
-          disabled={!recoverySlug.trim() || recoveryPin.length < 4 || recovering}
+          disabled={!recoveryUsername.trim() || recoveryPin.length < 4 || recovering}
         >
           {recovering ? 'Looking up...' : 'Access My Profile'}
         </button>
@@ -752,31 +817,128 @@ export default function OwnerPage() {
         </div>
       )}
 
-      {/* Name prompt modal */}
-      {showNamePrompt && (
-        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); }}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: 8 }}>What's your name?</h3>
+      {/* Username setup for existing users with auto-generated slugs */}
+      {showUsernameSetup && profile && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3 style={{ marginBottom: 8 }}>Choose a username</h3>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
-              We will create your profile so your work is saved.
+              Pick a username so you can log in on any device with just your username and PIN.
             </p>
             <input
               className="input"
               type="text"
-              placeholder="Your name"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
+              placeholder="Your username"
+              value={usernameSetupInput}
+              onChange={(e) => { setUsernameSetupInput(e.target.value); setUsernameSetupError(''); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
               autoFocus
             />
+            {usernameSetupError && (
+              <p style={{ color: '#e74c3c', fontSize: 14, marginTop: 8 }}>{usernameSetupError}</p>
+            )}
             <button
               className="btn btn-primary btn-full"
-              onClick={createProfileFromName}
-              disabled={!nameInput.trim() || creating}
+              onClick={handleSaveUsername}
+              disabled={!usernameSetupInput.trim() || savingUsername}
               style={{ marginTop: 16 }}
             >
-              {creating ? 'Creating...' : 'Continue'}
+              {savingUsername ? 'Saving...' : 'Save Username'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Name prompt modal - multi-step onboarding */}
+      {showNamePrompt && (
+        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); setOnboardingStep('name'); }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+            {onboardingStep === 'name' && (
+              <>
+                <h3 style={{ marginBottom: 8 }}>What's your name?</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
+                  We will create your profile so your work is saved.
+                </p>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Your name"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()}
+                  autoFocus
+                />
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={handleOnboardingName}
+                  disabled={!nameInput.trim()}
+                  style={{ marginTop: 16 }}
+                >
+                  Continue
+                </button>
+              </>
+            )}
+
+            {onboardingStep === 'username' && (
+              <>
+                <h3 style={{ marginBottom: 8 }}>Choose a username</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
+                  This is how you will log in on any device.
+                </p>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Your username"
+                  value={onboardingUsername}
+                  onChange={(e) => { setOnboardingUsername(e.target.value); setOnboardingUsernameError(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()}
+                  autoFocus
+                />
+                {onboardingUsernameError && (
+                  <p style={{ color: '#e74c3c', fontSize: 14, marginTop: 8 }}>{onboardingUsernameError}</p>
+                )}
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={handleOnboardingUsername}
+                  disabled={!onboardingUsername.trim() || checkingUsername}
+                  style={{ marginTop: 16 }}
+                >
+                  {checkingUsername ? 'Checking...' : 'Continue'}
+                </button>
+              </>
+            )}
+
+            {onboardingStep === 'pin' && (
+              <>
+                <h3 style={{ marginBottom: 8 }}>Set a PIN</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 20 }}>
+                  You will use this with your username to log in on other devices.
+                </p>
+                <input
+                  className="input"
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="4 to 6 digits"
+                  value={pinSetupInput}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setPinSetupInput(val);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
+                  autoFocus
+                />
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={createProfileFromName}
+                  disabled={pinSetupInput.length < 4 || creating}
+                  style={{ marginTop: 16 }}
+                >
+                  {creating ? 'Creating...' : 'Create Profile'}
+                </button>
+              </>
+            )}
+
           </div>
         </div>
       )}
