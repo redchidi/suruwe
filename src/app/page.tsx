@@ -315,6 +315,11 @@ export default function OwnerPage() {
     }
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem(PROFILE_KEY);
+    setProfile(null);
+  };
+
   const handleShareProfile = () => {
     if (!profile) return;
     if (!profile!.phone) {
@@ -580,6 +585,20 @@ export default function OwnerPage() {
             </svg>
           </button>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          {profile && !isGuest && (
+            <button
+              className="theme-toggle"
+              onClick={handleSignOut}
+              title="Sign out"
+              style={{ fontSize: 14 }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -594,6 +613,13 @@ export default function OwnerPage() {
             <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5 }}>
               Share your measurements, photos, and fit notes with your tailor in one link.
             </p>
+            <button
+              className="btn btn-ghost"
+              onClick={() => setShowRecovery(true)}
+              style={{ fontSize: 13, padding: '4px 0', marginTop: 10, color: 'var(--text-secondary)' }}
+            >
+              I already have a profile
+            </button>
           </>
         ) : (
           <>
@@ -774,19 +800,6 @@ export default function OwnerPage() {
           </div>
         )}
       </div>
-
-      {/* Recovery link for guests */}
-      {isGuest && (
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <button
-            className="btn btn-ghost"
-            onClick={() => setShowRecovery(true)}
-            style={{ fontSize: 14 }}
-          >
-            I already have a profile
-          </button>
-        </div>
-      )}
 
       {/* Feedback link */}
       <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
