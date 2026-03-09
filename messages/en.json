@@ -1,0 +1,208 @@
+{
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "save": "Save",
+    "saving": "Saving...",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "skip": "Skip for now",
+    "notNow": "Not now",
+    "sending": "Sending...",
+    "uploading": "Uploading...",
+    "checking": "Checking...",
+    "creating": "Creating...",
+    "lookingUp": "Looking up..."
+  },
+  "status": {
+    "sent": "Sent",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "draft": "Draft"
+  },
+  "nav": {
+    "logo": "Suruwe"
+  },
+  "home": {
+    "tagline": "What you ordered is what you get.",
+    "subtitle": "Share your measurements, photos, and fit notes with your tailor in one link.",
+    "profileUrl": "suruwe.vercel.app/{slug}",
+    "newOrder": "New Order",
+    "alreadyHaveProfile": "I already have a profile",
+    "shareSuruwe": "Share Suruwe",
+    "feedback": "Got feedback? Tell us on WhatsApp"
+  },
+  "nudge": {
+    "guest": "Add your body photo and measurements below. When you save, we will create your profile.",
+    "missingBoth": "Add your body photo and measurements below so your tailor has everything they need when you place an order.",
+    "missingPhoto": "Looking good! Add a body photo so your tailor can see your build.",
+    "missingMeasurements": "Almost there! Add your measurements to complete your profile."
+  },
+  "bodyPhoto": {
+    "sectionTitle": "Body Photo",
+    "description": "Add one photo so your tailor can see your body profile — how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
+    "addPhoto": "Add a body photo"
+  },
+  "measurements": {
+    "sectionTitle": "Measurements",
+    "addButton": "Add Measurements",
+    "shareProfile": "Share My Profile",
+    "shareCard": "Share My Card"
+  },
+  "orders": {
+    "sectionTitle": "Orders",
+    "empty": "No orders yet. Tap New Order to get something made."
+  },
+  "orderCard": {
+    "deleteConfirm": "Delete this order?",
+    "deleteCancel": "Cancel",
+    "deleteConfirmButton": "Delete"
+  },
+  "onboarding": {
+    "nameStep": {
+      "title": "What's your name?",
+      "subtitle": "We will create your profile so your work is saved.",
+      "placeholder": "Your name",
+      "continue": "Continue"
+    },
+    "usernameStep": {
+      "title": "Choose a username",
+      "subtitle": "This is how you will log in on any device.",
+      "placeholder": "Your username",
+      "continue": "Continue",
+      "takenError": "That username is taken. Please try another."
+    },
+    "pinStep": {
+      "title": "Set a PIN",
+      "subtitle": "You will use this with your username to log in on other devices.",
+      "placeholder": "4 to 6 digits",
+      "createProfile": "Create Profile"
+    }
+  },
+  "recovery": {
+    "title": "Suruwe",
+    "tagline": "What you ordered is what you get.",
+    "subtitle": "Enter your username and PIN to access your profile on this device.",
+    "usernamePlaceholder": "Your username",
+    "pinPlaceholder": "Your PIN",
+    "accessButton": "Access My Profile",
+    "backButton": "Back",
+    "error": "No profile found with that username and PIN. Please check and try again."
+  },
+  "pinSetup": {
+    "title": "Secure your profile",
+    "subtitle": "Set a 4 to 6 digit PIN so you can access your profile on other devices.",
+    "placeholder": "Enter a PIN (4-6 digits)",
+    "saveButton": "Save PIN"
+  },
+  "usernameSetup": {
+    "title": "Choose a username",
+    "subtitle": "Pick a username so you can log in on any device with just your username and PIN.",
+    "placeholder": "Your username",
+    "saveButton": "Save Username",
+    "takenError": "That username is taken. Please try another."
+  },
+  "shareSuruwe": {
+    "heading": "What you ordered vs what you got.",
+    "subheading": "Never again.",
+    "message": "You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:",
+    "shareButton": "Share Suruwe"
+  },
+  "orderFlow": {
+    "stepIndicator": "Step {step} of {total}",
+    "step1": {
+      "title": "What are you making?",
+      "descriptionLabel": "What are you making?",
+      "descriptionPlaceholder": "e.g. Kaftan, dress, trado pants...",
+      "deadlineLabel": "Need it by (optional)",
+      "tailorNameLabel": "Tailor name (optional)",
+      "tailorNamePlaceholder": "Your tailor's name",
+      "tailorPhoneLabel": "Tailor's WhatsApp number (optional)",
+      "tailorPhonePlaceholder": "e.g. +234 801 234 5678",
+      "tailorCityLabel": "City (optional)",
+      "tailorCityPlaceholder": "e.g. Accra, Lagos, Nairobi, London",
+      "noDetails": "No details"
+    },
+    "step2": {
+      "title": "Fit notes and reference images",
+      "fitNotesLabel": "Fit notes (optional)",
+      "fitNotesPlaceholder": "e.g.\n- Slim fit, not too tight around the arms\n- Leave extra room in the chest\n- Knee length",
+      "fitNotesHint": "Use dashes or numbers for a list. Line breaks will be preserved.",
+      "imagesLabel": "Inspiration images or chat screenshots",
+      "addImages": "Add images",
+      "tailorCanSee": "Tailor can see this",
+      "privateToYou": "Private to you"
+    },
+    "step3": {
+      "hasRecentTitle": "Your measurements",
+      "hasRecentLastUpdated": "Last updated {date}.",
+      "hasRecentContinue": "Looks good, continue",
+      "hasRecentUpdate": "Update measurements",
+      "staleTitle": "Check your measurements",
+      "staleBanner": "Your measurements were last updated {date}. Want to update before sending?",
+      "staleUpdate": "Update measurements",
+      "staleSkip": "Skip, they are still correct",
+      "emptyTitle": "Add your measurements",
+      "emptySubtitle": "Your tailor needs these to get the fit right. You only have to do this once.",
+      "saveLabel": "Save and Continue",
+      "skip": "Skip for now"
+    },
+    "step35": {
+      "title": "Update measurements",
+      "saveLabel": "Save and Continue"
+    },
+    "step4": {
+      "title": "Review and send",
+      "noPhotoWarning": "You have not added a photo of yourself yet. A photo helps your tailor see your frame and get the fit right.",
+      "tapToEdit": "Tap any section to edit",
+      "labelMaking": "Making",
+      "labelNeedBy": "Need it by",
+      "labelTailor": "Tailor",
+      "labelFitNotes": "Fit notes",
+      "fitNotesNone": "None",
+      "labelAttachments": "Attachments ({count} visible to tailor)",
+      "sendToTailor": "Send to {name}",
+      "shareOnWhatsApp": "Share on WhatsApp"
+    },
+    "sent": {
+      "title": "Order sent!",
+      "description": "Your order for {description} has been sent{tailor} via WhatsApp.",
+      "tailorPart": " to {name}",
+      "sharePrompt": "Know someone who struggles with getting clothes made the way they want?",
+      "shareButton": "Share Suruwe",
+      "feedbackPrompt": "This is new. One thing that would make it better?",
+      "feedbackPlaceholder": "Be honest, it helps",
+      "feedbackSend": "Send feedback",
+      "feedbackThanks": "Thanks, that helps a lot."
+    }
+  },
+  "orderDetail": {
+    "editTitle": "Edit order",
+    "tailorNameLabel": "Tailor name",
+    "whatsappLabel": "WhatsApp number",
+    "cityLabel": "City",
+    "makingLabel": "What are you making?",
+    "fitNotesLabel": "Fit notes",
+    "referenceImagesLabel": "Reference Images",
+    "addReferenceImages": "+ Add reference images",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel",
+    "fitNotesSectionTitle": "Fit Notes",
+    "referenceImagesSectionTitle": "Reference Images",
+    "editButton": "Edit order",
+    "resendButton": "Resend to {name}",
+    "deleteButton": "Delete order",
+    "deleteConfirmText": "Delete this order? This cannot be undone.",
+    "deleteCancel": "Cancel",
+    "deleteConfirm": "Delete",
+    "completedTitle": "Completed Piece",
+    "completedSubtitle": "Add a photo of the finished garment and a note on how the fit turned out. This builds your fit history over time.",
+    "completedNotePlaceholder": "How did the fit turn out? What worked, what needed adjusting...",
+    "saveFitNote": "Save fit note",
+    "shareCompleted": "Share this on WhatsApp",
+    "addCompletedPhoto": "Got your piece? Add a photo of the finished work."
+  }
+}
