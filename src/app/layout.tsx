@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
+import { getLocale } from 'next-intl/server';
 import './globals.css';
 
 const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
@@ -37,13 +38,14 @@ export const viewport: Viewport = {
   themeColor: '#0C0C0C',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
