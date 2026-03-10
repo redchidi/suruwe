@@ -15,7 +15,8 @@
     "uploading": "Uploading...",
     "checking": "Checking...",
     "creating": "Creating...",
-    "lookingUp": "Looking up..."
+    "lookingUp": "Looking up...",
+    "signOut": "Sign out"
   },
   "status": {
     "sent": "Sent",
@@ -43,7 +44,7 @@
   },
   "bodyPhoto": {
     "sectionTitle": "Body Photo",
-    "description": "Add one photo so your tailor can see your body profile â how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
+    "description": "Add one photo so your tailor can see your body profile Ã¢ÂÂ how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
     "addPhoto": "Add a body photo"
   },
   "measurements": {
@@ -209,5 +210,31 @@
     "title": "Add your phone number",
     "subtitle": "So you can always access your Suruwe profile from any device. We will send you a link via WhatsApp.",
     "placeholder": "+234 XXX XXX XXXX"
+  },
+  "tailorView": {
+    "notFound": "Profile not found",
+    "notFoundDesc": "This measurement profile does not exist or may have moved.",
+    "photos": "Photos",
+    "measurementNotes": "Measurement Notes",
+    "styleNotes": "Style Notes",
+    "pinLabel": "Your PIN",
+    "pinError": "Incorrect PIN. Please try again.",
+    "verify": "Verify",
+    "showGuides": "Show measurement guides",
+    "hideGuides": "Hide measurement guides",
+    "thisIsMe": "This is me",
+    "fullSizePhoto": "Full size photo",
+    "orderedBy": "Ordered by",
+    "orderFor": "Order for",
+    "fitNotes": "Fit notes",
+    "referenceImages": "Reference images",
+    "deadline": "Need by",
+    "measurements": "Measurements",
+    "noMeasurements": "No measurements saved yet.",
+    "noPhotos": "No photos added yet.",
+    "noFitNotes": "No fit notes.",
+    "noReferenceImages": "No reference images.",
+    "visibleToTailor": "Visible to tailor",
+    "privateToCustomer": "Private"
   }
 }
