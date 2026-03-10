@@ -1,6 +1,5 @@
 'use client';
 import { useTranslations } from 'next-intl';
-
 import { useState, useEffect } from 'react';
 import { Profile, ProfilePhoto, getMeasurementSections, getMeasurementFields, getKeyMeasurements } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -24,13 +23,8 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
   const [verifying, setVerifying] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
-  useEffect(() => {
-    loadProfile();
-  }, [params.profileId]);
-
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+  useEffect(() => { loadProfile(); }, [params.profileId]);
+  useEffect(() => { applyTheme(theme); }, [theme]);
 
   const loadProfile = async () => {
     const { data: profileData } = await supabase
@@ -49,17 +43,15 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
     setProfile(p);
     setTheme(p.theme as Theme);
 
-    // Load photos
     const { data: photoData } = await supabase
       .from('profile_photos')
       .select('*')
       .eq('profile_id', p.id)
       .order('sort_order', { ascending: true });
-    if (photoData) setPhotos(photoData);
 
+    if (photoData) setPhotos(photoData);
     setLoading(false);
 
-    // Check if this device already owns this profile
     const storedId = localStorage.getItem('suruwe_profile_id');
     if (storedId === p.id) {
       setIsOwner(true);
@@ -107,12 +99,8 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
       <div className="not-found">
         <h1>{t('tailorView.notFound')}</h1>
         <p>{t('tailorView.notFoundDesc')}</p>
-        <a
-          href="/"
-          className="btn btn-primary"
-          style={{ marginTop: 24 }}
-        >
-          Create your own profile
+        <a href="/" className="btn btn-primary" style={{ marginTop: 24 }}>
+          {t('tailorView.footerCreate')} suruwe.vercel.app
         </a>
       </div>
     );
@@ -146,43 +134,26 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
         <div
           onClick={() => setShowPinEntry(true)}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            padding: '14px 20px',
-            marginBottom: 24,
-            borderRadius: 10,
-            background: 'var(--accent)',
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: 15,
-            fontWeight: 500,
-            fontFamily: 'var(--font-display, inherit)',
-            letterSpacing: '-0.01em',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            padding: '14px 20px', marginBottom: 24, borderRadius: 10,
+            background: 'var(--accent)', color: '#fff', cursor: 'pointer',
+            fontSize: 15, fontWeight: 500,
+            fontFamily: 'var(--font-display, inherit)', letterSpacing: '-0.01em',
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
-          This is my profile
+          {t('tailorView.thisIsMe')}
         </div>
       )}
 
       {/* PIN entry */}
       {showPinEntry && !isOwner && (
-        <div
-          style={{
-            padding: '20px',
-            marginBottom: 24,
-            borderRadius: 10,
-            border: '1px solid var(--border)',
-            background: 'var(--card-bg)',
-          }}
-        >
+        <div style={{ padding: '20px', marginBottom: 24, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--card-bg)' }}>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
-            Enter your PIN to access your profile on this device.
+            {t('tailorView.pinPrompt')}
           </p>
           <input
             type="number"
@@ -195,58 +166,23 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
               setPinError('');
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && pinInput.length >= 4) {
-                handlePinVerify();
-              }
+              if (e.key === 'Enter' && pinInput.length >= 4) { handlePinVerify(); }
             }}
             autoFocus
-            style={{
-              width: '100%',
-              fontSize: 16,
-              padding: '12px 14px',
-              background: 'var(--input-bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              color: 'var(--text)',
-              fontFamily: 'inherit',
-              marginBottom: pinError ? 8 : 16,
-            }}
+            style={{ width: '100%', fontSize: 16, padding: '12px 14px', background: 'var(--input-bg)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)', fontFamily: 'inherit', marginBottom: pinError ? 8 : 16 }}
           />
-          {pinError && (
-            <p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 12 }}>{pinError}</p>
-          )}
+          {pinError && (<p style={{ color: '#e74c3c', fontSize: 13, marginBottom: 12 }}>{pinError}</p>)}
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={() => { setShowPinEntry(false); setPinInput(''); setPinError(''); }}
-              style={{
-                flex: 1,
-                padding: '12px',
-                fontSize: 14,
-                background: 'none',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
+              style={{ flex: 1, padding: '12px', fontSize: 14, background: 'none', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'inherit' }}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handlePinVerify}
               disabled={pinInput.length < 4 || verifying}
-              style={{
-                flex: 1,
-                padding: '12px',
-                fontSize: 14,
-                background: 'var(--accent)',
-                border: 'none',
-                borderRadius: 8,
-                color: '#fff',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                opacity: pinInput.length < 4 ? 0.5 : 1,
-              }}
+              style={{ flex: 1, padding: '12px', fontSize: 14, background: 'var(--accent)', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontFamily: 'inherit', opacity: pinInput.length < 4 ? 0.5 : 1 }}
             >
               {verifying ? t('common.checking') : t('tailorView.verify')}
             </button>
@@ -258,27 +194,13 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
       {isOwner && (
         <a
           href="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            padding: '14px 20px',
-            marginBottom: 24,
-            borderRadius: 10,
-            border: '1px solid var(--accent)',
-            color: 'var(--accent)',
-            textDecoration: 'none',
-            fontSize: 15,
-            fontWeight: 500,
-            fontFamily: 'var(--font-display, inherit)',
-          }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 20px', marginBottom: 24, borderRadius: 10, border: '1px solid var(--accent)', color: 'var(--accent)', textDecoration: 'none', fontSize: 15, fontWeight: 500, fontFamily: 'var(--font-display, inherit)' }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
-          Go to my profile
+          {t('tailorView.goToProfile')}
         </a>
       )}
 
@@ -286,22 +208,15 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
       <div className="tailor-layout">
         {(primaryPhoto || hasMeasurements) && (
           <div className="tailor-top">
-            {/* Photo */}
             {primaryPhoto && (
               <div className="tailor-photo" onClick={() => setLightboxUrl(primaryPhoto.url)}>
-                <img
-                  src={primaryPhoto.url}
-                  alt={`${profile.name}'s photo`}
-                  loading="eager"
-                />
+                <img src={primaryPhoto.url} alt={`${profile.name}'s photo`} loading="eager" />
               </div>
             )}
-
-            {/* Key measurements */}
             {hasMeasurements && (
               <div className="tailor-key-measurements">
                 <div className="label" style={{ marginBottom: 8 }}>
-                  Key Measurements ({unitLabel})
+                  {t('tailorView.keyMeasurements')} ({unitLabel})
                 </div>
                 {keyMeasurementKeys
                   .filter((key) => profile.measurements[key] != null)
@@ -309,12 +224,12 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
                     const field = allFields.find((f) => f.key === key);
                     return (
                       <div key={key} className="tailor-measurement-row">
-                        <span className="name">{field?.label || key}</span>
+                        <span className="name">
+                          {field ? t(`measurementLabels.${profile.gender}.${key}`) : key}
+                        </span>
                         <span className="value">
                           {profile.measurements[key]}
-                          <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 2 }}>
-                            {unitLabel}
-                          </span>
+                          <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 2 }}>{unitLabel}</span>
                         </span>
                       </div>
                     );
@@ -324,47 +239,24 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
-        {/* Additional photos */}
         {photos.length > 1 && (
           <div className="tailor-section">
             <div className="tailor-section-title">{t('tailorView.photos')}</div>
-            <div
-              className={`photos-grid ${photos.length === 2 ? 'two' : ''}`}
-            >
+            <div className={`photos-grid ${photos.length === 2 ? 'two' : ''}`}>
               {photos.slice(1).map((photo) => (
-                <div
-                  key={photo.id}
-                  className="photo-item"
-                  onClick={() => setLightboxUrl(photo.url)}
-                >
-                  <img
-                    src={photo.url}
-                    alt={`${profile.name}'s photo`}
-                    loading="lazy"
-                  />
+                <div key={photo.id} className="photo-item" onClick={() => setLightboxUrl(photo.url)}>
+                  <img src={photo.url} alt={`${profile.name}'s photo`} loading="lazy" />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Measurement Guides toggle */}
         {hasMeasurements && (
           <div className="tailor-section">
             <button
               onClick={() => setShowGuides(!showGuides)}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                fontSize: 14,
-                color: 'var(--accent)',
-                background: 'none',
-                border: '1px solid var(--accent)',
-                borderRadius: 8,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                opacity: 0.85,
-              }}
+              style={{ width: '100%', padding: '10px 14px', fontSize: 14, color: 'var(--accent)', background: 'none', border: '1px solid var(--accent)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', opacity: 0.85 }}
             >
               {showGuides ? t('tailorView.hideGuides') : t('tailorView.showGuides')}
             </button>
@@ -376,27 +268,22 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
-        {/* Full Measurements */}
         {hasMeasurements && (
           <div>
             <div className="label" style={{ marginBottom: 16 }}>
-              All Measurements ({unitLabel})
+              {t('tailorView.allMeasurements')} ({unitLabel})
             </div>
-            {Object.entries(sections).map(([sectionName, fields]) => {
-              const filledFields = fields.filter(
-                (f) => profile.measurements[f.key] != null
-              );
+            {Object.entries(sections).map(([sectionKey, fields]) => {
+              const filledFields = fields.filter((f) => profile.measurements[f.key] != null);
               if (filledFields.length === 0) return null;
               return (
-                <div key={sectionName} className="tailor-section">
-                  <div className="tailor-section-title">{sectionName}</div>
+                <div key={sectionKey} className="tailor-section">
+                  <div className="tailor-section-title">{t(`measurementSections.${sectionKey}`)}</div>
                   <div className="tailor-measurements-grid">
                     {filledFields.map((field) => (
                       <div key={field.key} className="tailor-measurement-cell">
-                        <span className="name">{field.label}</span>
-                        <span className="value">
-                          {profile.measurements[field.key]}
-                        </span>
+                        <span className="name">{t(`measurementLabels.${profile.gender}.${field.key}`)}</span>
+                        <span className="value">{profile.measurements[field.key]}</span>
                       </div>
                     ))}
                   </div>
@@ -406,7 +293,6 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
-        {/* Measurement Notes */}
         {profile.measurement_notes && profile.measurement_notes.trim() && (
           <div className="tailor-section">
             <div className="tailor-section-title">{t('tailorView.measurementNotes')}</div>
@@ -416,7 +302,6 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </div>
         )}
 
-        {/* Style Notes */}
         {profile.style_notes && (
           <div className="tailor-section">
             <div className="tailor-section-title">{t('tailorView.styleNotes')}</div>
@@ -433,25 +318,17 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
         </div>
         <p>
-          Create your own measurement profile at{' '}
+          {t('tailorView.footerCreate')}{' '}
           <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.vercel.app</a>
         </p>
       </div>
 
-      {/* Lightbox */}
       {lightboxUrl && (
         <div className="photo-lightbox" onClick={() => setLightboxUrl(null)}>
-          <button
-            className="photo-lightbox-close"
-            onClick={() => setLightboxUrl(null)}
-          >
+          <button className="photo-lightbox-close" onClick={() => setLightboxUrl(null)}>
             <XIcon size={20} />
           </button>
-          <img
-            src={lightboxUrl}
-            alt={t('tailorView.fullSizePhoto')}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <img src={lightboxUrl} alt={t('tailorView.fullSizePhoto')} onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </div>
