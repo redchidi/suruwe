@@ -44,14 +44,72 @@
   },
   "bodyPhoto": {
     "sectionTitle": "Body Photo",
-    "description": "Add one photo so your tailor can see your body profile Ã¢ÂÂ how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
+    "description": "Add one photo so your tailor can see your body profile - how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
     "addPhoto": "Add a body photo"
   },
   "measurements": {
     "sectionTitle": "Measurements",
     "addButton": "Add Measurements",
     "shareProfile": "Share My Profile",
-    "shareCard": "Share My Card"
+    "shareCard": "Share My Card",
+    "showGuide": "Show guide",
+    "hideGuide": "Hide guide",
+    "notesTitle": "Notes",
+    "notesDescription": "Any measurements your tailor took that are not listed above, or other notes.",
+    "notesPlaceholder": "e.g. Round back adjustment +1in, front rise 11in",
+    "emptyState": "No measurements added yet. Start a new order and you will be prompted to add them.",
+    "saveMeasurements": "Save Measurements",
+    "keyMeasurements": "Key Measurements",
+    "allMeasurements": "All Measurements"
+  },
+  "measurementSections": {
+    "upperBody": "Upper Body",
+    "arms": "Arms",
+    "lowerBody": "Lower Body",
+    "fullBody": "Full Body"
+  },
+  "measurementLabels": {
+    "male": {
+      "torso_length": "A. Shirt Length",
+      "chest": "B. Chest",
+      "shoulder": "C. Shoulder",
+      "neck": "E. Neck",
+      "armhole": "F. Armhole",
+      "belly": "f. Belly",
+      "sleeve": "D. Sleeve Length",
+      "bicep": "G. Bicep",
+      "wrist": "Wrist",
+      "outseam": "G. Trouser Length",
+      "waist": "H. Waist",
+      "hips": "I. Hips",
+      "thigh": "J. Thigh",
+      "knee": "K. Knee",
+      "ankle": "L. Ankle",
+      "inseam": "M. Inseam"
+    },
+    "female": {
+      "bodice_length": "N. Bodice Length",
+      "bust": "O. Bust",
+      "underbust": "P. Underbust",
+      "shoulder": "Q. Shoulder",
+      "armhole": "S. Armhole",
+      "belly": "V. Belly",
+      "sleeve": "R. Sleeve Length",
+      "bicep": "T. Bicep",
+      "wrist": "U. Wrist",
+      "across_front": "AF. Across Front",
+      "shoulder_to_waist": "AG. Shoulder to Waist",
+      "shoulder_to_floor": "AH. Shoulder to Floor",
+      "waist": "W. Waist",
+      "high_hip": "X. High Hip",
+      "hips": "Y. Hip",
+      "thigh": "Z. Thigh",
+      "knee": "AA. Knee",
+      "ankle": "AB. Ankle",
+      "inseam": "AC. Inseam",
+      "crotch_depth": "AD. Crotch Depth",
+      "bottom_length": "AE. Bottom Length"
+    }
   },
   "orders": {
     "sectionTitle": "Orders",
@@ -235,6 +293,30 @@
     "noFitNotes": "No fit notes.",
     "noReferenceImages": "No reference images.",
     "visibleToTailor": "Visible to tailor",
-    "privateToCustomer": "Private"
+    "privateToCustomer": "Private",
+    "keyMeasurements": "Key Measurements",
+    "allMeasurements": "All Measurements",
+    "orderFrom": "Order from",
+    "making": "Making",
+    "goToProfile": "Go to my profile",
+    "pinPrompt": "Enter your PIN to access your profile on this device.",
+    "footerCreate": "Create your own measurement profile at",
+    "footerTagline": "What you ordered is what you get."
+  },
+  "card": {
+    "measurements": "Measurements",
+    "completedPieces": "Completed Pieces",
+    "completed": "completed",
+    "piece": "piece",
+    "pieces": "pieces",
+    "tailor": "tailor",
+    "tailors": "tailors",
+    "madeBy": "Made by",
+    "whatYouOrdered": "What you ordered is what you get.",
+    "shareWhatsApp": "Share on WhatsApp",
+    "copyLink": "Copy card link",
+    "linkCopied": "Link copied!",
+    "footerCreate": "Create your own at",
+    "myMeasurements": "My Measurements"
   }
 }
