@@ -209,7 +209,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
 
             {/* Reference images in edit mode */}
             <div className="input-group">
-              <label>Reference Images</label>
+              <label>{t('orderDetail.referenceImagesLabel')}</label>
               {attachments.length > 0 && (
                 <div className="attachment-grid" style={{ marginBottom: 12 }}>
                   {attachments.map((att) => (
@@ -288,12 +288,12 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
 
           <p className="text-secondary mb-24" style={{ fontSize: 14 }}>
             {order.tailor_name}
-            {order.tailor_city ? `, ${order.tailor_city}` : ''} Â· {formatDate(order.created_at)}
+            {order.tailor_city ? `, ${order.tailor_city}` : ''} ÃÂ· {formatDate(order.created_at)}
           </p>
 
           {order.fit_notes && (
             <div className="section">
-              <div className="section-title">Fit Notes</div>
+              <div className="section-title">{t('orderDetail.fitNotesSectionTitle')}</div>
               <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>
                 {order.fit_notes}
               </p>
@@ -302,7 +302,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
 
           {attachments.length > 0 && (
             <div className="section">
-              <div className="section-title">Reference Images</div>
+              <div className="section-title">{t('orderDetail.referenceImagesSectionTitle')}</div>
               <div className="attachment-grid">
                 {attachments.map((att) => (
                   <div
@@ -381,7 +381,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
 
           {/* Completed photo section */}
           <div className="section">
-            <div className="section-title">Completed Piece</div>
+            <div className="section-title">{t('orderDetail.completedTitle')}</div>
             <p className="text-secondary" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
               Add a photo of the finished garment and a note on how the fit turned out. This builds your fit history over time.
             </p>
