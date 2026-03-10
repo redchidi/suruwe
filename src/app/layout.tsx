@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
-import Providers from '@/components/Providers';
 import './globals.css';
 
 const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
@@ -33,15 +32,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        <Providers>
-          {children}
-        </Providers>
+        {children}
         <Analytics />
       </body>
     </html>
