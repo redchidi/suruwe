@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Order, OrderAttachment, Profile } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
@@ -19,6 +19,7 @@ interface OrderDetailProps {
 
 export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onDelete }: OrderDetailProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [attachments, setAttachments] = useState<OrderAttachment[]>([]);
   const [completedPhoto, setCompletedPhoto] = useState(order.completed_photo_url);
   const [completedNote, setCompletedNote] = useState(order.completed_note || '');
@@ -288,7 +289,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
 
           <p className="text-secondary mb-24" style={{ fontSize: 14 }}>
             {order.tailor_name}
-            {order.tailor_city ? `, ${order.tailor_city}` : ''} ÃÂ· {formatDate(order.created_at)}
+            {order.tailor_city ? `, ${order.tailor_city}` : ''} ÃÂÃÂ· {formatDate(order.created_at)}
           </p>
 
           {order.fit_notes && (
@@ -418,9 +419,8 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                   className="btn btn-whatsapp btn-full btn-sm"
                   onClick={() => {
                     const message = generateCompletedOrderMessage(
-                      order,
-                      order.tailor_phone || null
-                    );
+                      order, order.tailor_phone || null
+                    , locale);
                     openWhatsApp(message);
                   }}
                 >
