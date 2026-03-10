@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Profile, Order, ProfilePhoto } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { applyTheme, Theme } from '@/lib/theme';
@@ -29,6 +29,7 @@ const PROFILE_KEY = 'suruwe_profile_id';
 
 export default function OwnerPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const [view, setView] = useState<View>('home');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
@@ -247,7 +248,7 @@ export default function OwnerPage() {
 
   const doShare = () => {
     if (!profile) return;
-    const message = generateProfileShareMessage(profile);
+    const message = generateProfileShareMessage(profile, locale);
     openWhatsApp(message);
   };
 
@@ -583,7 +584,7 @@ https://suruwe.vercel.app`);
                 className="btn btn-secondary btn-full btn-sm"
                 onClick={() => {
                   const cardUrl = `${window.location.origin}/${profile!.slug}/card`;
-                  const text = `Here are my measurements and fit profile â everything you need to get my clothes right. Save or pin this link so you always have it handy: ${cardUrl}`;
+                  const text = `Here are my measurements and fit profile Ã¢ÂÂ everything you need to get my clothes right. Save or pin this link so you always have it handy: ${cardUrl}`;
                   if (navigator.share) {
                     navigator.share({ title: `${profile!.name} on Suruwe`, text, url: cardUrl }).catch(() => {});
                   } else {
