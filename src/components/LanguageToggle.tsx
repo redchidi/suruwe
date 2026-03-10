@@ -13,9 +13,8 @@ export default function LanguageToggle() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('suruwe_locale', next);
     }
-    const newPath = next === 'fr' ? '/fr' : '/';
     startTransition(() => {
-      router.replace(newPath);
+      router.replace(`/${next}`);
     });
   };
 
