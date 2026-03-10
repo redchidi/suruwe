@@ -1,5 +1,5 @@
 'use client';
-
+import { useTranslations } from 'next-intl';
 import { Gender, MeasurementUnit, getKeyMeasurements, getMeasurementFields } from '@/types';
 
 interface MeasurementsPreviewProps {
@@ -13,16 +13,16 @@ export default function MeasurementsPreview({
   gender,
   unit,
 }: MeasurementsPreviewProps) {
+  const t = useTranslations();
   const keyKeys = getKeyMeasurements(gender);
   const allFields = getMeasurementFields(gender);
   const unitLabel = unit === 'inches' ? 'in' : 'cm';
-
   const filledKeys = keyKeys.filter((k) => measurements[k] != null);
 
   if (filledKeys.length === 0) {
     return (
       <div className="empty-state">
-        <p>No measurements added yet. Start a new order and you will be prompted to add them.</p>
+        <p>{t('measurements.emptyState')}</p>
       </div>
     );
   }
@@ -37,7 +37,9 @@ export default function MeasurementsPreview({
               {measurements[key]}
               <span className="unit">{unitLabel}</span>
             </div>
-            <div className="name">{field?.label || key}</div>
+            <div className="name">
+              {field ? t(`measurementLabels.${gender}.${field.key}`) : key}
+            </div>
           </div>
         );
       })}
