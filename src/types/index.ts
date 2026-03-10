@@ -53,62 +53,63 @@ export type MeasurementUnit = 'inches' | 'cm';
 
 export interface MeasurementField {
   key: string;
-  label: string;
-  section: string;
+  label: string;       // English fallback, keep for safety
+  sectionKey: string;  // e.g. 'upperBody', 'arms', 'lowerBody', 'fullBody'
+  section: string;     // English fallback, keep for safety
 }
 
 // Men's measurements grouped by body section
 // Labels match the measurement guide diagrams
 export const MALE_MEASUREMENTS: MeasurementField[] = [
   // Upper body (Male Shirt / Top Guide)
-  { key: 'torso_length', label: 'A. Shirt Length', section: 'Upper Body' },
-  { key: 'chest', label: 'B. Chest', section: 'Upper Body' },
-  { key: 'shoulder', label: 'C. Shoulder', section: 'Upper Body' },
-  { key: 'neck', label: 'E. Neck', section: 'Upper Body' },
-  { key: 'armhole', label: 'F. Armhole', section: 'Upper Body' },
-  { key: 'belly', label: 'f. Belly', section: 'Upper Body' },
+  { key: 'torso_length', label: 'A. Shirt Length', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'chest', label: 'B. Chest', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'shoulder', label: 'C. Shoulder', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'neck', label: 'E. Neck', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'armhole', label: 'F. Armhole', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'belly', label: 'f. Belly', section: 'Upper Body', sectionKey: 'upperBody' },
   // Arms
-  { key: 'sleeve', label: 'D. Sleeve Length', section: 'Arms' },
-  { key: 'bicep', label: 'G. Bicep', section: 'Arms' },
-  { key: 'wrist', label: 'Wrist', section: 'Arms' },
+  { key: 'sleeve', label: 'D. Sleeve Length', section: 'Arms', sectionKey: 'arms' },
+  { key: 'bicep', label: 'G. Bicep', section: 'Arms', sectionKey: 'arms' },
+  { key: 'wrist', label: 'Wrist', section: 'Arms', sectionKey: 'arms' },
   // Lower body (Male Trousers / Bottom Guide)
-  { key: 'outseam', label: 'G. Trouser Length', section: 'Lower Body' },
-  { key: 'waist', label: 'H. Waist', section: 'Lower Body' },
-  { key: 'hips', label: 'I. Hips', section: 'Lower Body' },
-  { key: 'thigh', label: 'J. Thigh', section: 'Lower Body' },
-  { key: 'knee', label: 'K. Knee', section: 'Lower Body' },
-  { key: 'ankle', label: 'L. Ankle', section: 'Lower Body' },
-  { key: 'inseam', label: 'M. Inseam', section: 'Lower Body' },
+  { key: 'outseam', label: 'G. Trouser Length', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'waist', label: 'H. Waist', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'hips', label: 'I. Hips', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'thigh', label: 'J. Thigh', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'knee', label: 'K. Knee', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'ankle', label: 'L. Ankle', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'inseam', label: 'M. Inseam', section: 'Lower Body', sectionKey: 'lowerBody' },
 ];
 
 // Women's measurements grouped by body section
 // Labels match the measurement guide diagrams
 export const FEMALE_MEASUREMENTS: MeasurementField[] = [
   // Upper body (Female Top Guide)
-  { key: 'bodice_length', label: 'N. Bodice Length', section: 'Upper Body' },
-  { key: 'bust', label: 'O. Bust', section: 'Upper Body' },
-  { key: 'underbust', label: 'P. Underbust', section: 'Upper Body' },
-  { key: 'shoulder', label: 'Q. Shoulder', section: 'Upper Body' },
-  { key: 'armhole', label: 'S. Armhole', section: 'Upper Body' },
-  { key: 'belly', label: 'V. Belly', section: 'Upper Body' },
+  { key: 'bodice_length', label: 'N. Bodice Length', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'bust', label: 'O. Bust', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'underbust', label: 'P. Underbust', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'shoulder', label: 'Q. Shoulder', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'armhole', label: 'S. Armhole', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'belly', label: 'V. Belly', section: 'Upper Body', sectionKey: 'upperBody' },
   // Arms
-  { key: 'sleeve', label: 'R. Sleeve Length', section: 'Arms' },
-  { key: 'bicep', label: 'T. Bicep', section: 'Arms' },
-  { key: 'wrist', label: 'U. Wrist', section: 'Arms' },
+  { key: 'sleeve', label: 'R. Sleeve Length', section: 'Arms', sectionKey: 'arms' },
+  { key: 'bicep', label: 'T. Bicep', section: 'Arms', sectionKey: 'arms' },
+  { key: 'wrist', label: 'U. Wrist', section: 'Arms', sectionKey: 'arms' },
   // Full body (common for dresses, gowns, iro & buba)
-  { key: 'across_front', label: 'AF. Across Front', section: 'Full Body' },
-  { key: 'shoulder_to_waist', label: 'AG. Shoulder to Waist', section: 'Full Body' },
-  { key: 'shoulder_to_floor', label: 'AH. Shoulder to Floor', section: 'Full Body' },
+  { key: 'across_front', label: 'AF. Across Front', section: 'Full Body', sectionKey: 'fullBody' },
+  { key: 'shoulder_to_waist', label: 'AG. Shoulder to Waist', section: 'Full Body', sectionKey: 'fullBody' },
+  { key: 'shoulder_to_floor', label: 'AH. Shoulder to Floor', section: 'Full Body', sectionKey: 'fullBody' },
   // Lower body (Female Bottom Guide)
-  { key: 'waist', label: 'W. Waist', section: 'Lower Body' },
-  { key: 'high_hip', label: 'X. High Hip', section: 'Lower Body' },
-  { key: 'hips', label: 'Y. Hip', section: 'Lower Body' },
-  { key: 'thigh', label: 'Z. Thigh', section: 'Lower Body' },
-  { key: 'knee', label: 'AA. Knee', section: 'Lower Body' },
-  { key: 'ankle', label: 'AB. Ankle', section: 'Lower Body' },
-  { key: 'inseam', label: 'AC. Inseam', section: 'Lower Body' },
-  { key: 'crotch_depth', label: 'AD. Crotch Depth', section: 'Lower Body' },
-  { key: 'bottom_length', label: 'AE. Bottom Length', section: 'Lower Body' },
+  { key: 'waist', label: 'W. Waist', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'high_hip', label: 'X. High Hip', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'hips', label: 'Y. Hip', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'thigh', label: 'Z. Thigh', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'knee', label: 'AA. Knee', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'ankle', label: 'AB. Ankle', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'inseam', label: 'AC. Inseam', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'crotch_depth', label: 'AD. Crotch Depth', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'bottom_length', label: 'AE. Bottom Length', section: 'Lower Body', sectionKey: 'lowerBody' },
 ];
 
 export function getMeasurementFields(gender: Gender): MeasurementField[] {
@@ -119,8 +120,8 @@ export function getMeasurementSections(gender: Gender): Record<string, Measureme
   const fields = getMeasurementFields(gender);
   const sections: Record<string, MeasurementField[]> = {};
   for (const field of fields) {
-    if (!sections[field.section]) sections[field.section] = [];
-    sections[field.section].push(field);
+    if (!sections[field.sectionKey]) sections[field.sectionKey] = [];
+    sections[field.sectionKey].push(field);
   }
   return sections;
 }
