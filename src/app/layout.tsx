@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
-import { NextIntlClientProvider } from 'next-intl';
+import Providers from '@/components/Providers';
 import './globals.css';
-import enMessages from '../../messages/en.json';
 
 const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
 
@@ -15,14 +14,7 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Suruwe',
     url: 'https://suruwe.vercel.app',
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: 'Suruwe: What you ordered vs what you got. Never again.',
-      },
-    ],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: 'Suruwe: What you ordered vs what you got. Never again.' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -39,11 +31,7 @@ export const viewport: Viewport = {
   themeColor: '#0C0C0C',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -51,9 +39,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        <NextIntlClientProvider locale="en" messages={enMessages}>
+        <Providers>
           {children}
-        </NextIntlClientProvider>
+        </Providers>
         <Analytics />
       </body>
     </html>
