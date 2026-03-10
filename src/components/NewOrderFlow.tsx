@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Profile, Order, OrderAttachment, getMeasurementFields } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
@@ -57,6 +57,7 @@ export default function NewOrderFlow({
   draftOrder,
 }: NewOrderFlowProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState(draftOrder?.tailor_name || '');
   const [tailorPhone, setTailorPhone] = useState(draftOrder?.tailor_phone || '');
@@ -269,7 +270,7 @@ export default function NewOrderFlow({
     if (!order) return;
 
     const updatedProfile = { ...p, measurements: localMeasurements };
-    const message = generateOrderMessage(updatedProfile, order);
+    const message = generateOrderMessage(updatedProfile, order, locale);
     const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
     openWhatsApp(message, phone);
 
@@ -292,7 +293,7 @@ export default function NewOrderFlow({
     if (!order) return;
 
     const updatedProfile = { ...p, measurements: localMeasurements };
-    const message = generateOrderShareMessage(updatedProfile, order);
+    const message = generateOrderShareMessage(updatedProfile, order, locale);
     openWhatsApp(message);
 
     setSentOrder(order);
@@ -480,7 +481,7 @@ export default function NewOrderFlow({
                     >
                       <div style={{ fontWeight: 500, color: 'var(--text)' }}>{tailor.name}</div>
                       <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                        {[tailor.city, tailor.phone].filter(Boolean).join(' Â· ') || t('orderFlow.step1.noDetails')}
+                        {[tailor.city, tailor.phone].filter(Boolean).join(' ÃÂ· ') || t('orderFlow.step1.noDetails')}
                       </div>
                     </div>
                   ))}
