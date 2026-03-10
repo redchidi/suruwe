@@ -1,10 +1,15 @@
 'use client';
 import { NextIntlClientProvider } from 'next-intl';
-import enMessages from '../../messages/en.json';
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+interface ProvidersProps {
+  locale: string;
+  messages: Record<string, unknown>;
+  children: React.ReactNode;
+}
+
+export default function Providers({ locale, messages, children }: ProvidersProps) {
   return (
-    <NextIntlClientProvider locale="en" messages={enMessages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {children}
     </NextIntlClientProvider>
   );
