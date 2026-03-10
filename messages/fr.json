@@ -5,7 +5,7 @@
     "continue": "Continuer",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
-    "done": "TerminÃ©",
+    "done": "TerminÃÂ©",
     "edit": "Modifier",
     "delete": "Supprimer",
     "deleting": "Suppression...",
@@ -13,13 +13,14 @@
     "notNow": "Pas maintenant",
     "sending": "Envoi en cours...",
     "uploading": "Chargement...",
-    "checking": "VÃ©rification...",
-    "creating": "CrÃ©ation...",
-    "lookingUp": "Recherche en cours..."
+    "checking": "VÃÂ©rification...",
+    "creating": "CrÃÂ©ation...",
+    "lookingUp": "Recherche en cours...",
+    "signOut": "Se déconnecter"
   },
   "status": {
-    "sent": "EnvoyÃ©",
-    "completed": "TerminÃ©",
+    "sent": "EnvoyÃÂ©",
+    "completed": "TerminÃÂ©",
     "inProgress": "En cours",
     "draft": "Brouillon"
   },
@@ -27,23 +28,23 @@
     "logo": "Suruwe"
   },
   "home": {
-    "tagline": "Ce que tu commandes, c'est ce que tu reÃ§ois.",
+    "tagline": "Ce que tu commandes, c'est ce que tu reÃÂ§ois.",
     "subtitle": "Partage tes mensurations, photos et notes de coupe avec ton tailleur en un seul lien.",
     "profileUrl": "suruwe.vercel.app/{slug}",
     "newOrder": "Nouvelle commande",
-    "alreadyHaveProfile": "J'ai dÃ©jÃ  un profil",
+    "alreadyHaveProfile": "J'ai dÃÂ©jÃÂ  un profil",
     "shareSuruwe": "Partager Suruwe",
-    "feedback": "Un retour Ã  faire ? Ãcris-nous sur WhatsApp"
+    "feedback": "Un retour ÃÂ  faire ? ÃÂcris-nous sur WhatsApp"
   },
   "nudge": {
-    "guest": "Ajoute ta photo et tes mensurations ci-dessous. En enregistrant, nous crÃ©erons ton profil.",
+    "guest": "Ajoute ta photo et tes mensurations ci-dessous. En enregistrant, nous crÃÂ©erons ton profil.",
     "missingBoth": "Ajoute ta photo et tes mensurations pour que ton tailleur ait tout ce qu'il faut au moment de passer une commande.",
     "missingPhoto": "Bien ! Ajoute une photo pour que ton tailleur voit ta silhouette.",
-    "missingMeasurements": "Presque ! Ajoute tes mensurations pour complÃ©ter ton profil."
+    "missingMeasurements": "Presque ! Ajoute tes mensurations pour complÃÂ©ter ton profil."
   },
   "bodyPhoto": {
     "sectionTitle": "Photo corporelle",
-    "description": "Ajoute une photo pour que ton tailleur puisse voir ta silhouette â comment tu portes le poids, ta posture et ta morphologie. Cette photo est distincte des images de rÃ©fÃ©rence que tu joins Ã  chaque commande.",
+    "description": "Ajoute une photo pour que ton tailleur puisse voir ta silhouette Ã¢ÂÂ comment tu portes le poids, ta posture et ta morphologie. Cette photo est distincte des images de rÃÂ©fÃÂ©rence que tu joins ÃÂ  chaque commande.",
     "addPhoto": "Ajouter une photo"
   },
   "measurements": {
@@ -63,9 +64,9 @@
   },
   "onboarding": {
     "nameStep": {
-      "title": "Quel est ton prÃ©nom ?",
-      "subtitle": "Nous allons crÃ©er ton profil pour sauvegarder ton travail.",
-      "placeholder": "Ton prÃ©nom",
+      "title": "Quel est ton prÃÂ©nom ?",
+      "subtitle": "Nous allons crÃÂ©er ton profil pour sauvegarder ton travail.",
+      "placeholder": "Ton prÃÂ©nom",
       "continue": "Continuer"
     },
     "usernameStep": {
@@ -73,28 +74,28 @@
       "subtitle": "C'est ainsi que tu te connecteras depuis n'importe quel appareil.",
       "placeholder": "Ton nom d'utilisateur",
       "continue": "Continuer",
-      "takenError": "Ce nom d'utilisateur est dÃ©jÃ  pris. Essaie-en un autre."
+      "takenError": "Ce nom d'utilisateur est dÃÂ©jÃÂ  pris. Essaie-en un autre."
     },
     "pinStep": {
-      "title": "CrÃ©e un code PIN",
+      "title": "CrÃÂ©e un code PIN",
       "subtitle": "Tu l'utiliseras avec ton nom d'utilisateur pour te connecter depuis d'autres appareils.",
-      "placeholder": "4 Ã  6 chiffres",
-      "createProfile": "CrÃ©er mon profil"
+      "placeholder": "4 ÃÂ  6 chiffres",
+      "createProfile": "CrÃÂ©er mon profil"
     }
   },
   "recovery": {
     "title": "Suruwe",
-    "tagline": "Ce que tu commandes, c'est ce que tu reÃ§ois.",
-    "subtitle": "Entre ton nom d'utilisateur et ton code PIN pour accÃ©der Ã  ton profil sur cet appareil.",
+    "tagline": "Ce que tu commandes, c'est ce que tu reÃÂ§ois.",
+    "subtitle": "Entre ton nom d'utilisateur et ton code PIN pour accÃÂ©der ÃÂ  ton profil sur cet appareil.",
     "usernamePlaceholder": "Ton nom d'utilisateur",
     "pinPlaceholder": "Ton code PIN",
-    "accessButton": "AccÃ©der Ã  mon profil",
+    "accessButton": "AccÃÂ©der ÃÂ  mon profil",
     "backButton": "Retour",
-    "error": "Aucun profil trouvÃ© avec ce nom d'utilisateur et ce code PIN. VÃ©rifie et rÃ©essaie."
+    "error": "Aucun profil trouvÃÂ© avec ce nom d'utilisateur et ce code PIN. VÃÂ©rifie et rÃÂ©essaie."
   },
   "pinSetup": {
-    "title": "SÃ©curise ton profil",
-    "subtitle": "DÃ©finis un code PIN de 4 Ã  6 chiffres pour accÃ©der Ã  ton profil depuis d'autres appareils.",
+    "title": "SÃÂ©curise ton profil",
+    "subtitle": "DÃÂ©finis un code PIN de 4 ÃÂ  6 chiffres pour accÃÂ©der ÃÂ  ton profil depuis d'autres appareils.",
     "placeholder": "Entre un code PIN (4-6 chiffres)",
     "saveButton": "Enregistrer le PIN"
   },
@@ -103,34 +104,34 @@
     "subtitle": "Choisis un nom d'utilisateur pour te connecter depuis n'importe quel appareil avec ton identifiant et ton PIN.",
     "placeholder": "Ton nom d'utilisateur",
     "saveButton": "Enregistrer le nom d'utilisateur",
-    "takenError": "Ce nom d'utilisateur est dÃ©jÃ  pris. Essaie-en un autre."
+    "takenError": "Ce nom d'utilisateur est dÃÂ©jÃÂ  pris. Essaie-en un autre."
   },
   "shareSuruwe": {
-    "heading": "Ce que tu commandes vs ce que tu reÃ§ois.",
+    "heading": "Ce que tu commandes vs ce que tu reÃÂ§ois.",
     "subheading": "Plus jamais.",
-    "message": "Tu connais ce sentiment quand tu envoies une photo Ã  ton tailleur et que ce qui arrive ressemble Ã  rien de ce que tu avais montrÃ© ? J'utilise Suruwe pour envoyer mes mensurations, mes photos et mes notes en un seul lien. Fini les malentendus. Essaie :",
+    "message": "Tu connais ce sentiment quand tu envoies une photo ÃÂ  ton tailleur et que ce qui arrive ressemble ÃÂ  rien de ce que tu avais montrÃÂ© ? J'utilise Suruwe pour envoyer mes mensurations, mes photos et mes notes en un seul lien. Fini les malentendus. Essaie :",
     "shareButton": "Partager Suruwe"
   },
   "orderFlow": {
-    "stepIndicator": "Ãtape {step} sur {total}",
+    "stepIndicator": "ÃÂtape {step} sur {total}",
     "step1": {
       "title": "Que souhaites-tu faire confectionner ?",
       "descriptionLabel": "Que souhaites-tu faire confectionner ?",
       "descriptionPlaceholder": "ex. Kaftan, robe, pantalon trado...",
-      "deadlineLabel": "Ã livrer pour le (optionnel)",
+      "deadlineLabel": "ÃÂ livrer pour le (optionnel)",
       "tailorNameLabel": "Nom du tailleur (optionnel)",
       "tailorNamePlaceholder": "Le nom de ton tailleur",
-      "tailorPhoneLabel": "NumÃ©ro WhatsApp du tailleur (optionnel)",
+      "tailorPhoneLabel": "NumÃÂ©ro WhatsApp du tailleur (optionnel)",
       "tailorPhonePlaceholder": "ex. +225 07 12 34 56 78",
       "tailorCityLabel": "Ville (optionnel)",
       "tailorCityPlaceholder": "ex. Abidjan, Dakar, Douala, Paris",
       "noDetails": "Aucune info"
     },
     "step2": {
-      "title": "Notes de coupe et images de rÃ©fÃ©rence",
+      "title": "Notes de coupe et images de rÃÂ©fÃÂ©rence",
       "fitNotesLabel": "Notes de coupe (optionnel)",
-      "fitNotesPlaceholder": "ex.\n- Coupe ajustÃ©e, pas trop serrÃ©e aux bras\n- Laisser de la place dans la poitrine\n- Longueur au genou",
-      "fitNotesHint": "Utilise des tirets ou des chiffres pour une liste. Les sauts de ligne seront conservÃ©s.",
+      "fitNotesPlaceholder": "ex.\n- Coupe ajustÃÂ©e, pas trop serrÃÂ©e aux bras\n- Laisser de la place dans la poitrine\n- Longueur au genou",
+      "fitNotesHint": "Utilise des tirets ou des chiffres pour une liste. Les sauts de ligne seront conservÃÂ©s.",
       "imagesLabel": "Images d'inspiration ou captures de discussion",
       "addImages": "Ajouter des images",
       "tailorCanSee": "Le tailleur peut voir ceci",
@@ -138,76 +139,102 @@
     },
     "step3": {
       "hasRecentTitle": "Tes mensurations",
-      "hasRecentLastUpdated": "DerniÃ¨re mise Ã  jour {date}.",
+      "hasRecentLastUpdated": "DerniÃÂ¨re mise ÃÂ  jour {date}.",
       "hasRecentContinue": "C'est bon, continuer",
-      "hasRecentUpdate": "Mettre Ã  jour les mensurations",
-      "staleTitle": "VÃ©rifie tes mensurations",
-      "staleBanner": "Tes mensurations ont Ã©tÃ© mises Ã  jour pour la derniÃ¨re fois {date}. Tu veux les mettre Ã  jour avant d'envoyer ?",
-      "staleUpdate": "Mettre Ã  jour les mensurations",
+      "hasRecentUpdate": "Mettre ÃÂ  jour les mensurations",
+      "staleTitle": "VÃÂ©rifie tes mensurations",
+      "staleBanner": "Tes mensurations ont ÃÂ©tÃÂ© mises ÃÂ  jour pour la derniÃÂ¨re fois {date}. Tu veux les mettre ÃÂ  jour avant d'envoyer ?",
+      "staleUpdate": "Mettre ÃÂ  jour les mensurations",
       "staleSkip": "Passer, elles sont toujours correctes",
       "emptyTitle": "Ajoute tes mensurations",
-      "emptySubtitle": "Ton tailleur en a besoin pour rÃ©aliser une coupe parfaite. Tu n'as Ã  le faire qu'une seule fois.",
+      "emptySubtitle": "Ton tailleur en a besoin pour rÃÂ©aliser une coupe parfaite. Tu n'as ÃÂ  le faire qu'une seule fois.",
       "saveLabel": "Enregistrer et continuer",
       "skip": "Passer pour l'instant"
     },
     "step35": {
-      "title": "Mettre Ã  jour les mensurations",
+      "title": "Mettre ÃÂ  jour les mensurations",
       "saveLabel": "Enregistrer et continuer"
     },
     "step4": {
-      "title": "VÃ©rifier et envoyer",
-      "noPhotoWarning": "Tu n'as pas encore ajoutÃ© de photo de toi. Une photo aide ton tailleur Ã  voir ta morphologie et Ã  obtenir la bonne coupe.",
+      "title": "VÃÂ©rifier et envoyer",
+      "noPhotoWarning": "Tu n'as pas encore ajoutÃÂ© de photo de toi. Une photo aide ton tailleur ÃÂ  voir ta morphologie et ÃÂ  obtenir la bonne coupe.",
       "tapToEdit": "Appuie sur une section pour la modifier",
       "labelMaking": "Confection",
-      "labelNeedBy": "Ã livrer pour le",
+      "labelNeedBy": "ÃÂ livrer pour le",
       "labelTailor": "Tailleur",
       "labelFitNotes": "Notes de coupe",
       "fitNotesNone": "Aucune",
-      "labelAttachments": "PiÃ¨ces jointes ({count} visibles par le tailleur)",
-      "sendToTailor": "Envoyer Ã  {name}",
+      "labelAttachments": "PiÃÂ¨ces jointes ({count} visibles par le tailleur)",
+      "sendToTailor": "Envoyer ÃÂ  {name}",
       "shareOnWhatsApp": "Partager sur WhatsApp"
     },
     "sent": {
-      "title": "Commande envoyÃ©e !",
-      "description": "Ta commande pour {description} a Ã©tÃ© envoyÃ©e{tailor} via WhatsApp.",
-      "tailorPart": " Ã  {name}",
-      "sharePrompt": "Tu connais quelqu'un qui a du mal Ã  se faire faire des vÃªtements comme il le souhaite ?",
+      "title": "Commande envoyÃÂ©e !",
+      "description": "Ta commande pour {description} a ÃÂ©tÃÂ© envoyÃÂ©e{tailor} via WhatsApp.",
+      "tailorPart": " ÃÂ  {name}",
+      "sharePrompt": "Tu connais quelqu'un qui a du mal ÃÂ  se faire faire des vÃÂªtements comme il le souhaite ?",
       "shareButton": "Partager Suruwe",
-      "feedbackPrompt": "C'est nouveau. Qu'est-ce qui pourrait l'amÃ©liorer ?",
-      "feedbackPlaceholder": "Sois honnÃªte, Ã§a aide",
+      "feedbackPrompt": "C'est nouveau. Qu'est-ce qui pourrait l'amÃÂ©liorer ?",
+      "feedbackPlaceholder": "Sois honnÃÂªte, ÃÂ§a aide",
       "feedbackSend": "Envoyer le retour",
-      "feedbackThanks": "Merci, c'est trÃ¨s utile."
+      "feedbackThanks": "Merci, c'est trÃÂ¨s utile."
     }
   },
   "orderDetail": {
     "editTitle": "Modifier la commande",
     "tailorNameLabel": "Nom du tailleur",
-    "whatsappLabel": "NumÃ©ro WhatsApp",
+    "whatsappLabel": "NumÃÂ©ro WhatsApp",
     "cityLabel": "Ville",
     "makingLabel": "Que souhaites-tu faire confectionner ?",
     "fitNotesLabel": "Notes de coupe",
-    "referenceImagesLabel": "Images de rÃ©fÃ©rence",
-    "addReferenceImages": "+ Ajouter des images de rÃ©fÃ©rence",
+    "referenceImagesLabel": "Images de rÃÂ©fÃÂ©rence",
+    "addReferenceImages": "+ Ajouter des images de rÃÂ©fÃÂ©rence",
     "saveChanges": "Enregistrer les modifications",
     "cancel": "Annuler",
     "fitNotesSectionTitle": "Notes de coupe",
-    "referenceImagesSectionTitle": "Images de rÃ©fÃ©rence",
+    "referenceImagesSectionTitle": "Images de rÃÂ©fÃÂ©rence",
     "editButton": "Modifier la commande",
-    "resendButton": "Renvoyer Ã  {name}",
+    "resendButton": "Renvoyer ÃÂ  {name}",
     "deleteButton": "Supprimer la commande",
-    "deleteConfirmText": "Supprimer cette commande ? Cette action est irrÃ©versible.",
+    "deleteConfirmText": "Supprimer cette commande ? Cette action est irrÃÂ©versible.",
     "deleteCancel": "Annuler",
     "deleteConfirm": "Supprimer",
-    "completedTitle": "PiÃ¨ce rÃ©alisÃ©e",
-    "completedSubtitle": "Ajoute une photo du vÃªtement terminÃ© et une note sur la coupe obtenue. Cela construit ton historique de coupe au fil du temps.",
-    "completedNotePlaceholder": "Comment Ã©tait la coupe ? Qu'est-ce qui a bien marchÃ©, qu'est-ce qui a nÃ©cessitÃ© des ajustements...",
+    "completedTitle": "PiÃÂ¨ce rÃÂ©alisÃÂ©e",
+    "completedSubtitle": "Ajoute une photo du vÃÂªtement terminÃÂ© et une note sur la coupe obtenue. Cela construit ton historique de coupe au fil du temps.",
+    "completedNotePlaceholder": "Comment ÃÂ©tait la coupe ? Qu'est-ce qui a bien marchÃÂ©, qu'est-ce qui a nÃÂ©cessitÃÂ© des ajustements...",
     "saveFitNote": "Enregistrer la note de coupe",
     "shareCompleted": "Partager sur WhatsApp",
-    "addCompletedPhoto": "Tu as reÃ§u ta piÃ¨ce ? Ajoute une photo du travail terminÃ©."
+    "addCompletedPhoto": "Tu as reÃÂ§u ta piÃÂ¨ce ? Ajoute une photo du travail terminÃÂ©."
   },
   "phonePrompt": {
-    "title": "Ajoutez votre numéro",
-    "subtitle": "Pour accéder à votre profil Suruwe depuis n'importe quel appareil. Nous vous enverrons un lien via WhatsApp.",
+    "title": "Ajoutez votre numÃ©ro",
+    "subtitle": "Pour accÃ©der Ã  votre profil Suruwe depuis n'importe quel appareil. Nous vous enverrons un lien via WhatsApp.",
     "placeholder": "+33 X XX XX XX XX"
+  },
+  "tailorView": {
+    "notFound": "Profil introuvable",
+    "notFoundDesc": "Ce profil de mesures n'existe pas ou a peut-être été déplacé.",
+    "photos": "Photos",
+    "measurementNotes": "Notes de mesures",
+    "styleNotes": "Notes de style",
+    "pinLabel": "Votre PIN",
+    "pinError": "PIN incorrect. Veuillez réessayer.",
+    "verify": "Vérifier",
+    "showGuides": "Afficher les guides de mesure",
+    "hideGuides": "Masquer les guides de mesure",
+    "thisIsMe": "C'est moi",
+    "fullSizePhoto": "Photo en taille réelle",
+    "orderedBy": "Commandé par",
+    "orderFor": "Commande pour",
+    "fitNotes": "Notes de coupe",
+    "referenceImages": "Images de référence",
+    "deadline": "À livrer pour",
+    "measurements": "Mesures",
+    "noMeasurements": "Aucune mesure enregistrée.",
+    "noPhotos": "Aucune photo ajoutée.",
+    "noFitNotes": "Aucune note de coupe.",
+    "noReferenceImages": "Aucune image de référence.",
+    "visibleToTailor": "Visible par le tailleur",
+    "privateToCustomer": "Privé"
   }
 }
