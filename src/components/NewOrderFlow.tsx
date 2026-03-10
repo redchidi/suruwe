@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Profile, Order, OrderAttachment, getMeasurementFields } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
@@ -55,6 +56,7 @@ export default function NewOrderFlow({
   onActionConsumed,
   draftOrder,
 }: NewOrderFlowProps) {
+  const t = useTranslations();
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState(draftOrder?.tailor_name || '');
   const [tailorPhone, setTailorPhone] = useState(draftOrder?.tailor_phone || '');
@@ -402,7 +404,7 @@ export default function NewOrderFlow({
         <div className="flex items-center gap-12 mb-24">
           <button className="back-btn" onClick={step === 1 ? handleClose : () => setStep(step - 1)}>
             <ArrowLeftIcon size={18} />
-            <span>{step === 1 ? 'Cancel' : 'Back'}</span>
+            <span>{step === 1 ? t('common.cancel') : t('common.back')}</span>
           </button>
           <span className="text-muted" style={{ fontSize: 14, marginLeft: 'auto' }}>
             Step {step} of {totalSteps}
@@ -425,14 +427,14 @@ export default function NewOrderFlow({
       {/* Step 1: Tailor details */}
       {step === 1 && (
         <div>
-          <h2 className="mb-24">What are you making?</h2>
+          <h2 className="mb-24">{t('orderFlow.step1.title')}</h2>
 
           <div className="flex flex-col gap-16">
             <div className="input-group">
-              <label>What are you making?</label>
+              <label>{t('orderFlow.step1.descriptionLabel')}</label>
               <input
                 className="input"
-                placeholder="e.g. Kaftan, dress, trado pants..."
+                placeholder={t('orderFlow.step1.descriptionPlaceholder')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 autoFocus
@@ -440,7 +442,7 @@ export default function NewOrderFlow({
             </div>
 
             <div className="input-group">
-              <label>Need it by (optional)</label>
+              <label>{t('orderFlow.step1.deadlineLabel')}</label>
               <input
                 className="input"
                 type="date"
@@ -452,10 +454,10 @@ export default function NewOrderFlow({
             </div>
 
             <div className="input-group" style={{ position: 'relative' }}>
-              <label>Tailor name (optional)</label>
+              <label>{t('orderFlow.step1.tailorNameLabel')}</label>
               <input
                 className="input"
-                placeholder="Your tailor's name"
+                placeholder={t('orderFlow.step1.tailorNamePlaceholder')}
                 value={tailorName}
                 onChange={(e) => {
                   setTailorName(e.target.value);
@@ -478,7 +480,7 @@ export default function NewOrderFlow({
                     >
                       <div style={{ fontWeight: 500, color: 'var(--text)' }}>{tailor.name}</div>
                       <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                        {[tailor.city, tailor.phone].filter(Boolean).join(' · ') || 'No details'}
+                        {[tailor.city, tailor.phone].filter(Boolean).join(' Â· ') || t('orderFlow.step1.noDetails')}
                       </div>
                     </div>
                   ))}
@@ -487,21 +489,21 @@ export default function NewOrderFlow({
             </div>
 
             <div className="input-group">
-              <label>Tailor's WhatsApp number (optional)</label>
+              <label>{t('orderFlow.step1.tailorPhoneLabel')}</label>
               <input
                 className="input"
                 type="tel"
-                placeholder="e.g. +234 801 234 5678"
+                placeholder={t('orderFlow.step1.tailorPhonePlaceholder')}
                 value={tailorPhone}
                 onChange={(e) => setTailorPhone(e.target.value)}
               />
             </div>
 
             <div className="input-group">
-              <label>City (optional)</label>
+              <label>{t('orderFlow.step1.tailorCityLabel')}</label>
               <input
                 className="input"
-                placeholder="e.g. Accra, Lagos, Nairobi, London"
+                placeholder={t('orderFlow.step1.tailorCityPlaceholder')}
                 value={tailorCity}
                 onChange={(e) => setTailorCity(e.target.value)}
               />
@@ -512,20 +514,18 @@ export default function NewOrderFlow({
             className="btn btn-primary btn-full mt-32"
             disabled={!canProceedStep1}
             onClick={() => setStep(2)}
-          >
-            Continue
-          </button>
+          >{t('common.continue')}</button>
         </div>
       )}
 
       {/* Step 2: Fit notes and attachments */}
       {step === 2 && (
         <div>
-          <h2 className="mb-24">Fit notes and reference images</h2>
+          <h2 className="mb-24">{t('orderFlow.step2.title')}</h2>
 
           <div className="flex flex-col gap-16">
             <div className="input-group">
-              <label>Fit notes (optional)</label>
+              <label>{t('orderFlow.step2.fitNotesLabel')}</label>
               <textarea
                 className="textarea"
                 rows={5}
@@ -586,9 +586,7 @@ export default function NewOrderFlow({
             </div>
           </div>
 
-          <button className="btn btn-primary btn-full mt-32" onClick={() => setStep(3)}>
-            Continue
-          </button>
+          <button className="btn btn-primary btn-full mt-32" onClick={() => setStep(3)}>{t('common.continue')}</button>
         </div>
       )}
 
@@ -597,7 +595,7 @@ export default function NewOrderFlow({
         <div>
           {hasMeasurements && !measurementsStale ? (
             <div>
-              <h2 className="mb-16">Your measurements</h2>
+              <h2 className="mb-16">{t('orderFlow.step3.hasRecentTitle')}</h2>
               {profile?.measurements_updated_at && (
                 <p className="text-secondary mb-24" style={{ fontSize: 14 }}>
                   Last updated {formatRelativeDate(profile?.measurements_updated_at)}.
@@ -617,7 +615,7 @@ export default function NewOrderFlow({
             </div>
           ) : hasMeasurements && measurementsStale ? (
             <div>
-              <h2 className="mb-16">Check your measurements</h2>
+              <h2 className="mb-16">{t('orderFlow.step3.staleTitle')}</h2>
               <div className="stale-banner mb-24">
                 Your measurements were last updated{' '}
                 {profile?.measurements_updated_at
@@ -636,7 +634,7 @@ export default function NewOrderFlow({
             </div>
           ) : (
             <div>
-              <h2 className="mb-8">Add your measurements</h2>
+              <h2 className="mb-8">{t('orderFlow.step3.emptyTitle')}</h2>
               <p className="text-secondary mb-24" style={{ fontSize: 14, lineHeight: 1.5 }}>
                 Your tailor needs these to get the fit right. You only have to do this once.
               </p>
@@ -649,7 +647,7 @@ export default function NewOrderFlow({
                 onMeasurementsChange={setLocalMeasurements}
                 onSave={saveMeasurements}
                 saving={measurementsSaving}
-                saveLabel="Save and Continue"
+                saveLabel={t('orderFlow.step3.saveLabel')}
               />
               <button className="btn btn-ghost btn-full mt-8" onClick={() => setStep(4)}>
                 Skip for now
@@ -662,7 +660,7 @@ export default function NewOrderFlow({
       {/* Step 3.5: Edit measurements inline */}
       {step === (3.5 as any) && (
         <div>
-          <h2 className="mb-24">Update measurements</h2>
+          <h2 className="mb-24">{t('orderFlow.step3.hasRecentUpdate')}</h2>
           <MeasurementsEditor
             gender={localGender}
             unit={localUnit}
@@ -680,7 +678,7 @@ export default function NewOrderFlow({
       {/* Step 4: Review and send */}
       {step === 4 && !sent && (
         <div>
-          <h2 className="mb-24">Review and send</h2>
+          <h2 className="mb-24">{t('orderFlow.step4.title')}</h2>
 
           {!hasPhotos && (
             <div className="card mb-16" style={{ padding: '14px 16px', border: '1px dashed var(--border)' }}>
@@ -696,12 +694,12 @@ export default function NewOrderFlow({
 
           <div className="card mb-24">
             <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
-              <div className="review-label">Making</div>
+              <div className="review-label">{t('orderFlow.step4.labelMaking')}</div>
               <div className="review-value">{description}</div>
             </div>
             {deadline && (
               <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
-                <div className="review-label">Need it by</div>
+                <div className="review-label">{t('orderFlow.step4.labelNeedBy')}</div>
                 <div className="review-value">
                   {new Date(deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 </div>
@@ -709,7 +707,7 @@ export default function NewOrderFlow({
             )}
             {tailorName.trim() && (
               <div className="review-item review-item-tappable" onClick={() => setStep(1)}>
-                <div className="review-label">Tailor</div>
+                <div className="review-label">{t('orderFlow.step4.labelTailor')}</div>
                 <div className="review-value">
                   {tailorName}
                   {tailorCity ? `, ${tailorCity}` : ''}
@@ -717,8 +715,8 @@ export default function NewOrderFlow({
               </div>
             )}
             <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
-              <div className="review-label">Fit notes</div>
-              <div className="review-value" style={{ whiteSpace: 'pre-wrap' }}>{fitNotes || 'None'}</div>
+              <div className="review-label">{t('orderFlow.step4.labelFitNotes')}</div>
+              <div className="review-value" style={{ whiteSpace: 'pre-wrap' }}>{fitNotes || t('orderFlow.step4.fitNotesNone')}</div>
             </div>
             {attachments.length > 0 && (
               <div className="review-item review-item-tappable" onClick={() => setStep(2)}>
@@ -746,7 +744,7 @@ export default function NewOrderFlow({
                 disabled={saving}
               >
                 <WhatsAppIcon size={20} />
-                {saving ? 'Sending...' : `Send to ${tailorName}`}
+                {saving ? 'Sending...' : t('orderFlow.step4.sendToTailor', { name: tailorName })}
               </button>
             ) : null}
             <button
@@ -756,7 +754,7 @@ export default function NewOrderFlow({
               style={tailorName.trim() && tailorPhone.trim() ? { opacity: 0.85, background: 'var(--bg-secondary)' } : {}}
             >
               <WhatsAppIcon size={20} />
-              {saving ? 'Sending...' : 'Share on WhatsApp'}
+              {saving ? t('common.sending') : t('orderFlow.step4.shareOnWhatsApp')}
             </button>
           </div>
         </div>
@@ -765,11 +763,9 @@ export default function NewOrderFlow({
       {sent && sentOrder && (
         <div style={{ textAlign: 'center', paddingTop: 40 }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>&#x2714;&#xFE0F;</div>
-          <h2 style={{ marginBottom: 8 }}>Order sent!</h2>
+          <h2 style={{ marginBottom: 8 }}>{t('orderFlow.sent.title')}</h2>
           <p className="text-secondary" style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 32 }}>
-            Your order for {sentOrder.description} has been sent
-            {tailorName.trim() ? ` to ${tailorName}` : ''} via WhatsApp.
-          </p>
+            {t('orderFlow.sent.description', { description: sentOrder.description, tailor: tailorName.trim() ? t('orderFlow.sent.tailorPart', { name: tailorName }) : '' })}</p>
 
           {!showSharePreview ? (
             <div
@@ -836,7 +832,7 @@ export default function NewOrderFlow({
               </p>
               <textarea
                 rows={2}
-                placeholder="Be honest, it helps"
+                placeholder={t('orderFlow.sent.feedbackPlaceholder')}
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
                 style={{
