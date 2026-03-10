@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 import { useState, useEffect } from 'react';
 import { Profile, ProfilePhoto, getMeasurementSections, getMeasurementFields, getKeyMeasurements } from '@/types';
@@ -9,6 +10,7 @@ import { XIcon } from '@/components/Icons';
 import { MeasurementGuides } from '@/components/MeasurementGuides';
 
 export default function ProfileViewClient({ params }: { params: { profileId: string } }) {
+  const t = useTranslations();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [theme, setTheme] = useState<Theme>('dark');
@@ -87,7 +89,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
       setShowPinEntry(false);
       setPinInput('');
     } else {
-      setPinError('Incorrect PIN. Please try again.');
+      setPinError(t('tailorView.pinError'));
     }
     setVerifying(false);
   };
@@ -103,8 +105,8 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
   if (notFound || !profile) {
     return (
       <div className="not-found">
-        <h1>Profile not found</h1>
-        <p>This measurement profile does not exist or may have moved.</p>
+        <h1>{t('tailorView.notFound')}</h1>
+        <p>{t('tailorView.notFoundDesc')}</p>
         <a
           href="/"
           className="btn btn-primary"
@@ -185,7 +187,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           <input
             type="number"
             inputMode="numeric"
-            placeholder="Your PIN"
+            placeholder={t('tailorView.pinLabel')}
             value={pinInput}
             onChange={(e) => {
               const val = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -246,7 +248,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
                 opacity: pinInput.length < 4 ? 0.5 : 1,
               }}
             >
-              {verifying ? 'Checking...' : 'Verify'}
+              {verifying ? t('common.checking') : t('tailorView.verify')}
             </button>
           </div>
         </div>
@@ -325,7 +327,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
         {/* Additional photos */}
         {photos.length > 1 && (
           <div className="tailor-section">
-            <div className="tailor-section-title">Photos</div>
+            <div className="tailor-section-title">{t('tailorView.photos')}</div>
             <div
               className={`photos-grid ${photos.length === 2 ? 'two' : ''}`}
             >
@@ -364,7 +366,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
                 opacity: 0.85,
               }}
             >
-              {showGuides ? 'Hide measurement guides' : 'Show measurement guides'}
+              {showGuides ? t('tailorView.hideGuides') : t('tailorView.showGuides')}
             </button>
             {showGuides && (
               <div style={{ marginTop: 16 }}>
@@ -407,7 +409,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
         {/* Measurement Notes */}
         {profile.measurement_notes && profile.measurement_notes.trim() && (
           <div className="tailor-section">
-            <div className="tailor-section-title">Measurement Notes</div>
+            <div className="tailor-section-title">{t('tailorView.measurementNotes')}</div>
             <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
               {profile.measurement_notes}
             </div>
@@ -417,7 +419,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
         {/* Style Notes */}
         {profile.style_notes && (
           <div className="tailor-section">
-            <div className="tailor-section-title">Style Notes</div>
+            <div className="tailor-section-title">{t('tailorView.styleNotes')}</div>
             <div className="style-notes-card">
               <p>{profile.style_notes}</p>
             </div>
@@ -447,7 +449,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
           </button>
           <img
             src={lightboxUrl}
-            alt="Full size photo"
+            alt={t('tailorView.fullSizePhoto')}
             onClick={(e) => e.stopPropagation()}
           />
         </div>
