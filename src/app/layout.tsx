@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
+import { NextIntlClientProvider } from 'next-intl';
 import './globals.css';
+import enMessages from '../messages/en.json';
 
 const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
 
@@ -49,7 +51,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        {children}
+        <NextIntlClientProvider locale="en" messages={enMessages}>
+          {children}
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>
