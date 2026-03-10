@@ -43,7 +43,7 @@
   },
   "bodyPhoto": {
     "sectionTitle": "Body Photo",
-    "description": "Add one photo so your tailor can see your body profile — how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
+    "description": "Add one photo so your tailor can see your body profile â how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
     "addPhoto": "Add a body photo"
   },
   "measurements": {
@@ -204,5 +204,10 @@
     "saveFitNote": "Save fit note",
     "shareCompleted": "Share this on WhatsApp",
     "addCompletedPhoto": "Got your piece? Add a photo of the finished work."
+  },
+  "phonePrompt": {
+    "title": "Add your phone number",
+    "subtitle": "So you can always access your Suruwe profile from any device. We will send you a link via WhatsApp.",
+    "placeholder": "+234 XXX XXX XXXX"
   }
 }
