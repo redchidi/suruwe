@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Order, OrderAttachment, Profile } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { uploadImage } from '@/lib/upload';
@@ -17,6 +18,7 @@ interface OrderDetailProps {
 }
 
 export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onDelete }: OrderDetailProps) {
+  const t = useTranslations();
   const [attachments, setAttachments] = useState<OrderAttachment[]>([]);
   const [completedPhoto, setCompletedPhoto] = useState(order.completed_photo_url);
   const [completedNote, setCompletedNote] = useState(order.completed_note || '');
@@ -59,7 +61,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
     if (url) {
       await supabase
         .from('orders')
-        .update({ completed_photo_url: url, status: 'completed' })
+        .update({ completed_photo_url: url, status: t('status.completed') })
         .eq('id', order.id);
       setCompletedPhoto(url);
       onOrderUpdate({ ...order, completed_photo_url: url, status: 'completed' });
@@ -155,16 +157,16 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
     <div>
       <button className="back-btn mb-16" onClick={onBack}>
         <ArrowLeftIcon size={18} />
-        <span>Back</span>
+        <span>{t('common.back')}</span>
       </button>
 
       {/* Edit mode */}
       {editing ? (
         <div>
-          <h2 className="mb-24">Edit order</h2>
+          <h2 className="mb-24">{t('orderDetail.editTitle')}</h2>
           <div className="flex flex-col gap-16">
             <div className="input-group">
-              <label>Tailor name</label>
+              <label>{t('orderDetail.tailorNameLabel')}</label>
               <input
                 className="input"
                 value={editTailorName}
@@ -172,7 +174,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               />
             </div>
             <div className="input-group">
-              <label>WhatsApp number</label>
+              <label>{t('orderDetail.whatsappLabel')}</label>
               <input
                 className="input"
                 type="tel"
@@ -181,7 +183,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               />
             </div>
             <div className="input-group">
-              <label>City</label>
+              <label>{t('orderDetail.cityLabel')}</label>
               <input
                 className="input"
                 value={editTailorCity}
@@ -189,7 +191,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               />
             </div>
             <div className="input-group">
-              <label>What are you making?</label>
+              <label>{t('orderDetail.makingLabel')}</label>
               <input
                 className="input"
                 value={editDescription}
@@ -197,7 +199,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               />
             </div>
             <div className="input-group">
-              <label>Fit notes</label>
+              <label>{t('orderDetail.fitNotesLabel')}</label>
               <textarea
                 className="textarea"
                 value={editFitNotes}
@@ -253,7 +255,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                 disabled={uploadingAttachment}
                 style={{ fontSize: 13 }}
               >
-                {uploadingAttachment ? 'Uploading...' : '+ Add reference images'}
+                {uploadingAttachment ? t('common.uploading') : t('orderDetail.addReferenceImages')}
               </button>
             </div>
           </div>
@@ -264,7 +266,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               onClick={handleSaveEdit}
               disabled={saving || !editDescription.trim() || !editTailorName.trim()}
             >
-              {saving ? 'Saving...' : 'Save changes'}
+              {saving ? t('common.saving') : t('orderDetail.saveChanges')}
             </button>
             <button className="btn btn-ghost btn-full" onClick={handleCancelEdit}>
               Cancel
@@ -280,13 +282,13 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
               className={`order-status ${order.status}`}
               style={{ display: 'inline-block', fontSize: 12, padding: '3px 10px', borderRadius: 20 }}
             >
-              {order.status === 'sent' ? 'Sent' : order.status === 'completed' ? 'Completed' : order.status}
+              {order.status === t('status.sent') ? 'Sent' : order.status === 'completed' ? 'Completed' : order.status}
             </span>
           </div>
 
           <p className="text-secondary mb-24" style={{ fontSize: 14 }}>
             {order.tailor_name}
-            {order.tailor_city ? `, ${order.tailor_city}` : ''} · {formatDate(order.created_at)}
+            {order.tailor_city ? `, ${order.tailor_city}` : ''} Â· {formatDate(order.created_at)}
           </p>
 
           {order.fit_notes && (
@@ -320,13 +322,9 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
           {!isCompleted && (
             <div className="flex flex-col gap-8 mb-24">
               <button className="btn btn-secondary btn-full btn-sm" onClick={() => setEditing(true)}>
-                <EditIcon size={16} />
-                Edit order
-              </button>
+                <EditIcon size={16} />{t('orderDetail.editButton')}</button>
               <button className="btn btn-whatsapp btn-full btn-sm" onClick={handleResend}>
-                <WhatsAppIcon size={16} />
-                Resend to {order.tailor_name}
-              </button>
+                <WhatsAppIcon size={16} />{t('orderDetail.resendButton', { name: order.tailor_name })}</button>
             </div>
           )}
 
@@ -375,7 +373,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                     border: 'none',
                   }}
                 >
-                  {deleting ? 'Deleting...' : 'Delete'}
+                  {deleting ? t('common.deleting') : t('orderDetail.deleteConfirm')}
                 </button>
               </div>
             </div>
@@ -413,7 +411,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                     disabled={savingNote}
                     style={{ marginBottom: 12, fontSize: 13 }}
                   >
-                    {savingNote ? 'Saving...' : 'Save fit note'}
+                    {savingNote ? t('common.saving') : t('orderDetail.saveFitNote')}
                   </button>
                 )}
                 <button
@@ -443,7 +441,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
                   <CameraIcon size={28} />
                   <span>
                     {uploading
-                      ? 'Uploading...'
+                      ? t('common.uploading')
                       : 'Got your piece? Add a photo of the finished work.'}
                   </span>
                 </div>
