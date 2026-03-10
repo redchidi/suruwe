@@ -1,9 +1,10 @@
 'use client';
 import { NextIntlClientProvider } from 'next-intl';
+import type { AbstractIntlMessages } from 'next-intl';
 
 interface ProvidersProps {
   locale: string;
-  messages: Record<string, unknown>;
+  messages: AbstractIntlMessages;
   children: React.ReactNode;
 }
 
