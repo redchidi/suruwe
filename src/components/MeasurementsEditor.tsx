@@ -1,6 +1,6 @@
 'use client';
-
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Gender, MeasurementUnit, getMeasurementSections } from '@/types';
 import { MaleIcon, FemaleIcon } from './Icons';
 import { MaleTopGuide, MaleBottomGuide, FemaleTopGuide, FemaleBottomGuide } from './MeasurementGuides';
@@ -32,11 +32,12 @@ export default function MeasurementsEditor({
   saving,
   saveLabel,
 }: MeasurementsEditorProps) {
+  const t = useTranslations();
   const sections = getMeasurementSections(gender);
   const [showGuide, setShowGuide] = useState<Record<string, boolean>>({});
 
-  const toggleGuide = (section: string) => {
-    setShowGuide((prev) => ({ ...prev, [section]: !prev[section] }));
+  const toggleGuide = (sectionKey: string) => {
+    setShowGuide((prev) => ({ ...prev, [sectionKey]: !prev[sectionKey] }));
   };
 
   const handleFieldChange = (key: string, value: string) => {
@@ -50,15 +51,15 @@ export default function MeasurementsEditor({
     onMeasurementsChange(updated);
   };
 
-  const getGuideForSection = (sectionName: string) => {
-    const isTop = sectionName === 'Upper Body' || sectionName === 'Arms';
+  const getGuideForSectionKey = (sectionKey: string) => {
+    const isTop = sectionKey === 'upperBody' || sectionKey === 'arms';
     if (gender === 'male') {
       return isTop ? <MaleTopGuide /> : <MaleBottomGuide />;
     }
     return isTop ? <FemaleTopGuide /> : <FemaleBottomGuide />;
   };
 
-  const guideSections = ['Upper Body', 'Lower Body'];
+  const guideSectionKeys = ['upperBody', 'lowerBody'];
 
   return (
     <div>
@@ -80,7 +81,6 @@ export default function MeasurementsEditor({
             <FemaleIcon />
           </button>
         </div>
-
         {/* Unit toggle */}
         <div className="unit-toggle">
           <button
@@ -99,13 +99,16 @@ export default function MeasurementsEditor({
       </div>
 
       {/* Measurement sections */}
-      {Object.entries(sections).map(([sectionName, fields]) => (
-        <div key={sectionName} className="measurement-section">
-          <div className="measurement-section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>{sectionName}</span>
-            {guideSections.includes(sectionName) && (
+      {Object.entries(sections).map(([sectionKey, fields]) => (
+        <div key={sectionKey} className="measurement-section">
+          <div
+            className="measurement-section-title"
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+          >
+            <span>{t(`measurementSections.${sectionKey}`)}</span>
+            {guideSectionKeys.includes(sectionKey) && (
               <button
-                onClick={() => toggleGuide(sectionName)}
+                onClick={() => toggleGuide(sectionKey)}
                 style={{
                   fontSize: 12,
                   color: 'var(--accent)',
@@ -119,22 +122,22 @@ export default function MeasurementsEditor({
                   lineHeight: 1.6,
                 }}
               >
-                {showGuide[sectionName] ? 'Hide guide' : 'Show guide'}
+                {showGuide[sectionKey] ? t('measurements.hideGuide') : t('measurements.showGuide')}
               </button>
             )}
           </div>
 
           {/* Guide image */}
-          {guideSections.includes(sectionName) && showGuide[sectionName] && (
+          {guideSectionKeys.includes(sectionKey) && showGuide[sectionKey] && (
             <div style={{ marginBottom: 16 }}>
-              {getGuideForSection(sectionName)}
+              {getGuideForSectionKey(sectionKey)}
             </div>
           )}
 
           <div className="measurement-fields">
             {fields.map((field) => (
               <div key={field.key} className="measurement-field">
-                <label>{field.label}</label>
+                <label>{t(`measurementLabels.${gender}.${field.key}`)}</label>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -151,13 +154,20 @@ export default function MeasurementsEditor({
 
       {/* Measurement notes */}
       <div className="measurement-section">
-        <div className="measurement-section-title">Notes</div>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 8px 0', lineHeight: 1.5 }}>
-          Any measurements your tailor took that are not listed above, or other notes.
+        <div className="measurement-section-title">{t('measurements.notesTitle')}</div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            margin: '0 0 8px 0',
+            lineHeight: 1.5,
+          }}
+        >
+          {t('measurements.notesDescription')}
         </p>
         <textarea
           rows={3}
-          placeholder="e.g. Round back adjustment +1in, front rise 11in"
+          placeholder={t('measurements.notesPlaceholder')}
           value={measurementNotes}
           onChange={(e) => onNotesChange?.(e.target.value)}
           style={{
@@ -180,7 +190,7 @@ export default function MeasurementsEditor({
         onClick={onSave}
         disabled={saving}
       >
-        {saving ? 'Saving...' : (saveLabel || 'Save Measurements')}
+        {saving ? t('common.saving') : (saveLabel || t('measurements.saveMeasurements'))}
       </button>
     </div>
   );
