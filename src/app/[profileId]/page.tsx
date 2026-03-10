@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import ProfileViewClient from './ProfileViewClient';
 
@@ -78,5 +79,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function TailorViewPage({ params }: Props) {
+  const LOCALES = ['fr', 'en'];
+  if (LOCALES.includes(params.profileId)) {
+    redirect('/');
+  }
   return <ProfileViewClient params={params} />;
 }
