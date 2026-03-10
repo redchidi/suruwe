@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import { NextIntlClientProvider } from 'next-intl';
 import './globals.css';
-import enMessages from '../messages/en.json';
+import enMessages from '../../messages/en.json';
 
 const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
 
