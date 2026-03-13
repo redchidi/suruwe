@@ -77,6 +77,7 @@ export default function NewOrderFlow({
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const fabricFileRef = useRef<HTMLInputElement>(null);
 
   // Tailor history
   const [tailorHistory, setTailorHistory] = useState<TailorHistory[]>([]);
@@ -427,8 +428,8 @@ export default function NewOrderFlow({
           </h2>
 
           <div className="step-chips" style={{ marginTop: 14 }}>
-            <div className="step-chip step-chip-done">{t('orderFlow.review.stepDetails')} &#10003;</div>
-            <div className="step-chip step-chip-done">{t('orderFlow.review.stepNotes')} &#10003;</div>
+            <div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div>
+            <div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(2)}>{t('orderFlow.review.stepNotes')} &#10003;</div>
             <div className="step-chip step-chip-active">{t('orderFlow.review.stepReview')}</div>
           </div>
         </div>
@@ -554,7 +555,7 @@ export default function NewOrderFlow({
       ),
       chips: (
         <div className="step-chips" style={{ marginTop: 14 }}>
-          <div className="step-chip step-chip-done">{t('orderFlow.review.stepDetails')} &#10003;</div>
+          <div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div>
           <div className="step-chip step-chip-active">{t('orderFlow.review.stepNotes')}</div>
           <div className="step-chip step-chip-todo">{t('orderFlow.review.stepReview')}</div>
         </div>
@@ -568,8 +569,8 @@ export default function NewOrderFlow({
       ),
       chips: (
         <div className="step-chips" style={{ marginTop: 14 }}>
-          <div className="step-chip step-chip-done">{t('orderFlow.review.stepDetails')} &#10003;</div>
-          <div className="step-chip step-chip-done">{t('orderFlow.review.stepNotes')} &#10003;</div>
+          <div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div>
+          <div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(2)}>{t('orderFlow.review.stepNotes')} &#10003;</div>
           <div className="step-chip step-chip-todo">{t('orderFlow.review.stepReview')}</div>
         </div>
       ),
@@ -733,6 +734,27 @@ export default function NewOrderFlow({
                 value={fabricNotes}
                 onChange={(e) => setFabricNotes(e.target.value)}
               />
+            </FormField>
+            <FormField label={t('orderFlow.step2.fabricImagesLabel')}>
+              <input
+                ref={fabricFileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleAttachmentAdd}
+                style={{ display: 'none' }}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => fabricFileRef.current?.click()}
+                  style={{
+                    width: 56, height: 56, borderRadius: 8,
+                    background: 'transparent', border: '0.5px dashed rgba(20,16,12,0.15)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 18, color: 'var(--ink-soft)', opacity: 0.4, cursor: 'pointer',
+                  }}
+                >+</button>
+              </div>
             </FormField>
           </>
         )}

@@ -9,7 +9,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "deleting": "Deleting...",
-    "skip": "Skip for now",
+    "skip": "Skip",
     "notNow": "Not now",
     "sending": "Sending...",
     "uploading": "Uploading...",
@@ -142,6 +142,58 @@
       "createProfile": "Create Profile"
     }
   },
+  "onboardingFlow": {
+    "slide1": {
+      "eyebrow": "No more lost threads",
+      "headline": "What you ordered is what you {get}.",
+      "body": "Your measurements, photos, and fit notes \u2014 one link, sent on WhatsApp.",
+      "getWord": "get.",
+      "alreadyHaveProfile": "I already have a profile"
+    },
+    "slide2": {
+      "eyebrow": "From the founder",
+      "headline": "Hey there. I'm {Chidi}.",
+      "chidiWord": "Chidi.",
+      "body1": "I created Suruwe because I love making stylish gear with my tailors, but the wahala was real. Orders went wrong, the incorrect measurements were used, the WhatsApp threads were long and hard to follow.",
+      "body2": "Now, with Suruwe, life is simpler. Your tailor gets what you asked for, and the information they need. All in one place. Still via WhatsApp."
+    },
+    "slide3": {
+      "eyebrow": "Sound familiar?",
+      "headline": "The order that went wrong.",
+      "msg1": "Please send me your measurements.",
+      "msg2": "You have my last measurements.",
+      "msg3": "I can't find it. And also send me a picture.",
+      "msg4": "Ok, I'll send again. But you should have it somewhere.",
+      "threadNote": "Another thread. Another order at risk.",
+      "fix": "Suruwe fixes this. One link. Everything your tailor needs."
+    },
+    "slide4": {
+      "eyebrow": "How it works",
+      "headline": "The complete fit package. In one link.",
+      "prop1Title": "Your profile",
+      "prop1Desc": "Measurements, body photo, fit preferences. Set once, used forever.",
+      "prop2Title": "Your order",
+      "prop2Desc": "Fit notes, reference images, deadline. Briefed completely, every time.",
+      "prop3Title": "One WhatsApp link",
+      "prop3Desc": "Your tailor sees everything. Nothing gets lost."
+    },
+    "slide5": {
+      "eyebrow": "People like you",
+      "quote1": "\u201CI genuinely was wondering why something like this didn\u2019t exist already.\u201D",
+      "name1": "Ama",
+      "location1": "Accra",
+      "quote2": "\u201CAh, if you see the back and forth b/w me and my tailor. Now, they can just click the link, without disturbing my WhatsApp.\u201D",
+      "name2": "Wanjiru",
+      "location2": "Nairobi"
+    },
+    "slide6": {
+      "readyWord": "Ready.",
+      "headline": "Your first order starts here.",
+      "body": "Two minutes. Your tailor will thank you.",
+      "startButton": "Start my first order",
+      "alreadyHaveProfile": "I already have a profile"
+    }
+  },
   "recovery": {
     "title": "Suruwe",
     "tagline": "What you ordered is what you get.",
@@ -186,7 +238,6 @@
       "evening": "Good evening"
     },
     "noOrders": "No orders yet. Tap below to start.",
-    "activeOrders": "{count} active {count, plural, one {order} other {orders}}.",
     "activeOrdersSimple": "{count} active order.",
     "activeOrdersPlural": "{count} active orders.",
     "guestSubtitle": "Create your profile to get started.",
@@ -240,6 +291,7 @@
       "fitNotesHint": "Use dashes or numbers for a list. Line breaks will be preserved.",
       "fabricNotesLabel": "Fabric or material notes",
       "fabricNotesPlaceholder": "e.g. Quality trado material, soft cotton",
+      "fabricImagesLabel": "Photos of the material (optional)",
       "imagesLabel": "Inspiration images or chat screenshots",
       "addImages": "Add images",
       "tailorCanSee": "Tailor can see this",

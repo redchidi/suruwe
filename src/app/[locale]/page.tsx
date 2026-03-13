@@ -118,7 +118,7 @@ export default function OwnerPage() {
 
   const requestProfile = (action?: 'save-measurements' | 'send-order') => {
     if (action) setPendingAction(action);
-    setShowNamePrompt(true);
+    // No prompt - user lands on dashboard freely
   };
 
   const handleOnboardingName = () => {
@@ -345,7 +345,7 @@ export default function OwnerPage() {
     return (
       <OnboardingFlow
         onComplete={() => {
-          setShowNamePrompt(true);
+          // No prompt - user lands on dashboard freely
           setAppState('app');
         }}
         onAlreadyHaveProfile={() => setAppState('return')}

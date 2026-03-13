@@ -39,7 +39,11 @@ export function generateOrderShareMessage(profile: Profile, order: Order, locale
 export function openWhatsApp(message: string, phone?: string): void {
   const encoded = encodeURIComponent(message);
   const phonePath = phone ? `/${phone}` : '';
-  window.open(`https://wa.me${phonePath}?text=${encoded}`, '_blank');
+  const url = `https://wa.me${phonePath}?text=${encoded}`;
+
+  // Use location.href for better mobile browser compatibility.
+  // window.open gets blocked by popup blockers on many mobile browsers (Aloha, Brave, Firefox Focus, etc.)
+  window.location.href = url;
 }
 
 export function generateCompletedOrderMessage(order: Order, tailorPhone: string | null, locale = 'en'): string {
