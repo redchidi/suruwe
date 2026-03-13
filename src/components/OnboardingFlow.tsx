@@ -153,7 +153,7 @@ function SlideHero({
             opacity: 0.85,
           }}
         >
-          Custom clothing, done right
+          No more lost threads
         </div>
         <h1
           style={{
@@ -165,7 +165,7 @@ function SlideHero({
             marginBottom: 20,
           }}
         >
-          What you{'\n'}ordered is{'\n'}what you <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>get.</em>
+          What you{'\n'}ordered is{'\n'}what you <em style={{ color: 'var(--gold-pale)' }}>get.</em>
         </h1>
         <p
           style={{
@@ -286,28 +286,15 @@ function SlideFounder({
             marginBottom: 20,
           }}
         >
-          Hey, I&apos;m <em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Chidi.</em>
+          Hey there. I&apos;m <em style={{ color: 'var(--gold)' }}>Chidi.</em>
         </h2>
 
         <p style={{ fontSize: 15, fontWeight: 300, color: 'var(--ink-soft)', lineHeight: 1.7, marginBottom: 12 }}>
-          I built Suruwe because I&apos;ve had too many orders go wrong &#8212; the wrong measurements used, details lost in a WhatsApp thread.
+          I created Suruwe because I love making stylish gear with my tailors, but the wahala was real. Orders went wrong, the incorrect measurements were used, the WhatsApp threads were long and hard to follow.
         </p>
         <p style={{ fontSize: 15, fontWeight: 300, color: 'var(--ink-soft)', lineHeight: 1.7 }}>
-          Every order you place through Suruwe gives your tailor exactly what they need. Nothing left to chance.
+          Now, with Suruwe, life is simpler. Your tailor gets what you asked for, and the information they need. All in one place. Still via WhatsApp.
         </p>
-
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 22,
-            fontStyle: 'italic',
-            fontWeight: 300,
-            color: 'var(--gold)',
-            marginTop: 20,
-          }}
-        >
-          &#8212; Chidi
-        </div>
       </div>
 
       <div style={{ flex: '1 1 0', minHeight: 24 }} />
@@ -387,10 +374,10 @@ function SlideProblem({
             border: '0.5px solid rgba(196,81,42,0.12)',
           }}
         >
-          <Msg text="My measurements are in the thread from March... I think" />
-          <Msg text="Just use the last ones" sent />
-          <Msg text="Which reference pic was it again?" />
-          <Msg text="I'll send again 😅" sent />
+          <Msg text="Please send me your measurements." />
+          <Msg text="You have my last measurements." sent />
+          <Msg text="I can't find it. And also send me a picture." />
+          <Msg text="Ok, I'll send again. But you should have it somewhere." sent />
           <div
             style={{
               fontSize: 11,
@@ -535,7 +522,7 @@ function SlideHowItWorks({
           marginBottom: 12,
         }}
       >
-        Three things. One link.
+        The complete fit package. In one link.
       </h2>
 
       <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -595,18 +582,18 @@ function SlideProof({
 }) {
   const testimonials = [
     {
-      quote: '\u201CI was just thinking about doing something like this.\u201D',
+      quote: '\u201CI genuinely was wondering why something like this didn\u2019t exist already.\u201D',
       name: 'Ama',
-      title: 'Communications Director',
+      title: '',
       location: 'Accra',
       initial: 'A',
     },
     {
-      quote: '\u201CFinally. My tailor in Lagos always had questions. Now he doesn\u2019t.\u201D',
-      name: 'Kwame',
-      title: 'Engineer',
-      location: 'London \u2192 Kumasi',
-      initial: 'K',
+      quote: '\u201CAh, if you see the back and forth b/w me and my tailor. Now, they can just click the link, without disturbing my WhatsApp.\u201D',
+      name: 'Wanjiru',
+      title: '',
+      location: 'Nairobi',
+      initial: 'W',
     },
   ];
 
@@ -677,7 +664,6 @@ function SlideProof({
                   justifyContent: 'center',
                   fontFamily: 'var(--font-display)',
                   fontSize: 14,
-                  fontStyle: 'italic',
                   color: 'var(--gold)',
                 }}
               >
@@ -686,7 +672,7 @@ function SlideProof({
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{t.name}</div>
                 <div style={{ fontSize: 12, fontWeight: 300, color: 'var(--ink-soft)' }}>
-                  {t.title} &middot; {t.location}
+                  {t.title ? `${t.title} \u00B7 ` : ''}{t.location}
                 </div>
               </div>
             </div>
@@ -742,7 +728,6 @@ function SlideCommit({
             fontFamily: 'var(--font-display)',
             fontSize: 64,
             fontWeight: 200,
-            fontStyle: 'italic',
             color: 'var(--gold-pale)',
             opacity: 0.2,
             lineHeight: 1,
