@@ -11,9 +11,6 @@ interface OnboardingFlowProps {
 
 const TOTAL_SLIDES = 6;
 
-/* ═══════════════════════════════
-   SVG TEXTILE PATTERNS
-═══════════════════════════════ */
 function TextilePattern() {
   return (
     <svg
@@ -107,7 +104,7 @@ function SlideHero({ currentSlide, onNext, onAlreadyHaveProfile }: { currentSlid
           {t('eyebrow')}
         </div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px, 10vw, 48px)', fontWeight: 200, lineHeight: 1.05, color: 'var(--cream)', marginBottom: 20 }}>
-          What you{'\n'}ordered is{'\n'}what you <span style={{ color: 'var(--gold-pale)' }}>{t('getWord')}</span>
+          {t('headlinePre')} <span style={{ color: 'var(--gold-pale)' }}>{t('getWord')}</span>
         </h1>
         <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.65, marginBottom: 36, maxWidth: 280 }}>
           {t('body')}
@@ -131,7 +128,6 @@ function SlideFounder({ currentSlide, onNext, onSkip }: { currentSlide: number; 
   return (
     <div style={{ width: `${100 / TOTAL_SLIDES}%`, flexShrink: 0, height: '100%', background: 'var(--cream)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 28px', paddingBottom: 'max(48px, env(safe-area-inset-bottom, 20px) + 28px)', position: 'relative' }}>
       <div style={{ flex: '0 0 auto' }}>
-        {/* Chidi photo */}
         <div style={{ width: 72, height: 72, borderRadius: '50%', border: '1.5px solid var(--gold-bdr)', marginBottom: 24, overflow: 'hidden' }}>
           <img src="/chidi.jpg" alt="Chidi" style={{ width: 72, height: 72, objectFit: 'cover' }} />
         </div>
@@ -139,7 +135,7 @@ function SlideFounder({ currentSlide, onNext, onSkip }: { currentSlide: number; 
           {t('eyebrow')}
         </div>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 34, fontWeight: 300, color: 'var(--ink)', lineHeight: 1.1, marginBottom: 20 }}>
-          Hey there. I&apos;m <span style={{ color: 'var(--gold)' }}>{t('chidiWord')}</span>
+          {t('headlinePre')} <span style={{ color: 'var(--gold)' }}>{t('chidiWord')}</span>
         </h2>
         <p style={{ fontSize: 15, fontWeight: 300, color: 'var(--ink-soft)', lineHeight: 1.7, marginBottom: 12 }}>
           {t('body1')}
@@ -300,7 +296,6 @@ function SlideCommit({ onStart, onAlreadyHaveProfile }: { onStart: () => void; o
   );
 }
 
-/* ═══════════════════════════════ DOT INDICATORS ═══════════════════════════════ */
 function DotIndicators({ total, current }: { total: number; current: number }) {
   return (
     <div className="dot-indicators">

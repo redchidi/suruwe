@@ -146,16 +146,18 @@
     "slide1": {
       "eyebrow": "Fini les fils de discussion perdus",
       "headline": "Ce que tu commandes, c'est ce que tu {reçois}.",
-      "body": "Tes mensurations, photos et notes de coupe \u2014 un seul lien, envoyé sur WhatsApp.",
+      "body": "Tes mensurations, photos et notes de coupe — un seul lien, envoyé sur WhatsApp.",
       "getWord": "reçois.",
-      "alreadyHaveProfile": "J'ai déjà un profil"
+      "alreadyHaveProfile": "J'ai déjà un profil",
+      "headlinePre": "Ce que tu commandes, c’est ce que tu"
     },
     "slide2": {
       "eyebrow": "Du fondateur",
       "headline": "Salut. Moi c'est {Chidi}.",
       "chidiWord": "Chidi.",
       "body1": "J'ai créé Suruwe parce que j'adore me faire confectionner des vêtements stylés, mais c'était souvent la galère. Des commandes ratées, les mauvaises mensurations utilisées, des fils WhatsApp interminables et difficiles à suivre.",
-      "body2": "Maintenant, avec Suruwe, c'est plus simple. Ton tailleur reçoit exactement ce que tu as demandé, avec toutes les informations nécessaires. Au même endroit. Toujours via WhatsApp."
+      "body2": "Maintenant, avec Suruwe, c'est plus simple. Ton tailleur reçoit exactement ce que tu as demandé, avec toutes les informations nécessaires. Au même endroit. Toujours via WhatsApp.",
+      "headlinePre": "Salut. Moi c’est"
     },
     "slide3": {
       "eyebrow": "Ça te dit quelque chose ?",
@@ -179,10 +181,10 @@
     },
     "slide5": {
       "eyebrow": "Des gens comme toi",
-      "quote1": "\u00ABJe me demandais justement pourquoi un truc comme ça n'existait pas encore.\u00BB",
+      "quote1": "«Je me demandais justement pourquoi un truc comme ça n'existait pas encore.»",
       "name1": "Ama",
       "location1": "Accra",
-      "quote2": "\u00ABAh, si tu voyais les allers-retours avec mon tailleur. Maintenant, il clique sur le lien et c'est tout.\u00BB",
+      "quote2": "«Ah, si tu voyais les allers-retours avec mon tailleur. Maintenant, il clique sur le lien et c'est tout.»",
       "name2": "Wanjiru",
       "location2": "Nairobi"
     },
@@ -252,8 +254,8 @@
     "ordersSection": "Commandes",
     "ordersAll": "Tout",
     "orderDraft": "Brouillon",
-    "orderSentAwaiting": "Envoyé \u00B7 En attente du tailleur",
-    "orderOpened": "Le tailleur a ouvert \u00B7 {date}",
+    "orderSentAwaiting": "Envoyé · En attente du tailleur",
+    "orderOpened": "Le tailleur a ouvert · {date}",
     "untitledOrder": "Commande sans titre"
   },
   "profileCreation": {
@@ -364,7 +366,7 @@
       "labelSentTo": "Envoyé à",
       "labelDeadline": "Date limite",
       "labelLinkOpened": "Lien ouvert",
-      "linkWaiting": "En attente\u2026",
+      "linkWaiting": "En attente…",
       "linkOpened": "Ouvert",
       "yourTailor": "Ton tailleur",
       "feedbackPrompt": "C'est nouveau. Qu'est-ce qui pourrait l'améliorer ?",

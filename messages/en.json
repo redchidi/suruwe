@@ -146,16 +146,18 @@
     "slide1": {
       "eyebrow": "No more lost threads",
       "headline": "What you ordered is what you {get}.",
-      "body": "Your measurements, photos, and fit notes \u2014 one link, sent on WhatsApp.",
+      "body": "Your measurements, photos, and fit notes — one link, sent on WhatsApp.",
       "getWord": "get.",
-      "alreadyHaveProfile": "I already have a profile"
+      "alreadyHaveProfile": "I already have a profile",
+      "headlinePre": "What you ordered is what you"
     },
     "slide2": {
       "eyebrow": "From the founder",
       "headline": "Hey there. I'm {Chidi}.",
       "chidiWord": "Chidi.",
       "body1": "I created Suruwe because I love making stylish gear with my tailors, but the wahala was real. Orders went wrong, the incorrect measurements were used, the WhatsApp threads were long and hard to follow.",
-      "body2": "Now, with Suruwe, life is simpler. Your tailor gets what you asked for, and the information they need. All in one place. Still via WhatsApp."
+      "body2": "Now, with Suruwe, life is simpler. Your tailor gets what you asked for, and the information they need. All in one place. Still via WhatsApp.",
+      "headlinePre": "Hey there. I’m"
     },
     "slide3": {
       "eyebrow": "Sound familiar?",
@@ -179,10 +181,10 @@
     },
     "slide5": {
       "eyebrow": "People like you",
-      "quote1": "\u201CI genuinely was wondering why something like this didn\u2019t exist already.\u201D",
+      "quote1": "“I genuinely was wondering why something like this didn’t exist already.”",
       "name1": "Ama",
       "location1": "Accra",
-      "quote2": "\u201CAh, if you see the back and forth b/w me and my tailor. Now, they can just click the link, without disturbing my WhatsApp.\u201D",
+      "quote2": "“Ah, if you see the back and forth b/w me and my tailor. Now, they can just click the link, without disturbing my WhatsApp.”",
       "name2": "Wanjiru",
       "location2": "Nairobi"
     },
@@ -252,8 +254,8 @@
     "ordersSection": "Orders",
     "ordersAll": "All",
     "orderDraft": "Draft",
-    "orderSentAwaiting": "Sent \u00B7 Awaiting tailor",
-    "orderOpened": "Tailor opened \u00B7 {date}",
+    "orderSentAwaiting": "Sent · Awaiting tailor",
+    "orderOpened": "Tailor opened · {date}",
     "untitledOrder": "Untitled order"
   },
   "profileCreation": {
@@ -364,7 +366,7 @@
       "labelSentTo": "Sent to",
       "labelDeadline": "Deadline",
       "labelLinkOpened": "Link opened",
-      "linkWaiting": "Waiting\u2026",
+      "linkWaiting": "Waiting…",
       "linkOpened": "Opened",
       "yourTailor": "Your tailor",
       "feedbackPrompt": "This is new. One thing that would make it better?",

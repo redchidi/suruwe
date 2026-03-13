@@ -41,9 +41,14 @@ export function openWhatsApp(message: string, phone?: string): void {
   const phonePath = phone ? `/${phone}` : '';
   const url = `https://wa.me${phonePath}?text=${encoded}`;
 
-  // Use location.href for better mobile browser compatibility.
-  // window.open gets blocked by popup blockers on many mobile browsers (Aloha, Brave, Firefox Focus, etc.)
-  window.location.href = url;
+  // On mobile, use location.href (avoids popup blockers on Aloha, Brave, Firefox Focus, etc.)
+  // On desktop, use window.open so we don't navigate away from the app
+  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    window.location.href = url;
+  } else {
+    window.open(url, '_blank');
+  }
 }
 
 export function generateCompletedOrderMessage(order: Order, tailorPhone: string | null, locale = 'en'): string {
