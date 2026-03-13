@@ -30,6 +30,16 @@ export default function OwnerPage() {
   const locale = useLocale();
 
   const [appState, setAppState] = useState<AppState>('loading');
+
+  // Keep sessionStorage in sync so locale switches don't reset guest users to the return screen
+  useEffect(() => {
+    if (appState === 'app') {
+      sessionStorage.setItem('SURUWE_IN_APP', 'true');
+    } else if (appState === 'return' || appState === 'onboarding') {
+      sessionStorage.removeItem('SURUWE_IN_APP');
+    }
+  }, [appState]);
+
   const [view, setView] = useState<View>('home');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
@@ -73,6 +83,13 @@ export default function OwnerPage() {
     if (profileId) {
       loadProfile(profileId);
     } else {
+      // Check if we were already in the app (e.g. guest browsing, locale switch re-mounted us)
+      const inApp = sessionStorage.getItem('SURUWE_IN_APP');
+      if (inApp) {
+        setAppState('app');
+        setLoading(false);
+        return;
+      }
       const onboardingSeen = localStorage.getItem('ONBOARDING_SEEN');
       if (onboardingSeen) {
         setAppState('return');
@@ -118,7 +135,7 @@ export default function OwnerPage() {
 
   const requestProfile = (action?: 'save-measurements' | 'send-order') => {
     if (action) setPendingAction(action);
-    // No prompt - user lands on dashboard freely
+    setShowNamePrompt(true);
   };
 
   const handleOnboardingName = () => {
