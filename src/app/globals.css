@@ -486,3 +486,334 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; line-height: 1.
     right: auto;
   }
 }
+
+
+/* ═══════════════════════════════════
+   PHOTO & ATTACHMENT GRIDS
+   Cream surface styling
+═══════════════════════════════════ */
+.photos-grid-square {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.photo-tile {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--cream-3);
+}
+
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-tile-add {
+  border: 1.5px dashed rgba(20,16,12,0.12);
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  opacity: 0.5;
+}
+
+.photo-tile-add:hover {
+  border-color: var(--gold);
+  opacity: 0.8;
+}
+
+.photo-delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+.photo-tile:hover .photo-delete {
+  opacity: 1;
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+  .photo-delete { opacity: 1; }
+}
+
+.photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-lightbox img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.photo-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 210;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+}
+
+/* Attachment grid (reference images in order flow and tailor view) */
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.attachment-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--cream-3);
+}
+
+.attachment-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.attachment-visibility {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-size: 12px;
+}
+
+.attachment-visibility.hidden {
+  background: rgba(0,0,0,0.3);
+  color: rgba(255,255,255,0.5);
+}
+
+/* Tailor view photo */
+.tailor-photo {
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tailor-photo img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.photos-grid.two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.photos-grid .photo-item {
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.photos-grid .photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Tailor view sections */
+.tailor-section {
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.tailor-section-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.tailor-key-measurements {
+  display: flex;
+  flex-direction: column;
+}
+
+.tailor-measurement-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 0.5px solid rgba(20,16,12,0.06);
+}
+
+.tailor-measurement-row .name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+.tailor-measurement-row .value {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tailor-measurements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tailor-measurement-cell {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(20,16,12,0.08);
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tailor-measurement-cell .name {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+.tailor-measurement-cell .value {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Tailor footer */
+.tailor-footer {
+  text-align: center;
+  padding: 32px 24px 0;
+  border-top: 0.5px solid rgba(20,16,12,0.06);
+  margin-top: 20px;
+}
+
+.tailor-footer .logo {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.tailor-footer p {
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+/* Not found page */
+.not-found {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--cream);
+  text-align: center;
+}
+
+.not-found h1 {
+  font-size: 28px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.not-found p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+/* Tailor header (legacy compat for tailor view) */
+.tailor-header {
+  padding: 40px 24px 28px;
+  text-align: center;
+}
+
+.tailor-header .name {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.tailor-header .branding {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
