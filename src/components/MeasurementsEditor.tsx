@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Gender, MeasurementUnit, getMeasurementSections } from '@/types';
@@ -63,35 +64,78 @@ export default function MeasurementsEditor({
 
   return (
     <div>
-      {/* Gender toggle */}
-      <div className="flex items-center justify-between mb-16">
-        <div className="gender-toggle">
+      {/* Gender + Unit toggles */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 24,
+      }}>
+        {/* Gender */}
+        <div style={{
+          display: 'flex', gap: 4,
+          background: 'var(--cream-2)', borderRadius: 8, padding: 3,
+        }}>
           <button
-            className={`gender-option ${gender === 'male' ? 'active' : ''}`}
             onClick={() => onGenderChange('male')}
-            aria-label="Male measurements"
+            style={{
+              padding: '8px 16px', borderRadius: 6,
+              fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 500,
+              border: 'none', cursor: 'pointer',
+              background: gender === 'male' ? 'white' : 'transparent',
+              color: gender === 'male' ? 'var(--ink)' : 'var(--ink-soft)',
+              boxShadow: gender === 'male' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              transition: 'all 200ms ease',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
           >
             <MaleIcon />
           </button>
           <button
-            className={`gender-option ${gender === 'female' ? 'active' : ''}`}
             onClick={() => onGenderChange('female')}
-            aria-label="Female measurements"
+            style={{
+              padding: '8px 16px', borderRadius: 6,
+              fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 500,
+              border: 'none', cursor: 'pointer',
+              background: gender === 'female' ? 'white' : 'transparent',
+              color: gender === 'female' ? 'var(--ink)' : 'var(--ink-soft)',
+              boxShadow: gender === 'female' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              transition: 'all 200ms ease',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
           >
             <FemaleIcon />
           </button>
         </div>
+
         {/* Unit toggle */}
-        <div className="unit-toggle">
+        <div style={{
+          display: 'flex', gap: 4,
+          background: 'var(--cream-2)', borderRadius: 8, padding: 3,
+        }}>
           <button
-            className={`unit-option ${unit === 'inches' ? 'active' : ''}`}
             onClick={() => onUnitChange('inches')}
+            style={{
+              padding: '8px 14px', borderRadius: 6,
+              fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600,
+              letterSpacing: '0.06em',
+              border: 'none', cursor: 'pointer',
+              background: unit === 'inches' ? 'var(--gold)' : 'transparent',
+              color: unit === 'inches' ? 'var(--charcoal)' : 'var(--ink-soft)',
+              transition: 'all 200ms ease',
+            }}
           >
             in
           </button>
           <button
-            className={`unit-option ${unit === 'cm' ? 'active' : ''}`}
             onClick={() => onUnitChange('cm')}
+            style={{
+              padding: '8px 14px', borderRadius: 6,
+              fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600,
+              letterSpacing: '0.06em',
+              border: 'none', cursor: 'pointer',
+              background: unit === 'cm' ? 'var(--gold)' : 'transparent',
+              color: unit === 'cm' ? 'var(--charcoal)' : 'var(--ink-soft)',
+              transition: 'all 200ms ease',
+            }}
           >
             cm
           </button>
@@ -100,26 +144,27 @@ export default function MeasurementsEditor({
 
       {/* Measurement sections */}
       {Object.entries(sections).map(([sectionKey, fields]) => (
-        <div key={sectionKey} className="measurement-section">
-          <div
-            className="measurement-section-title"
-            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-          >
-            <span>{t(`measurementSections.${sectionKey}`)}</span>
+        <div key={sectionKey} style={{ marginBottom: 28 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: 14,
+          }}>
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 18, fontWeight: 300,
+              color: 'var(--ink)',
+            }}>
+              {t(`measurementSections.${sectionKey}`)}
+            </h3>
             {guideSectionKeys.includes(sectionKey) && (
               <button
                 onClick={() => toggleGuide(sectionKey)}
                 style={{
-                  fontSize: 12,
-                  color: 'var(--accent)',
-                  background: 'none',
-                  border: '1px solid var(--accent)',
-                  cursor: 'pointer',
-                  padding: '2px 10px',
-                  borderRadius: 12,
-                  opacity: 0.85,
-                  fontFamily: 'inherit',
-                  lineHeight: 1.6,
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.04em',
+                  color: 'var(--gold)', background: 'none',
+                  border: '0.5px solid var(--gold-bdr)', cursor: 'pointer',
+                  padding: '3px 10px', borderRadius: 12,
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {showGuide[sectionKey] ? t('measurements.hideGuide') : t('measurements.showGuide')}
@@ -134,10 +179,22 @@ export default function MeasurementsEditor({
             </div>
           )}
 
-          <div className="measurement-fields">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '10px 12px',
+          }}>
             {fields.map((field) => (
-              <div key={field.key} className="measurement-field">
-                <label>{t(`measurementLabels.${gender}.${field.key}`)}</label>
+              <div key={field.key}>
+                <label style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 10, fontWeight: 600,
+                  letterSpacing: '0.14em', textTransform: 'uppercase' as const,
+                  color: 'var(--ink-soft)', opacity: 0.6,
+                  display: 'block', marginBottom: 6,
+                }}>
+                  {t(`measurementLabels.${gender}.${field.key}`)}
+                </label>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -145,6 +202,8 @@ export default function MeasurementsEditor({
                   placeholder="--"
                   value={measurements[field.key] ?? ''}
                   onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  className="input-cream"
+                  style={{ padding: '10px 12px', fontSize: 14, textAlign: 'center' }}
                 />
               </div>
             ))}
@@ -153,16 +212,18 @@ export default function MeasurementsEditor({
       ))}
 
       {/* Measurement notes */}
-      <div className="measurement-section">
-        <div className="measurement-section-title">{t('measurements.notesTitle')}</div>
-        <p
-          style={{
-            fontSize: 13,
-            color: 'var(--text-secondary)',
-            margin: '0 0 8px 0',
-            lineHeight: 1.5,
-          }}
-        >
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 18, fontWeight: 300,
+          color: 'var(--ink)', marginBottom: 8,
+        }}>
+          {t('measurements.notesTitle')}
+        </h3>
+        <p style={{
+          fontSize: 13, color: 'var(--ink-soft)', margin: '0 0 10px 0',
+          lineHeight: 1.55, fontFamily: 'var(--font-body)', fontWeight: 300,
+        }}>
           {t('measurements.notesDescription')}
         </p>
         <textarea
@@ -170,27 +231,17 @@ export default function MeasurementsEditor({
           placeholder={t('measurements.notesPlaceholder')}
           value={measurementNotes}
           onChange={(e) => onNotesChange?.(e.target.value)}
-          style={{
-            width: '100%',
-            fontSize: 15,
-            lineHeight: 1.6,
-            padding: '12px 14px',
-            background: 'var(--input-bg)',
-            border: '1px solid var(--border)',
-            borderRadius: 8,
-            color: 'var(--text)',
-            resize: 'vertical',
-            fontFamily: 'inherit',
-          }}
+          className="textarea-cream"
         />
       </div>
 
       <button
-        className="btn btn-primary btn-full mt-16"
+        className="btn-charcoal"
         onClick={onSave}
         disabled={saving}
       >
-        {saving ? t('common.saving') : (saveLabel || t('measurements.saveMeasurements'))}
+        <span>{saving ? t('common.saving') : (saveLabel || t('measurements.saveMeasurements'))}</span>
+        <span className="arrow">&rarr;</span>
       </button>
     </div>
   );
