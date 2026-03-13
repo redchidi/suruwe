@@ -11,6 +11,47 @@ interface OnboardingFlowProps {
 
 const TOTAL_SLIDES = 6;
 
+/* ═══════════════════════════════
+   SVG TEXTILE PATTERNS
+   Adire (Yoruba) + Shweshwe (South Africa)
+═══════════════════════════════ */
+function TextilePattern() {
+  return (
+    <svg
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 0,
+        opacity: 1,
+      }}
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <pattern id="shweshwe" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+          <circle cx="24" cy="24" r="18" fill="none" stroke="rgba(184,146,74,0.04)" strokeWidth="0.5" />
+          <circle cx="24" cy="24" r="12" fill="none" stroke="rgba(184,146,74,0.035)" strokeWidth="0.5" />
+          <circle cx="24" cy="24" r="6" fill="none" stroke="rgba(184,146,74,0.03)" strokeWidth="0.5" />
+          <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
+          <circle cx="48" cy="0" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
+          <circle cx="0" cy="48" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
+          <circle cx="48" cy="48" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
+        </pattern>
+        <pattern id="adire" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+          <path d="M16 0 L32 16 L16 32 L0 16 Z" fill="none" stroke="rgba(184,146,74,0.03)" strokeWidth="0.5" />
+          <line x1="0" y1="0" x2="32" y2="32" stroke="rgba(184,146,74,0.02)" strokeWidth="0.3" />
+          <line x1="32" y1="0" x2="0" y2="32" stroke="rgba(184,146,74,0.02)" strokeWidth="0.3" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#shweshwe)" />
+      <rect width="100%" height="100%" fill="url(#adire)" />
+    </svg>
+  );
+}
+
 export default function OnboardingFlow({ onComplete, onAlreadyHaveProfile }: OnboardingFlowProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -129,6 +170,9 @@ function SlideHero({
         overflow: 'hidden',
       }}
     >
+      {/* Textile pattern */}
+      <TextilePattern />
+
       {/* Ghost S */}
       <div className="ghost-letter" style={{ top: -20, right: -20, fontSize: 200 }}>S</div>
 
@@ -165,7 +209,7 @@ function SlideHero({
             marginBottom: 20,
           }}
         >
-          What you{'\n'}ordered is{'\n'}what you <em style={{ color: 'var(--gold-pale)' }}>get.</em>
+          What you{'\n'}ordered is{'\n'}what you <span style={{ color: 'var(--gold-pale)' }}>get.</span>
         </h1>
         <p
           style={{
@@ -286,7 +330,7 @@ function SlideFounder({
             marginBottom: 20,
           }}
         >
-          Hey there. I&apos;m <em style={{ color: 'var(--gold)' }}>Chidi.</em>
+          Hey there. I&apos;m <span style={{ color: 'var(--gold)' }}>Chidi.</span>
         </h2>
 
         <p style={{ fontSize: 15, fontWeight: 300, color: 'var(--ink-soft)', lineHeight: 1.7, marginBottom: 12 }}>
