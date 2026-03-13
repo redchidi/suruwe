@@ -16,7 +16,8 @@
     "checking": "Vérification...",
     "creating": "Création...",
     "lookingUp": "Recherche en cours...",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "signingIn": "Connexion en cours..."
   },
   "status": {
     "sent": "Envoyé",
@@ -44,7 +45,7 @@
   },
   "bodyPhoto": {
     "sectionTitle": "Photo corporelle",
-    "description": "Ajoute une photo pour que ton tailleur puisse voir ta silhouette : comment tu portes le poids, ta posture et ta morphologie. Cette photo est distincte des images de référence que tu joins à chaque commande.",
+    "description": "Ajoute une photo pour que ton tailleur puisse voir ta silhouette. Cette photo est distincte des images de référence que tu joins à chaque commande.",
     "addPhoto": "Ajouter une photo"
   },
   "measurements": {
@@ -170,32 +171,82 @@
     "message": "Tu connais ce sentiment quand tu envoies une photo à ton tailleur et que ce qui arrive ne ressemble pas à ce que tu avais montré ? J'utilise Suruwe pour envoyer mes mensurations, mes photos et mes notes en un seul lien. Fini les malentendus. Essaie :",
     "shareButton": "Partager Suruwe"
   },
+  "returnScreen": {
+    "headline": "Bon retour.",
+    "subtitle": "Connecte-toi pour reprendre là où tu en étais.",
+    "usernameLabel": "Nom d'utilisateur",
+    "pinLabel": "PIN",
+    "signIn": "Se connecter",
+    "newUser": "Nouveau sur Suruwe ? Commence ici"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir"
+    },
+    "noOrders": "Aucune commande pour l'instant. Appuie ci-dessous pour commencer.",
+    "activeOrdersSimple": "{count} commande active.",
+    "activeOrdersPlural": "{count} commandes actives.",
+    "guestSubtitle": "Crée ton profil pour commencer.",
+    "newOrder": "Nouvelle commande",
+    "newOrderSub": "Briefe ton tailleur complètement",
+    "yourProfile": "Ton profil",
+    "measurementCount": "{count} mensurations",
+    "noMeasurements": "Pas encore de mensurations",
+    "bodyPhotoSaved": "Photo corporelle enregistrée",
+    "profileReady": "Prêt",
+    "profileIncomplete": "Incomplet",
+    "ordersSection": "Commandes",
+    "ordersAll": "Tout",
+    "orderDraft": "Brouillon",
+    "orderSentAwaiting": "Envoyé \u00B7 En attente du tailleur",
+    "orderOpened": "Le tailleur a ouvert \u00B7 {date}",
+    "untitledOrder": "Commande sans titre"
+  },
+  "profileCreation": {
+    "stepOf": "Étape {step} sur {total}",
+    "nameLabel": "Ton prénom",
+    "usernameLabel": "Nom d'utilisateur",
+    "pinLabel": "PIN",
+    "security": "Sécurité",
+    "yourIdentity": "Ton identité"
+  },
   "orderFlow": {
     "stepIndicator": "Étape {step} sur {total}",
+    "newOrder": "Nouvelle commande",
     "step1": {
+      "headline": "Dis-nous ce que tu fais confectionner.",
       "title": "Que souhaites-tu faire confectionner ?",
-      "descriptionLabel": "Que souhaites-tu faire confectionner ?",
-      "descriptionPlaceholder": "ex. Kaftan, robe, pantalon trado...",
-      "deadlineLabel": "À livrer pour le (optionnel)",
-      "tailorNameLabel": "Nom du tailleur (optionnel)",
-      "tailorNamePlaceholder": "Le nom de ton tailleur",
+      "descriptionLabel": "Nom de la commande",
+      "descriptionPlaceholder": "ex. Agbada pour la fête",
+      "deadlineLabel": "À livrer pour le",
+      "tailorNameLabel": "Nom du tailleur",
+      "tailorNamePlaceholder": "ex. Kweku",
       "tailorPhoneLabel": "Numéro WhatsApp du tailleur (optionnel)",
       "tailorPhonePlaceholder": "ex. +225 07 12 34 56 78",
       "tailorCityLabel": "Ville (optionnel)",
       "tailorCityPlaceholder": "ex. Abidjan, Dakar, Douala, Paris",
-      "noDetails": "Aucune info"
+      "noDetails": "Aucune info",
+      "referenceImages": "Images de référence",
+      "continueButton": "Notes de coupe"
     },
     "step2": {
+      "headline": "Comment doit-il tomber ?",
       "title": "Notes de coupe et images de référence",
-      "fitNotesLabel": "Notes de coupe (optionnel)",
+      "fitNotesLabel": "Notes de coupe",
       "fitNotesPlaceholder": "ex.\n- Coupe ajustée, pas trop serrée aux bras\n- Laisser de la place dans la poitrine\n- Longueur au genou",
       "fitNotesHint": "Utilise des tirets ou des chiffres pour une liste. Les sauts de ligne seront conservés.",
+      "fabricNotesLabel": "Notes sur le tissu ou le matériau",
+      "fabricNotesPlaceholder": "ex. Trado de qualité, coton doux",
       "imagesLabel": "Images d'inspiration ou captures de discussion",
       "addImages": "Ajouter des images",
       "tailorCanSee": "Le tailleur peut voir ceci",
-      "privateToYou": "Visible uniquement par toi"
+      "privateToYou": "Visible uniquement par toi",
+      "continueButton": "Vérifier la commande"
     },
     "step3": {
+      "headline": "Tes mensurations.",
       "hasRecentTitle": "Tes mensurations",
       "hasRecentLastUpdated": "Dernière mise à jour {date}.",
       "hasRecentContinue": "C'est bon, continuer",
@@ -206,12 +257,37 @@
       "staleSkip": "Passer, elles sont toujours correctes",
       "emptyTitle": "Ajoute tes mensurations",
       "emptySubtitle": "Ton tailleur en a besoin pour réaliser une coupe parfaite. Tu n'as à le faire qu'une seule fois.",
+      "upToDate": "Tes mensurations sont à jour.",
       "saveLabel": "Enregistrer et continuer",
       "skip": "Passer pour l'instant"
     },
     "step35": {
       "title": "Mettre à jour les mensurations",
       "saveLabel": "Enregistrer et continuer"
+    },
+    "review": {
+      "eyebrow": "Presque terminé",
+      "headline": "Vérifie ton brief de commande.",
+      "stepDetails": "Détails",
+      "stepNotes": "Notes",
+      "stepReview": "Vérifier",
+      "labelOrder": "Commande",
+      "labelTailor": "Tailleur",
+      "labelNeedBy": "À livrer pour",
+      "labelReferenceImages": "Images de référence",
+      "labelMeasurements": "Mensurations",
+      "labelBodyPhoto": "Photo corporelle",
+      "valueNotSpecified": "Non précisé",
+      "valueNone": "Aucune",
+      "valueAttached": "{count} jointes",
+      "valueFromProfile": "{count} de ton profil",
+      "valueNotSet": "Non définies",
+      "valueIncluded": "Incluse",
+      "valueNotAdded": "Non ajoutée",
+      "fitNotesPreview": "Aperçu des notes de coupe",
+      "photoNudge": "Une photo corporelle aide ton tailleur à voir ta silhouette et à ajuster la coupe. Tu peux en ajouter une depuis ton profil.",
+      "sendToTailor": "Envoyer à {name} sur WhatsApp",
+      "whatsappAttribution": "Ouvre WhatsApp avec ton lien"
     },
     "step4": {
       "title": "Vérifier et envoyer",
@@ -225,6 +301,24 @@
       "labelAttachments": "Pièces jointes ({count} visibles par le tailleur)",
       "sendToTailor": "Envoyer à {name}",
       "shareOnWhatsApp": "Partager sur WhatsApp"
+    },
+    "postSend": {
+      "eyebrow": "Commande envoyée",
+      "headline": "Ce que tu as commandé, c'est ce que tu recevras.",
+      "bodyWithTailor": "{name} a tout ce qu'il faut. Ton brief de commande est sauvegardé et sera ici quand tu en auras besoin.",
+      "bodyGeneric": "Ton tailleur a tout ce qu'il faut. Ton brief de commande est sauvegardé et sera ici quand tu en auras besoin.",
+      "labelOrder": "Commande",
+      "labelSentTo": "Envoyé à",
+      "labelDeadline": "Date limite",
+      "labelLinkOpened": "Lien ouvert",
+      "linkWaiting": "En attente\u2026",
+      "linkOpened": "Ouvert",
+      "yourTailor": "Ton tailleur",
+      "feedbackPrompt": "C'est nouveau. Qu'est-ce qui pourrait l'améliorer ?",
+      "feedbackPlaceholder": "Tes idées...",
+      "feedbackSend": "Envoyer le retour",
+      "feedbackThanks": "Merci, c'est très utile.",
+      "backToOrders": "Retour à mes commandes"
     },
     "sent": {
       "title": "Commande envoyée !",

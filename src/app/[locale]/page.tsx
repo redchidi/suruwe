@@ -17,12 +17,7 @@ import OnboardingFlow from '@/components/OnboardingFlow';
 import ReturnScreen from '@/components/ReturnScreen';
 import { getStatusLabel } from '@/lib/status';
 import {
-  WhatsAppIcon,
-  PlusIcon,
-  EditIcon,
-  RulerIcon,
-  ArrowLeftIcon,
-  CameraIcon,
+  WhatsAppIcon, PlusIcon, EditIcon, RulerIcon, ArrowLeftIcon, CameraIcon,
 } from '@/components/Icons';
 
 type View = 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
@@ -135,13 +130,16 @@ export default function OwnerPage() {
     if (!onboardingUsername.trim() || checkingUsername) return;
     setCheckingUsername(true);
     setOnboardingUsernameError('');
+
     const username = onboardingUsername.trim().toLowerCase();
     const { data } = await supabase.from('profiles').select('id').eq('slug', username).maybeSingle();
+
     if (data) {
       setOnboardingUsernameError(t('onboarding.usernameStep.takenError'));
       setCheckingUsername(false);
       return;
     }
+
     setCheckingUsername(false);
     setOnboardingStep('pin');
   };
@@ -149,8 +147,10 @@ export default function OwnerPage() {
   const createProfileFromName = async () => {
     if (!nameInput.trim() || !onboardingUsername.trim() || !pinSetupInput || creating) return;
     if (pinSetupInput.length < 4) return;
+
     setCreating(true);
     const slug = onboardingUsername.trim().toLowerCase();
+
     const { data, error } = await supabase.from('profiles').insert({
       slug,
       name: nameInput.trim(),
@@ -161,6 +161,7 @@ export default function OwnerPage() {
       measurement_unit: 'inches',
       style_notes: '',
     }).select().single();
+
     if (data && !error) {
       const p = data as Profile;
       localStorage.setItem(PROFILE_KEY, p.id);
@@ -179,13 +180,16 @@ export default function OwnerPage() {
     if (!profile || !usernameSetupInput.trim() || savingUsername) return;
     setSavingUsername(true);
     setUsernameSetupError('');
+
     const username = usernameSetupInput.trim().toLowerCase();
     const { data: existing } = await supabase.from('profiles').select('id').eq('slug', username).maybeSingle();
+
     if (existing) {
       setUsernameSetupError(t('usernameSetup.takenError'));
       setSavingUsername(false);
       return;
     }
+
     await supabase.from('profiles').update({ slug: username }).eq('id', profile.id);
     setProfile({ ...profile, slug: username });
     setShowUsernameSetup(false);
@@ -209,12 +213,16 @@ export default function OwnerPage() {
         const url = await uploadImage(file, `profiles/${profile.id}`);
         if (url) {
           const { data } = await supabase.from('profile_photos').insert({
-            profile_id: profile.id, url, sort_order: photos.length + newPhotos.length,
+            profile_id: profile.id,
+            url,
+            sort_order: photos.length + newPhotos.length,
           }).select().single();
           if (data) newPhotos.push(data);
         }
       }
-      if (newPhotos.length > 0) { setPhotos((prev) => [...prev, ...newPhotos]); }
+      if (newPhotos.length > 0) {
+        setPhotos((prev) => [...prev, ...newPhotos]);
+      }
       setPendingFiles([]);
     };
     doUpload();
@@ -256,7 +264,10 @@ export default function OwnerPage() {
     doShare();
   };
 
-  const handlePhoneSkip = () => { setShowPhonePrompt(false); doShare(); };
+  const handlePhoneSkip = () => {
+    setShowPhonePrompt(false);
+    doShare();
+  };
 
   const shareSuruwe = () => { setShowShareSheet(true); };
 
@@ -282,8 +293,11 @@ export default function OwnerPage() {
 
   const handleDraftSaved = (draft: Order) => {
     const exists = orders.find((o) => o.id === draft.id);
-    if (exists) { setOrders(orders.map((o) => (o.id === draft.id ? draft : o))); }
-    else { setOrders([draft, ...orders]); }
+    if (exists) {
+      setOrders(orders.map((o) => (o.id === draft.id ? draft : o)));
+    } else {
+      setOrders([draft, ...orders]);
+    }
     setDraftOrder(null);
   };
 
@@ -291,7 +305,10 @@ export default function OwnerPage() {
     await supabase.from('order_attachments').delete().eq('order_id', orderId);
     await supabase.from('orders').delete().eq('id', orderId);
     setOrders(orders.filter((o) => o.id !== orderId));
-    if (selectedOrder?.id === orderId) { setSelectedOrder(null); setView('home'); }
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(null);
+      setView('home');
+    }
   };
 
   const handleProfileUpdate = (updated: Profile) => { setProfile(updated); };
@@ -313,9 +330,9 @@ export default function OwnerPage() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return t('dashboard.greeting.morning');
+    if (hour < 17) return t('dashboard.greeting.afternoon');
+    return t('dashboard.greeting.evening');
   };
 
   // ── RENDER ──
@@ -327,7 +344,10 @@ export default function OwnerPage() {
   if (appState === 'onboarding') {
     return (
       <OnboardingFlow
-        onComplete={() => { setShowNamePrompt(true); setAppState('app'); }}
+        onComplete={() => {
+          setShowNamePrompt(true);
+          setAppState('app');
+        }}
         onAlreadyHaveProfile={() => setAppState('return')}
       />
     );
@@ -337,7 +357,10 @@ export default function OwnerPage() {
     return (
       <ReturnScreen
         onSignedIn={(p, ph, ord) => {
-          setProfile(p); setPhotos(ph); setOrders(ord); setAppState('app');
+          setProfile(p);
+          setPhotos(ph);
+          setOrders(ord);
+          setAppState('app');
           if (!p.pin) setShowPinSetup(true);
           if (/^.+-[a-z0-9]{4}$/.test(p.slug)) setShowUsernameSetup(true);
         }}
@@ -392,20 +415,21 @@ export default function OwnerPage() {
               onClick={() => setView('home')}
               style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.06)', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(255,255,255,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
                 border: 'none', cursor: 'pointer', color: 'var(--muted-d)', fontSize: 14,
               }}
-            >
-              &larr;
-            </button>
-            <span className="wordmark" style={{ fontSize: 10, letterSpacing: '0.22em' }}>Profile</span>
+            >&larr;</button>
+            <span className="wordmark" style={{ fontSize: 10, letterSpacing: '0.22em' }}>
+              {t('dashboard.yourProfile')}
+            </span>
           </div>
           <h2 style={{
             fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 300,
             color: 'var(--cream)', lineHeight: 1.1,
           }}>
-            Your <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>measurements.</em>
+            {locale === 'fr' ? 'Tes ' : 'Your '}
+            <span style={{ color: 'var(--gold-pale)' }}>{locale === 'fr' ? 'mensurations.' : 'measurements.'}</span>
           </h2>
         </div>
         <div style={{ padding: '20px 22px', flex: 1 }}>
@@ -445,9 +469,11 @@ export default function OwnerPage() {
         }}>
           <span className="wordmark">Suruwe</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={shareSuruwe} title={t('home.shareSuruwe')} style={{
-              background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4,
-            }}>
+            <button
+              onClick={shareSuruwe}
+              title={t('home.shareSuruwe')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4 }}
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                 <polyline points="16 6 12 2 8 6" />
@@ -456,9 +482,11 @@ export default function OwnerPage() {
             </button>
             <LanguageToggle variant="pill" />
             {profile && (
-              <button onClick={handleSignOut} title={t('common.signOut')} style={{
-                background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4,
-              }}>
+              <button
+                onClick={handleSignOut}
+                title={t('common.signOut')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4 }}
+              >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -468,8 +496,9 @@ export default function OwnerPage() {
             )}
             {profile && (
               <div style={{
-                width: 32, height: 32, borderRadius: '50%', background: 'var(--charcoal-2)',
-                border: '1px solid var(--gold-bdr)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'var(--charcoal-2)', border: '1px solid var(--gold-bdr)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 500, color: 'var(--gold-pale)', fontFamily: 'var(--font-body)',
               }}>
                 {profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
@@ -485,19 +514,21 @@ export default function OwnerPage() {
                 {getGreeting()}.
               </h1>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--muted-d)', marginTop: 5 }}>
-                Create your profile to get started.
+                {t('dashboard.guestSubtitle')}
               </p>
             </>
           ) : (
             <>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--cream)', lineHeight: 1.1 }}>
                 {getGreeting()},{' '}
-                <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>{profile.name.split(' ')[0]}.</em>
+                <span style={{ color: 'var(--gold-pale)' }}>{profile.name.split(' ')[0]}.</span>
               </div>
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--muted-d)', marginTop: 5 }}>
                 {activeOrders.length === 0
-                  ? 'No orders yet. Tap below to start.'
-                  : `${activeOrders.length} active order${activeOrders.length === 1 ? '' : 's'}.`}
+                  ? t('dashboard.noOrders')
+                  : activeOrders.length === 1
+                  ? t('dashboard.activeOrdersSimple', { count: 1 })
+                  : t('dashboard.activeOrdersPlural', { count: activeOrders.length })}
               </p>
             </>
           )}
@@ -507,32 +538,46 @@ export default function OwnerPage() {
       {/* ── CREAM BODY ── */}
       <div style={{ padding: '20px 20px 32px' }}>
         {/* New Order CTA */}
-        <div onClick={() => { setDraftOrder(null); setView('new-order'); }} style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 20px', background: 'var(--charcoal)', borderRadius: 12, marginBottom: 24, cursor: 'pointer',
-        }}>
+        <div
+          onClick={() => { setDraftOrder(null); setView('new-order'); }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '16px 20px', background: 'var(--charcoal)', borderRadius: 12,
+            marginBottom: 24, cursor: 'pointer',
+          }}
+        >
           <div>
-            <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--cream)' }}>New order</div>
-            <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300, color: 'var(--muted-d)', marginTop: 2 }}>Brief your tailor completely</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--cream)' }}>
+              {t('dashboard.newOrder')}
+            </div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300, color: 'var(--muted-d)', marginTop: 2 }}>
+              {t('dashboard.newOrderSub')}
+            </div>
           </div>
           <div style={{
             width: 36, height: 36, borderRadius: '50%', background: 'var(--gold)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'var(--charcoal)', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 18, color: 'var(--charcoal)', flexShrink: 0,
           }}>+</div>
         </div>
 
         {/* Profile Section */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span className="field-label-cream" style={{ margin: 0 }}>Your profile</span>
-            <button onClick={() => setView('edit-measurements')} style={{
-              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: 'var(--gold)', background: 'none', border: 'none', cursor: 'pointer',
-            }}>Edit</button>
+            <span className="field-label-cream" style={{ margin: 0 }}>{t('dashboard.yourProfile')}</span>
+            <button
+              onClick={() => setView('edit-measurements')}
+              style={{
+                fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500,
+                color: 'var(--gold)', background: 'none', border: 'none', cursor: 'pointer',
+              }}
+            >{t('common.edit')}</button>
           </div>
           {profile ? (
             <div style={{
-              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)', borderRadius: 12,
-              padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14,
+              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)',
+              borderRadius: 12, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 14,
             }}>
               <div style={{
                 width: 44, height: 44, borderRadius: 8, background: 'var(--cream-3)',
@@ -551,24 +596,26 @@ export default function OwnerPage() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>{profile.name}</div>
                 <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--ink-soft)', marginTop: 2 }}>
-                  {measurementCount > 0 ? `${measurementCount} measurements` : 'No measurements yet'}
-                  {hasPhotos ? ' \u00B7 Body photo saved' : ''}
+                  {measurementCount > 0 ? t('dashboard.measurementCount', { count: measurementCount }) : t('dashboard.noMeasurements')}
+                  {hasPhotos ? ` \u00B7 ${t('dashboard.bodyPhotoSaved')}` : ''}
                 </div>
               </div>
               <div style={{
                 background: profileReady ? 'var(--forest-bg)' : 'var(--gold-dim)',
                 border: profileReady ? '0.5px solid rgba(45,90,61,0.15)' : '0.5px solid var(--gold-bdr)',
-                borderRadius: 20, padding: '4px 10px', fontFamily: 'var(--font-body)',
-                fontSize: 10, fontWeight: 600, color: profileReady ? 'var(--forest)' : 'var(--gold)',
+                borderRadius: 20, padding: '4px 10px',
+                fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 600,
+                color: profileReady ? 'var(--forest)' : 'var(--gold)',
                 letterSpacing: '0.04em', flexShrink: 0,
               }}>
-                {profileReady ? 'Ready' : 'Incomplete'}
+                {profileReady ? t('dashboard.profileReady') : t('dashboard.profileIncomplete')}
               </div>
             </div>
           ) : (
             <div style={{
-              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)', borderRadius: 12,
-              padding: '20px 16px', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)',
+              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)',
+              borderRadius: 12, padding: '20px 16px', textAlign: 'center',
+              fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)',
             }}>
               {t('nudge.guest')}
             </div>
@@ -578,9 +625,11 @@ export default function OwnerPage() {
         {/* Orders Section */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span className="field-label-cream" style={{ margin: 0 }}>Orders</span>
+            <span className="field-label-cream" style={{ margin: 0 }}>{t('dashboard.ordersSection')}</span>
             {orders.length > 3 && (
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: 'var(--gold)' }}>All</span>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: 'var(--gold)' }}>
+                {t('dashboard.ordersAll')}
+              </span>
             )}
           </div>
           {orders.length === 0 ? (
@@ -594,8 +643,13 @@ export default function OwnerPage() {
                   key={order.id}
                   order={order}
                   onTap={() => {
-                    if (order.status === 'draft') { setDraftOrder(order); setView('new-order'); }
-                    else { setSelectedOrder(order); setView('order-detail'); }
+                    if (order.status === 'draft') {
+                      setDraftOrder(order);
+                      setView('new-order');
+                    } else {
+                      setSelectedOrder(order);
+                      setView('order-detail');
+                    }
                   }}
                   onDelete={() => handleDeleteOrder(order.id)}
                 />
@@ -608,8 +662,12 @@ export default function OwnerPage() {
         <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
           <a
             href="https://wa.me/14704437293?text=Hey%2C%20I%20just%20tried%20Suruwe%20and..."
-            target="_blank" rel="noopener noreferrer"
-            style={{ fontSize: 13, color: 'var(--ink-soft)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, opacity: 0.5 }}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: 13, color: 'var(--ink-soft)', textDecoration: 'none',
+              display: 'inline-flex', alignItems: 'center', gap: 6, opacity: 0.5,
+            }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -632,7 +690,7 @@ export default function OwnerPage() {
               letterSpacing: '0.2em', textTransform: 'uppercase' as const,
               color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
             }}>
-              Security
+              {t('profileCreation.security')}
             </div>
             <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
               {t('pinSetup.title')}
@@ -640,11 +698,16 @@ export default function OwnerPage() {
             <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
               {t('pinSetup.subtitle')}
             </p>
-            <label className="field-label">PIN</label>
-            <input className="input-dark" type="number" inputMode="numeric" placeholder={t('pinSetup.placeholder')}
+            <label className="field-label">{t('profileCreation.pinLabel')}</label>
+            <input
+              className="input-dark"
+              type="number"
+              inputMode="numeric"
+              placeholder={t('pinSetup.placeholder')}
               value={pinSetupInput}
               onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()} autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()}
+              autoFocus
             />
             <button className="btn-gold" onClick={handleSavePin} disabled={pinSetupInput.length < 4 || savingPin} style={{ marginTop: 20 }}>
               <span>{savingPin ? t('common.saving') : t('pinSetup.saveButton')}</span>
@@ -663,7 +726,7 @@ export default function OwnerPage() {
               letterSpacing: '0.2em', textTransform: 'uppercase' as const,
               color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
             }}>
-              Your identity
+              {t('profileCreation.yourIdentity')}
             </div>
             <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
               {t('usernameSetup.title')}
@@ -671,11 +734,15 @@ export default function OwnerPage() {
             <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
               {t('usernameSetup.subtitle')}
             </p>
-            <label className="field-label">Username</label>
-            <input className="input-dark" type="text" placeholder={t('usernameSetup.placeholder')}
+            <label className="field-label">{t('profileCreation.usernameLabel')}</label>
+            <input
+              className="input-dark"
+              type="text"
+              placeholder={t('usernameSetup.placeholder')}
               value={usernameSetupInput}
               onChange={(e) => { setUsernameSetupInput(e.target.value); setUsernameSetupError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()} autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
+              autoFocus
             />
             {usernameSetupError && (
               <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{usernameSetupError}</p>
@@ -692,7 +759,6 @@ export default function OwnerPage() {
       {showNamePrompt && (
         <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); setOnboardingStep('name'); }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-
             {onboardingStep === 'name' && (
               <>
                 <div style={{
@@ -700,7 +766,7 @@ export default function OwnerPage() {
                   letterSpacing: '0.2em', textTransform: 'uppercase' as const,
                   color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
                 }}>
-                  Step 1 of 3
+                  {t('profileCreation.stepOf', { step: 1, total: 3 })}
                 </div>
                 <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
                   {t('onboarding.nameStep.title')}
@@ -708,10 +774,14 @@ export default function OwnerPage() {
                 <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.nameStep.subtitle')}
                 </p>
-                <label className="field-label">Your name</label>
-                <input className="input-dark" type="text" placeholder={t('onboarding.nameStep.placeholder')}
-                  value={nameInput} onChange={(e) => setNameInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()} autoFocus
+                <label className="field-label">{t('profileCreation.nameLabel')}</label>
+                <input
+                  className="input-dark" type="text"
+                  placeholder={t('onboarding.nameStep.placeholder')}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()}
+                  autoFocus
                 />
                 <button className="btn-gold" onClick={handleOnboardingName} disabled={!nameInput.trim()} style={{ marginTop: 20 }}>
                   <span>{t('onboarding.nameStep.continue')}</span>
@@ -719,7 +789,6 @@ export default function OwnerPage() {
                 </button>
               </>
             )}
-
             {onboardingStep === 'username' && (
               <>
                 <div style={{
@@ -727,7 +796,7 @@ export default function OwnerPage() {
                   letterSpacing: '0.2em', textTransform: 'uppercase' as const,
                   color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
                 }}>
-                  Step 2 of 3
+                  {t('profileCreation.stepOf', { step: 2, total: 3 })}
                 </div>
                 <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
                   {t('onboarding.usernameStep.title')}
@@ -735,23 +804,24 @@ export default function OwnerPage() {
                 <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.usernameStep.subtitle')}
                 </p>
-                <label className="field-label">Username</label>
-                <input className="input-dark" type="text" placeholder={t('onboarding.usernameStep.placeholder')}
+                <label className="field-label">{t('profileCreation.usernameLabel')}</label>
+                <input
+                  className="input-dark" type="text"
+                  placeholder={t('onboarding.usernameStep.placeholder')}
                   value={onboardingUsername}
                   onChange={(e) => { setOnboardingUsername(e.target.value); setOnboardingUsernameError(''); }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()} autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()}
+                  autoFocus
                 />
                 {onboardingUsernameError && (
                   <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{onboardingUsernameError}</p>
                 )}
-                <button className="btn-gold" onClick={handleOnboardingUsername}
-                  disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 20 }}>
+                <button className="btn-gold" onClick={handleOnboardingUsername} disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 20 }}>
                   <span>{checkingUsername ? t('common.checking') : t('onboarding.usernameStep.continue')}</span>
                   <span>&rarr;</span>
                 </button>
               </>
             )}
-
             {onboardingStep === 'pin' && (
               <>
                 <div style={{
@@ -759,7 +829,7 @@ export default function OwnerPage() {
                   letterSpacing: '0.2em', textTransform: 'uppercase' as const,
                   color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
                 }}>
-                  Step 3 of 3
+                  {t('profileCreation.stepOf', { step: 3, total: 3 })}
                 </div>
                 <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
                   {t('onboarding.pinStep.title')}
@@ -767,14 +837,16 @@ export default function OwnerPage() {
                 <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.pinStep.subtitle')}
                 </p>
-                <label className="field-label">PIN</label>
-                <input className="input-dark" type="number" inputMode="numeric" placeholder={t('onboarding.pinStep.placeholder')}
+                <label className="field-label">{t('profileCreation.pinLabel')}</label>
+                <input
+                  className="input-dark" type="number" inputMode="numeric"
+                  placeholder={t('onboarding.pinStep.placeholder')}
                   value={pinSetupInput}
                   onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()} autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
+                  autoFocus
                 />
-                <button className="btn-gold" onClick={createProfileFromName}
-                  disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 20 }}>
+                <button className="btn-gold" onClick={createProfileFromName} disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 20 }}>
                   <span>{creating ? t('common.creating') : t('onboarding.pinStep.createProfile')}</span>
                   <span>&rarr;</span>
                 </button>
@@ -802,8 +874,11 @@ export default function OwnerPage() {
               <span>{t('shareSuruwe.shareButton')}</span>
               <span>&rarr;</span>
             </button>
-            <button className="btn-ghost" onClick={() => setShowShareSheet(false)}
-              style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}>
+            <button
+              className="btn-ghost"
+              onClick={() => setShowShareSheet(false)}
+              style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}
+            >
               {t('common.notNow')}
             </button>
           </div>
@@ -824,20 +899,16 @@ function SwipeableOrderCard({ order, onTap, onDelete }: { order: Order; onTap: (
   const deleteThreshold = -80;
 
   const handleTouchStart = (e: React.TouchEvent) => { setStartX(e.touches[0].clientX); setSwiping(true); };
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!swiping) return;
-    const diff = e.touches[0].clientX - startX;
-    if (diff < 0) setOffsetX(Math.max(diff, -120));
-  };
-  const handleTouchEnd = () => {
-    setSwiping(false);
-    if (offsetX < deleteThreshold) setOffsetX(-120);
-    else setOffsetX(0);
-  };
+  const handleTouchMove = (e: React.TouchEvent) => { if (!swiping) return; const diff = e.touches[0].clientX - startX; if (diff < 0) setOffsetX(Math.max(diff, -120)); };
+  const handleTouchEnd = () => { setSwiping(false); if (offsetX < deleteThreshold) setOffsetX(-120); else setOffsetX(0); };
   const confirmDelete = async () => { setDeleting(true); await onDelete(); };
 
   const dotColor = order.status === 'draft' ? 'var(--cream-3)' : order.status === 'sent' ? 'var(--gold)' : 'var(--forest)';
-  const statusText = order.status === 'draft' ? 'Draft' : order.status === 'sent' ? 'Sent \u00B7 Awaiting tailor' : getStatusLabel(order.status, t);
+  const statusText = order.status === 'draft'
+    ? t('dashboard.orderDraft')
+    : order.status === 'sent'
+    ? t('dashboard.orderSentAwaiting')
+    : getStatusLabel(order.status, t);
 
   if (showConfirm) {
     return (
@@ -864,25 +935,32 @@ function SwipeableOrderCard({ order, onTap, onDelete }: { order: Order; onTap: (
         background: 'var(--terra)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12,
       }}>
         <button onClick={() => setShowConfirm(true)} style={{
-          background: 'none', border: 'none', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '8px 16px', fontFamily: 'inherit',
+          background: 'none', border: 'none', color: '#fff', fontSize: 13,
+          fontWeight: 600, cursor: 'pointer', padding: '8px 16px', fontFamily: 'inherit',
         }}>{t('common.delete')}</button>
       </div>
       <div
         onClick={() => { if (offsetX === 0) onTap(); else setOffsetX(0); }}
-        onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
-          transform: `translateX(${offsetX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease',
-          position: 'relative', zIndex: 1, background: 'white', border: '0.5px solid rgba(20,16,12,0.07)',
-          borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer',
+          transform: `translateX(${offsetX}px)`,
+          transition: swiping ? 'none' : 'transform 0.2s ease',
+          position: 'relative', zIndex: 1,
+          background: 'white', border: '0.5px solid rgba(20,16,12,0.07)',
+          borderRadius: 12, padding: '14px 16px',
+          display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer',
         }}
       >
         <div style={{
-          width: 6, height: 6, borderRadius: '50%', marginTop: 5, flexShrink: 0, background: dotColor,
+          width: 6, height: 6, borderRadius: '50%', marginTop: 5, flexShrink: 0,
+          background: dotColor,
           border: order.status === 'draft' ? '1px solid var(--cream-3)' : 'none',
         }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>
-            {order.description || 'Untitled order'}
+            {order.description || t('dashboard.untitledOrder')}
           </div>
           <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300, color: 'var(--ink-soft)' }}>{statusText}</div>
         </div>
@@ -906,18 +984,36 @@ function MeasurementsEditorWrapper({ profile, requestProfile, pendingAction, onA
   const [measurementNotes, setMeasurementNotes] = useState(profile?.measurement_notes || '');
   const [saving, setSaving] = useState(false);
 
-  const doSave = async () => { setSaving(true); await onSave(measurements, gender, unit, measurementNotes); setSaving(false); };
-  const handleSave = () => { if (!profile) { requestProfile(); return; } doSave(); };
+  const doSave = async () => {
+    setSaving(true);
+    await onSave(measurements, gender, unit, measurementNotes);
+    setSaving(false);
+  };
+
+  const handleSave = () => {
+    if (!profile) { requestProfile(); return; }
+    doSave();
+  };
 
   useEffect(() => {
-    if (profile && pendingAction === 'save-measurements') { onActionConsumed(); doSave(); }
+    if (profile && pendingAction === 'save-measurements') {
+      onActionConsumed();
+      doSave();
+    }
   }, [profile, pendingAction]);
 
   return (
     <MeasurementsEditor
-      gender={gender} unit={unit} measurements={measurements} measurementNotes={measurementNotes}
-      onGenderChange={setGender} onUnitChange={setUnit} onMeasurementsChange={setMeasurements}
-      onNotesChange={setMeasurementNotes} onSave={handleSave} saving={saving}
+      gender={gender}
+      unit={unit}
+      measurements={measurements}
+      measurementNotes={measurementNotes}
+      onGenderChange={setGender}
+      onUnitChange={setUnit}
+      onMeasurementsChange={setMeasurements}
+      onNotesChange={setMeasurementNotes}
+      onSave={handleSave}
+      saving={saving}
     />
   );
 }

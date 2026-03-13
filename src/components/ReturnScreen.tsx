@@ -34,7 +34,6 @@ function TextilePattern() {
       preserveAspectRatio="none"
     >
       <defs>
-        {/* Shweshwe-inspired: concentric circles in a grid */}
         <pattern id="shweshwe" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
           <circle cx="24" cy="24" r="18" fill="none" stroke="rgba(184,146,74,0.04)" strokeWidth="0.5" />
           <circle cx="24" cy="24" r="12" fill="none" stroke="rgba(184,146,74,0.035)" strokeWidth="0.5" />
@@ -44,18 +43,13 @@ function TextilePattern() {
           <circle cx="0" cy="48" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
           <circle cx="48" cy="48" r="6" fill="none" stroke="rgba(184,146,74,0.025)" strokeWidth="0.5" />
         </pattern>
-
-        {/* Adire-inspired: diamond crosshatch overlay */}
         <pattern id="adire" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
           <path d="M16 0 L32 16 L16 32 L0 16 Z" fill="none" stroke="rgba(184,146,74,0.03)" strokeWidth="0.5" />
           <line x1="0" y1="0" x2="32" y2="32" stroke="rgba(184,146,74,0.02)" strokeWidth="0.3" />
           <line x1="32" y1="0" x2="0" y2="32" stroke="rgba(184,146,74,0.02)" strokeWidth="0.3" />
         </pattern>
       </defs>
-
-      {/* Layer 1: Shweshwe circles */}
       <rect width="100%" height="100%" fill="url(#shweshwe)" />
-      {/* Layer 2: Adire diamonds */}
       <rect width="100%" height="100%" fill="url(#adire)" />
     </svg>
   );
@@ -126,45 +120,36 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
         flexDirection: 'column',
       }}
     >
-      {/* Textile pattern background */}
       <TextilePattern />
-
-      {/* Ghost S */}
       <div className="ghost-letter" style={{ top: -30, right: -18, fontSize: 200 }}>S</div>
 
-      {/* Content */}
       <div style={{ position: 'relative', zIndex: 2, padding: '48px 28px 0', flex: 1 }}>
         <span className="wordmark" style={{ marginBottom: 48, display: 'block', letterSpacing: '0.28em' }}>
           Suruwe
         </span>
 
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 40,
-            fontWeight: 200,
-            color: 'var(--cream)',
-            lineHeight: 1.05,
-            marginBottom: 10,
-          }}
-        >
-          Welcome back.
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 40,
+          fontWeight: 200,
+          color: 'var(--cream)',
+          lineHeight: 1.05,
+          marginBottom: 10,
+        }}>
+          {t('returnScreen.headline')}
         </h1>
-
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 16,
-            fontWeight: 300,
-            color: 'var(--gold-pale)',
-            lineHeight: 1.5,
-            marginBottom: 40,
-          }}
-        >
-          Let&apos;s get you styled up with no worries.
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 16,
+          fontWeight: 300,
+          color: 'var(--gold-pale)',
+          lineHeight: 1.5,
+          marginBottom: 40,
+        }}>
+          {t('returnScreen.subtitle')}
         </p>
 
-        {/* Username field: underline style */}
+        {/* Username field */}
         <div style={{ marginBottom: 28 }}>
           <label style={{
             fontFamily: 'var(--font-body)',
@@ -178,7 +163,7 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
             marginBottom: 0,
             transition: 'opacity 300ms',
           }}>
-            Username
+            {t('returnScreen.usernameLabel')}
           </label>
           <input
             ref={usernameRef}
@@ -208,7 +193,7 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
           />
         </div>
 
-        {/* PIN field: refined cells */}
+        {/* PIN field */}
         <div style={{ marginBottom: 20 }}>
           <label style={{
             fontFamily: 'var(--font-body)',
@@ -222,9 +207,8 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
             marginBottom: 10,
             transition: 'opacity 300ms',
           }}>
-            PIN
+            {t('returnScreen.pinLabel')}
           </label>
-          {/* Hidden input for mobile keyboard */}
           <input
             ref={hiddenPinRef}
             type="number"
@@ -240,10 +224,7 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
             onKeyDown={(e) => e.key === 'Enter' && handleSignIn()}
             style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }}
           />
-          <div
-            onClick={handlePinCellTap}
-            style={{ display: 'flex', gap: 12, cursor: 'pointer' }}
-          >
+          <div onClick={handlePinCellTap} style={{ display: 'flex', gap: 12, cursor: 'pointer' }}>
             {Array.from({ length: PIN_LENGTH }).map((_, i) => {
               const isFilled = i < filledCells;
               const isNext = i === filledCells;
@@ -256,9 +237,11 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
                     background: isFilled ? 'rgba(184,146,74,0.08)' : 'transparent',
                     border: 'none',
                     borderBottom: `1px solid ${
-                      isFilled ? 'var(--gold)' :
-                      isNext && focusedField === 'pin' ? 'rgba(184,146,74,0.5)' :
-                      'rgba(184,146,74,0.15)'
+                      isFilled
+                        ? 'var(--gold)'
+                        : isNext && focusedField === 'pin'
+                        ? 'rgba(184,146,74,0.5)'
+                        : 'rgba(184,146,74,0.15)'
                     }`,
                     borderRadius: 0,
                     display: 'flex',
@@ -268,12 +251,7 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
                   }}
                 >
                   {isFilled && (
-                    <div style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: 'var(--gold)',
-                    }} />
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)' }} />
                   )}
                 </div>
               );
@@ -282,13 +260,7 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
         </div>
 
         {error && (
-          <p style={{
-            color: 'var(--terra)',
-            fontSize: 13,
-            marginTop: 12,
-            textAlign: 'center',
-            lineHeight: 1.5,
-          }}>
+          <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 12, textAlign: 'center', lineHeight: 1.5 }}>
             {error}
           </p>
         )}
@@ -302,21 +274,15 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
           disabled={!username.trim() || pin.length < PIN_LENGTH || loading}
           style={{ marginBottom: 14 }}
         >
-          <span>{loading ? 'Signing in...' : 'Sign in'}</span>
+          <span>{loading ? t('common.signingIn') : t('returnScreen.signIn')}</span>
           <span>{'\u2192'}</span>
         </button>
-
         <button
           onClick={handleNewUser}
           className="btn-ghost"
-          style={{
-            display: 'block',
-            width: '100%',
-            textAlign: 'center',
-            color: 'var(--muted-d)',
-          }}
+          style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)' }}
         >
-          New to Suruwe? Start here
+          {t('returnScreen.newUser')}
         </button>
       </div>
     </div>

@@ -16,7 +16,8 @@
     "checking": "Checking...",
     "creating": "Creating...",
     "lookingUp": "Looking up...",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "signingIn": "Signing in..."
   },
   "status": {
     "sent": "Sent",
@@ -38,13 +39,13 @@
   },
   "nudge": {
     "guest": "Add your body photo and measurements below. When you save, we will create your profile.",
-    "missingBoth": "Add your body photo and measurements below so your tailor has everything they need when you place an order.",
+    "missingBoth": "Add your photo and measurements below so your tailor has everything they need when you place an order.",
     "missingPhoto": "Looking good! Add a body photo so your tailor can see your build.",
     "missingMeasurements": "Almost there! Add your measurements to complete your profile."
   },
   "bodyPhoto": {
     "sectionTitle": "Body Photo",
-    "description": "Add one photo so your tailor can see your body profile - how you carry weight, your posture, and your build. This is separate from the reference images you attach to each order.",
+    "description": "Add one photo so your tailor can see your body profile. This is separate from the reference images you attach to each order.",
     "addPhoto": "Add a body photo"
   },
   "measurements": {
@@ -170,32 +171,83 @@
     "message": "You know that feeling when you send your tailor a photo and what comes back looks nothing like it? I started using Suruwe to send my measurements, photos, and fit notes in one link. No more wahala. Try it:",
     "shareButton": "Share Suruwe"
   },
+  "returnScreen": {
+    "headline": "Welcome back.",
+    "subtitle": "Let's get you styled up with no worries.",
+    "usernameLabel": "Username",
+    "pinLabel": "PIN",
+    "signIn": "Sign in",
+    "newUser": "New to Suruwe? Start here"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "noOrders": "No orders yet. Tap below to start.",
+    "activeOrders": "{count} active {count, plural, one {order} other {orders}}.",
+    "activeOrdersSimple": "{count} active order.",
+    "activeOrdersPlural": "{count} active orders.",
+    "guestSubtitle": "Create your profile to get started.",
+    "newOrder": "New order",
+    "newOrderSub": "Brief your tailor completely",
+    "yourProfile": "Your profile",
+    "measurementCount": "{count} measurements",
+    "noMeasurements": "No measurements yet",
+    "bodyPhotoSaved": "Body photo saved",
+    "profileReady": "Ready",
+    "profileIncomplete": "Incomplete",
+    "ordersSection": "Orders",
+    "ordersAll": "All",
+    "orderDraft": "Draft",
+    "orderSentAwaiting": "Sent \u00B7 Awaiting tailor",
+    "orderOpened": "Tailor opened \u00B7 {date}",
+    "untitledOrder": "Untitled order"
+  },
+  "profileCreation": {
+    "stepOf": "Step {step} of {total}",
+    "nameLabel": "Your name",
+    "usernameLabel": "Username",
+    "pinLabel": "PIN",
+    "security": "Security",
+    "yourIdentity": "Your identity"
+  },
   "orderFlow": {
     "stepIndicator": "Step {step} of {total}",
+    "newOrder": "New order",
     "step1": {
+      "headline": "Tell us what you're making.",
       "title": "What are you making?",
-      "descriptionLabel": "What are you making?",
-      "descriptionPlaceholder": "e.g. Kaftan, dress, trado pants...",
-      "deadlineLabel": "Need it by (optional)",
-      "tailorNameLabel": "Tailor name (optional)",
-      "tailorNamePlaceholder": "Your tailor's name",
+      "descriptionLabel": "Order name",
+      "descriptionPlaceholder": "e.g. Agbada for Detty December",
+      "deadlineLabel": "Need it by",
+      "tailorNameLabel": "Tailor's name",
+      "tailorNamePlaceholder": "e.g. Kweku",
       "tailorPhoneLabel": "Tailor's WhatsApp number (optional)",
       "tailorPhonePlaceholder": "e.g. +234 801 234 5678",
       "tailorCityLabel": "City (optional)",
       "tailorCityPlaceholder": "e.g. Accra, Lagos, Nairobi, London",
-      "noDetails": "No details"
+      "noDetails": "No details",
+      "referenceImages": "Reference images",
+      "continueButton": "Fit notes"
     },
     "step2": {
+      "headline": "How should it fit?",
       "title": "Fit notes and reference images",
-      "fitNotesLabel": "Fit notes (optional)",
+      "fitNotesLabel": "Fit notes",
       "fitNotesPlaceholder": "e.g.\n- Slim fit, not too tight around the arms\n- Leave extra room in the chest\n- Knee length",
       "fitNotesHint": "Use dashes or numbers for a list. Line breaks will be preserved.",
+      "fabricNotesLabel": "Fabric or material notes",
+      "fabricNotesPlaceholder": "e.g. Quality trado material, soft cotton",
       "imagesLabel": "Inspiration images or chat screenshots",
       "addImages": "Add images",
       "tailorCanSee": "Tailor can see this",
-      "privateToYou": "Private to you"
+      "privateToYou": "Private to you",
+      "continueButton": "Review order"
     },
     "step3": {
+      "headline": "Your measurements.",
       "hasRecentTitle": "Your measurements",
       "hasRecentLastUpdated": "Last updated {date}.",
       "hasRecentContinue": "Looks good, continue",
@@ -206,12 +258,37 @@
       "staleSkip": "Skip, they are still correct",
       "emptyTitle": "Add your measurements",
       "emptySubtitle": "Your tailor needs these to get the fit right. You only have to do this once.",
+      "upToDate": "Your measurements are up to date.",
       "saveLabel": "Save and Continue",
       "skip": "Skip for now"
     },
     "step35": {
       "title": "Update measurements",
       "saveLabel": "Save and Continue"
+    },
+    "review": {
+      "eyebrow": "Almost done",
+      "headline": "Review your order brief.",
+      "stepDetails": "Details",
+      "stepNotes": "Notes",
+      "stepReview": "Review",
+      "labelOrder": "Order",
+      "labelTailor": "Tailor",
+      "labelNeedBy": "Need by",
+      "labelReferenceImages": "Reference images",
+      "labelMeasurements": "Measurements",
+      "labelBodyPhoto": "Body photo",
+      "valueNotSpecified": "Not specified",
+      "valueNone": "None",
+      "valueAttached": "{count} attached",
+      "valueFromProfile": "{count} from your profile",
+      "valueNotSet": "Not set",
+      "valueIncluded": "Included",
+      "valueNotAdded": "Not added",
+      "fitNotesPreview": "Fit notes preview",
+      "photoNudge": "A body photo helps your tailor see your frame and get the fit right. You can add one from your profile.",
+      "sendToTailor": "Send to {name} on WhatsApp",
+      "whatsappAttribution": "Opens WhatsApp with your link"
     },
     "step4": {
       "title": "Review and send",
@@ -225,6 +302,24 @@
       "labelAttachments": "Attachments ({count} visible to tailor)",
       "sendToTailor": "Send to {name}",
       "shareOnWhatsApp": "Share on WhatsApp"
+    },
+    "postSend": {
+      "eyebrow": "Order sent",
+      "headline": "What you ordered is what you'll get.",
+      "bodyWithTailor": "{name} has everything they need. Your order brief is saved and will be here when you need it.",
+      "bodyGeneric": "Your tailor has everything they need. Your order brief is saved and will be here when you need it.",
+      "labelOrder": "Order",
+      "labelSentTo": "Sent to",
+      "labelDeadline": "Deadline",
+      "labelLinkOpened": "Link opened",
+      "linkWaiting": "Waiting\u2026",
+      "linkOpened": "Opened",
+      "yourTailor": "Your tailor",
+      "feedbackPrompt": "This is new. One thing that would make it better?",
+      "feedbackPlaceholder": "Your thoughts...",
+      "feedbackSend": "Send feedback",
+      "feedbackThanks": "Thanks, that helps a lot.",
+      "backToOrders": "Back to my orders"
     },
     "sent": {
       "title": "Order sent!",
