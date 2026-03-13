@@ -69,12 +69,14 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
   const filledCells = pin.length;
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 50,
-      background: 'var(--charcoal)',
-      display: 'flex', flexDirection: 'column',
-      overflow: 'hidden',
-    }}>
+    <div
+      className="onboarding-shell"
+      style={{
+        background: 'var(--charcoal)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       {/* Ghost S */}
       <div className="ghost-letter" style={{ top: -30, right: -18, fontSize: 200 }}>S</div>
 
@@ -84,17 +86,30 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
           Suruwe
         </span>
 
-        <h1 style={{
-          fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 200,
-          fontStyle: 'italic', color: 'var(--cream)', lineHeight: 1.05, marginBottom: 8,
-        }}>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 40,
+            fontWeight: 200,
+            fontStyle: 'italic',
+            color: 'var(--cream)',
+            lineHeight: 1.05,
+            marginBottom: 8,
+          }}
+        >
           Welcome back.
         </h1>
 
-        <p style={{
-          fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 300,
-          color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 36,
-        }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            fontWeight: 300,
+            color: 'var(--muted-d)',
+            lineHeight: 1.6,
+            marginBottom: 36,
+          }}
+        >
           Enter your username and PIN to pick up where you left off.
         </p>
 
@@ -114,7 +129,6 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
 
         {/* PIN */}
         <label className="field-label">PIN</label>
-
         {/* Hidden input for mobile keyboard */}
         <input
           ref={hiddenPinRef}
@@ -127,12 +141,8 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
             setError('');
           }}
           onKeyDown={(e) => e.key === 'Enter' && handleSignIn()}
-          style={{
-            position: 'absolute', opacity: 0, width: 1, height: 1,
-            pointerEvents: 'none',
-          }}
+          style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }}
         />
-
         <div className="pin-row" onClick={handlePinCellTap} style={{ cursor: 'pointer' }}>
           {Array.from({ length: PIN_LENGTH }).map((_, i) => (
             <div key={i} className="pin-cell">
@@ -143,8 +153,11 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
 
         {error && (
           <p style={{
-            color: 'var(--terra)', fontSize: 13, marginTop: 12,
-            textAlign: 'center', lineHeight: 1.5,
+            color: 'var(--terra)',
+            fontSize: 13,
+            marginTop: 12,
+            textAlign: 'center',
+            lineHeight: 1.5,
           }}>
             {error}
           </p>
@@ -160,14 +173,16 @@ export default function ReturnScreen({ onSignedIn, onNewUser }: ReturnScreenProp
           style={{ marginBottom: 14 }}
         >
           <span>{loading ? 'Signing in...' : 'Sign in'}</span>
-          <span>\u2192</span>
+          <span>{'\u2192'}</span>
         </button>
 
         <button
           onClick={handleNewUser}
           className="btn-ghost"
           style={{
-            display: 'block', width: '100%', textAlign: 'center',
+            display: 'block',
+            width: '100%',
+            textAlign: 'center',
             color: 'var(--muted-d)',
           }}
         >

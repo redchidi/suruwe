@@ -441,3 +441,48 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; line-height: 1.
 .onboarding-input:focus { border-color: var(--border-focus); }
 .onboarding-input::placeholder { color: var(--text-muted); }
 .onboarding-btn { width: 100%; margin-top: 16px; }
+
+
+/* ═══════════════════════════════════
+   DESKTOP CONTAINMENT
+   Mobile-first PWA. On wider screens,
+   center in a phone column with
+   dark surround.
+═══════════════════════════════════ */
+@media (min-width: 481px) {
+  html {
+    background: #0f0d0b;
+  }
+  body {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    box-shadow: 0 0 80px rgba(0,0,0,0.5);
+    position: relative;
+  }
+}
+
+/* Full-screen overlay shell (onboarding, return screen)
+   On mobile: fixed fullscreen.
+   On desktop: constrained to body column. */
+.onboarding-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+}
+
+@media (min-width: 481px) {
+  .onboarding-shell {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 430px;
+    right: auto;
+  }
+  .modal-overlay {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 430px;
+    right: auto;
+  }
+}

@@ -69,7 +69,7 @@ export default function OnboardingFlow({ onComplete, onAlreadyHaveProfile }: Onb
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 50, overflow: 'hidden' }}
+      className="onboarding-shell"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
