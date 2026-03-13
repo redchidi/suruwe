@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Profile, Order, ProfilePhoto } from '@/types';
@@ -26,11 +27,13 @@ import {
 
 type View = 'home' | 'new-order' | 'order-detail' | 'edit-measurements';
 type AppState = 'loading' | 'onboarding' | 'return' | 'app';
+
 const PROFILE_KEY = 'suruwe_profile_id';
 
 export default function OwnerPage() {
   const t = useTranslations();
   const locale = useLocale();
+
   const [appState, setAppState] = useState<AppState>('loading');
   const [view, setView] = useState<View>('home');
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -73,7 +76,6 @@ export default function OwnerPage() {
   useEffect(() => {
     const profileId = localStorage.getItem(PROFILE_KEY);
     if (profileId) {
-      // Has profile -> go to app
       loadProfile(profileId);
     } else {
       const onboardingSeen = localStorage.getItem('ONBOARDING_SEEN');
@@ -90,24 +92,31 @@ export default function OwnerPage() {
   const loadProfile = async (profileId?: string) => {
     const id = profileId || localStorage.getItem(PROFILE_KEY);
     if (!id) { setLoading(false); return; }
+
     const { data: profileData } = await supabase
       .from('profiles').select('*').eq('id', id).single();
+
     if (!profileData) {
       localStorage.removeItem(PROFILE_KEY);
       setAppState('return');
       setLoading(false);
       return;
     }
+
     const p = profileData as Profile;
     setProfile(p);
+
     const { data: photoData } = await supabase
       .from('profile_photos').select('*').eq('profile_id', p.id).order('sort_order', { ascending: true });
     if (photoData) setPhotos(photoData);
+
     const { data: orderData } = await supabase
       .from('orders').select('*').eq('profile_id', p.id).order('created_at', { ascending: false });
     if (orderData) setOrders(orderData);
+
     setAppState('app');
     setLoading(false);
+
     if (!p.pin) { setShowPinSetup(true); }
     if (/^.+-[a-z0-9]{4}$/.test(p.slug)) { setShowUsernameSetup(true); }
   };
@@ -143,9 +152,14 @@ export default function OwnerPage() {
     setCreating(true);
     const slug = onboardingUsername.trim().toLowerCase();
     const { data, error } = await supabase.from('profiles').insert({
-      slug, name: nameInput.trim(), pin: pinSetupInput,
-      gender: 'male', theme: 'dark', measurements: {},
-      measurement_unit: 'inches', style_notes: '',
+      slug,
+      name: nameInput.trim(),
+      pin: pinSetupInput,
+      gender: 'male',
+      theme: 'dark',
+      measurements: {},
+      measurement_unit: 'inches',
+      style_notes: '',
     }).select().single();
     if (data && !error) {
       const p = data as Profile;
@@ -268,11 +282,8 @@ export default function OwnerPage() {
 
   const handleDraftSaved = (draft: Order) => {
     const exists = orders.find((o) => o.id === draft.id);
-    if (exists) {
-      setOrders(orders.map((o) => (o.id === draft.id ? draft : o)));
-    } else {
-      setOrders([draft, ...orders]);
-    }
+    if (exists) { setOrders(orders.map((o) => (o.id === draft.id ? draft : o))); }
+    else { setOrders([draft, ...orders]); }
     setDraftOrder(null);
   };
 
@@ -293,15 +304,13 @@ export default function OwnerPage() {
   ) => {
     if (!profile) return;
     const { data } = await supabase.from('profiles').update({
-      measurements, gender, measurement_unit: unit,
-      measurement_notes: notes,
+      measurements, gender, measurement_unit: unit, measurement_notes: notes,
       measurements_updated_at: new Date().toISOString(),
     }).eq('id', profile!.id).select().single();
     if (data) { setProfile(data as Profile); }
     setView('home');
   };
 
-  // ── Greeting time-of-day ──
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -311,33 +320,24 @@ export default function OwnerPage() {
 
   // ── RENDER ──
 
-  // Loading
   if (loading || appState === 'loading') {
     return <div className="loading"><div className="spinner" /></div>;
   }
 
-  // Onboarding carousel
   if (appState === 'onboarding') {
     return (
       <OnboardingFlow
-        onComplete={() => {
-          setShowNamePrompt(true);
-          setAppState('app');
-        }}
+        onComplete={() => { setShowNamePrompt(true); setAppState('app'); }}
         onAlreadyHaveProfile={() => setAppState('return')}
       />
     );
   }
 
-  // Return / sign-in screen
   if (appState === 'return') {
     return (
       <ReturnScreen
         onSignedIn={(p, ph, ord) => {
-          setProfile(p);
-          setPhotos(ph);
-          setOrders(ord);
-          setAppState('app');
+          setProfile(p); setPhotos(ph); setOrders(ord); setAppState('app');
           if (!p.pin) setShowPinSetup(true);
           if (/^.+-[a-z0-9]{4}$/.test(p.slug)) setShowUsernameSetup(true);
         }}
@@ -346,23 +346,21 @@ export default function OwnerPage() {
     );
   }
 
-  // New Order Flow
+  // ── NEW ORDER FLOW (owns its own layout) ──
   if (view === 'new-order') {
     return (
-      <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
-        <NewOrderFlow
-          profile={profile}
-          hasPhotos={photos.length > 0}
-          onClose={() => { setDraftOrder(null); setView('home'); }}
-          onOrderCreated={handleOrderCreated}
-          onDraftSaved={handleDraftSaved}
-          onProfileUpdate={handleProfileUpdate}
-          requestProfile={requestProfile}
-          pendingAction={pendingAction}
-          onActionConsumed={() => setPendingAction(null)}
-          draftOrder={draftOrder}
-        />
-      </div>
+      <NewOrderFlow
+        profile={profile}
+        hasPhotos={photos.length > 0}
+        onClose={() => { setDraftOrder(null); setView('home'); }}
+        onOrderCreated={handleOrderCreated}
+        onDraftSaved={handleDraftSaved}
+        onProfileUpdate={handleProfileUpdate}
+        requestProfile={requestProfile}
+        pendingAction={pendingAction}
+        onActionConsumed={() => setPendingAction(null)}
+        draftOrder={draftOrder}
+      />
     );
   }
 
@@ -384,24 +382,41 @@ export default function OwnerPage() {
     );
   }
 
-  // Edit Measurements
+  // ── EDIT MEASUREMENTS (charcoal header + cream body) ──
   if (view === 'edit-measurements') {
     return (
-      <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
-        <div className="flex items-center gap-12 mb-24">
-          <button className="back-btn" onClick={() => setView('home')}>
-            <ArrowLeftIcon size={18} />
-            <span>{t('common.back')}</span>
-          </button>
+      <div style={{ background: 'var(--cream)', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: 'var(--charcoal)', padding: '44px 24px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <button
+              onClick={() => setView('home')}
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                border: 'none', cursor: 'pointer', color: 'var(--muted-d)', fontSize: 14,
+              }}
+            >
+              &larr;
+            </button>
+            <span className="wordmark" style={{ fontSize: 10, letterSpacing: '0.22em' }}>Profile</span>
+          </div>
+          <h2 style={{
+            fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 300,
+            color: 'var(--cream)', lineHeight: 1.1,
+          }}>
+            Your <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>measurements.</em>
+          </h2>
         </div>
-        <h2 className="mb-24">{t('measurements.sectionTitle')}</h2>
-        <MeasurementsEditorWrapper
-          profile={profile}
-          requestProfile={() => requestProfile('save-measurements')}
-          pendingAction={pendingAction}
-          onActionConsumed={() => setPendingAction(null)}
-          onSave={handleSaveMeasurements}
-        />
+        <div style={{ padding: '20px 22px', flex: 1 }}>
+          <MeasurementsEditorWrapper
+            profile={profile}
+            requestProfile={() => requestProfile('save-measurements')}
+            pendingAction={pendingAction}
+            onActionConsumed={() => setPendingAction(null)}
+            onSave={handleSaveMeasurements}
+          />
+        </div>
       </div>
     );
   }
@@ -420,48 +435,30 @@ export default function OwnerPage() {
       <div style={{
         background: 'var(--charcoal)', padding: '44px 24px 24px',
         position: 'relative', overflow: 'hidden',
-        borderRadius: '0 0 0 0',
         marginLeft: -20, marginRight: -20, paddingLeft: 24, paddingRight: 24,
       }}>
-        {/* Ghost S */}
         <div className="ghost-letter" style={{ top: -24, right: -12, fontSize: 110 }}>S</div>
 
-        {/* Top bar: wordmark + actions */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           marginBottom: 20, position: 'relative', zIndex: 2,
         }}>
           <span className="wordmark">Suruwe</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {/* Share icon */}
-            <button
-              onClick={shareSuruwe}
-              title={t('home.shareSuruwe')}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: 'var(--muted-d)', padding: 4,
-              }}
-            >
+            <button onClick={shareSuruwe} title={t('home.shareSuruwe')} style={{
+              background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4,
+            }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                 <polyline points="16 6 12 2 8 6" />
                 <line x1="12" y1="2" x2="12" y2="15" />
               </svg>
             </button>
-
-            {/* Language toggle */}
             <LanguageToggle variant="pill" />
-
-            {/* Sign out */}
             {profile && (
-              <button
-                onClick={handleSignOut}
-                title={t('common.signOut')}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: 'var(--muted-d)', padding: 4,
-                }}
-              >
+              <button onClick={handleSignOut} title={t('common.signOut')} style={{
+                background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-d)', padding: 4,
+              }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
@@ -469,15 +466,11 @@ export default function OwnerPage() {
                 </svg>
               </button>
             )}
-
-            {/* Avatar */}
             {profile && (
               <div style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: 'var(--charcoal-2)', border: '1px solid var(--gold-bdr)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 500, color: 'var(--gold-pale)',
-                fontFamily: 'var(--font-body)',
+                width: 32, height: 32, borderRadius: '50%', background: 'var(--charcoal-2)',
+                border: '1px solid var(--gold-bdr)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 500, color: 'var(--gold-pale)', fontFamily: 'var(--font-body)',
               }}>
                 {profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
@@ -485,38 +478,23 @@ export default function OwnerPage() {
           </div>
         </div>
 
-        {/* Greeting */}
         <div style={{ position: 'relative', zIndex: 2 }}>
           {isGuest ? (
             <>
-              <h1 style={{
-                fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300,
-                color: 'var(--cream)', lineHeight: 1.1,
-              }}>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--cream)', lineHeight: 1.1 }}>
                 {getGreeting()}.
               </h1>
-              <p style={{
-                fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300,
-                color: 'var(--muted-d)', marginTop: 5,
-              }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--muted-d)', marginTop: 5 }}>
                 Create your profile to get started.
               </p>
             </>
           ) : (
             <>
-              <div style={{
-                fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300,
-                color: 'var(--cream)', lineHeight: 1.1,
-              }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 300, color: 'var(--cream)', lineHeight: 1.1 }}>
                 {getGreeting()},{' '}
-                <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>
-                  {profile.name.split(' ')[0]}.
-                </em>
+                <em style={{ fontStyle: 'italic', color: 'var(--gold-pale)' }}>{profile.name.split(' ')[0]}.</em>
               </div>
-              <p style={{
-                fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300,
-                color: 'var(--muted-d)', marginTop: 5,
-              }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--muted-d)', marginTop: 5 }}>
                 {activeOrders.length === 0
                   ? 'No orders yet. Tap below to start.'
                   : `${activeOrders.length} active order${activeOrders.length === 1 ? '' : 's'}.`}
@@ -529,78 +507,39 @@ export default function OwnerPage() {
       {/* ── CREAM BODY ── */}
       <div style={{ padding: '20px 20px 32px' }}>
         {/* New Order CTA */}
-        <div
-          onClick={() => { setDraftOrder(null); setView('new-order'); }}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '16px 20px', background: 'var(--charcoal)',
-            borderRadius: 12, marginBottom: 24, cursor: 'pointer',
-          }}
-        >
+        <div onClick={() => { setDraftOrder(null); setView('new-order'); }} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px', background: 'var(--charcoal)', borderRadius: 12, marginBottom: 24, cursor: 'pointer',
+        }}>
           <div>
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600,
-              color: 'var(--cream)',
-            }}>
-              New order
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300,
-              color: 'var(--muted-d)', marginTop: 2,
-            }}>
-              Brief your tailor completely
-            </div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--cream)' }}>New order</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300, color: 'var(--muted-d)', marginTop: 2 }}>Brief your tailor completely</div>
           </div>
           <div style={{
             width: 36, height: 36, borderRadius: '50%', background: 'var(--gold)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, color: 'var(--charcoal)', flexShrink: 0,
-          }}>
-            +
-          </div>
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'var(--charcoal)', flexShrink: 0,
+          }}>+</div>
         </div>
 
         {/* Profile Section */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 12,
-          }}>
-            <span style={{
-              fontFamily: 'var(--font-body)', fontSize: 9, fontWeight: 600,
-              letterSpacing: '0.18em', textTransform: 'uppercase' as const,
-              color: 'var(--ink-soft)', opacity: 0.5,
-            }}>
-              Your profile
-            </span>
-            <button
-              onClick={() => setView('edit-measurements')}
-              style={{
-                fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500,
-                color: 'var(--gold)', background: 'none', border: 'none', cursor: 'pointer',
-              }}
-            >
-              Edit
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span className="field-label-cream" style={{ margin: 0 }}>Your profile</span>
+            <button onClick={() => setView('edit-measurements')} style={{
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: 'var(--gold)', background: 'none', border: 'none', cursor: 'pointer',
+            }}>Edit</button>
           </div>
-
           {profile ? (
             <div style={{
-              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)',
-              borderRadius: 12, padding: '14px 16px',
-              display: 'flex', alignItems: 'center', gap: 14,
+              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)', borderRadius: 12,
+              padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14,
             }}>
               <div style={{
-                width: 44, height: 44, borderRadius: 8,
-                background: 'var(--cream-3)', overflow: 'hidden', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 44, height: 44, borderRadius: 8, background: 'var(--cream-3)',
+                overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {hasPhotos ? (
-                  <img
-                    src={photos[0].url}
-                    alt=""
-                    style={{ width: 44, height: 44, objectFit: 'cover' }}
-                  />
+                  <img src={photos[0].url} alt="" style={{ width: 44, height: 44, objectFit: 'cover' }} />
                 ) : (
                   <svg viewBox="0 0 44 44" fill="none" width="44" height="44">
                     <rect width="44" height="44" fill="#e8dfd0" />
@@ -610,16 +549,8 @@ export default function OwnerPage() {
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600,
-                  color: 'var(--ink)',
-                }}>
-                  {profile.name}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300,
-                  color: 'var(--ink-soft)', marginTop: 2,
-                }}>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>{profile.name}</div>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 300, color: 'var(--ink-soft)', marginTop: 2 }}>
                   {measurementCount > 0 ? `${measurementCount} measurements` : 'No measurements yet'}
                   {hasPhotos ? ' \u00B7 Body photo saved' : ''}
                 </div>
@@ -627,9 +558,8 @@ export default function OwnerPage() {
               <div style={{
                 background: profileReady ? 'var(--forest-bg)' : 'var(--gold-dim)',
                 border: profileReady ? '0.5px solid rgba(45,90,61,0.15)' : '0.5px solid var(--gold-bdr)',
-                borderRadius: 20, padding: '4px 10px',
-                fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 600,
-                color: profileReady ? 'var(--forest)' : 'var(--gold)',
+                borderRadius: 20, padding: '4px 10px', fontFamily: 'var(--font-body)',
+                fontSize: 10, fontWeight: 600, color: profileReady ? 'var(--forest)' : 'var(--gold)',
                 letterSpacing: '0.04em', flexShrink: 0,
               }}>
                 {profileReady ? 'Ready' : 'Incomplete'}
@@ -637,9 +567,8 @@ export default function OwnerPage() {
             </div>
           ) : (
             <div style={{
-              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)',
-              borderRadius: 12, padding: '20px 16px', textAlign: 'center',
-              fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)',
+              background: 'white', border: '0.5px solid rgba(20,16,12,0.08)', borderRadius: 12,
+              padding: '20px 16px', textAlign: 'center', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)',
             }}>
               {t('nudge.guest')}
             </div>
@@ -648,33 +577,14 @@ export default function OwnerPage() {
 
         {/* Orders Section */}
         <div>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginBottom: 12,
-          }}>
-            <span style={{
-              fontFamily: 'var(--font-body)', fontSize: 9, fontWeight: 600,
-              letterSpacing: '0.18em', textTransform: 'uppercase' as const,
-              color: 'var(--ink-soft)', opacity: 0.5,
-            }}>
-              Orders
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span className="field-label-cream" style={{ margin: 0 }}>Orders</span>
             {orders.length > 3 && (
-              <span style={{
-                fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500,
-                color: 'var(--gold)',
-              }}>
-                All
-              </span>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, color: 'var(--gold)' }}>All</span>
             )}
           </div>
-
           {orders.length === 0 ? (
-            <div style={{
-              textAlign: 'center', padding: '32px 16px',
-              fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)',
-              lineHeight: 1.6,
-            }}>
+            <div style={{ textAlign: 'center', padding: '32px 16px', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.6 }}>
               {t('orders.empty')}
             </div>
           ) : (
@@ -684,13 +594,8 @@ export default function OwnerPage() {
                   key={order.id}
                   order={order}
                   onTap={() => {
-                    if (order.status === 'draft') {
-                      setDraftOrder(order);
-                      setView('new-order');
-                    } else {
-                      setSelectedOrder(order);
-                      setView('order-detail');
-                    }
+                    if (order.status === 'draft') { setDraftOrder(order); setView('new-order'); }
+                    else { setSelectedOrder(order); setView('order-detail'); }
                   }}
                   onDelete={() => handleDeleteOrder(order.id)}
                 />
@@ -703,12 +608,8 @@ export default function OwnerPage() {
         <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
           <a
             href="https://wa.me/14704437293?text=Hey%2C%20I%20just%20tried%20Suruwe%20and..."
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontSize: 13, color: 'var(--ink-soft)', textDecoration: 'none',
-              display: 'inline-flex', alignItems: 'center', gap: 6, opacity: 0.5,
-            }}
+            target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 13, color: 'var(--ink-soft)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, opacity: 0.5 }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -717,7 +618,6 @@ export default function OwnerPage() {
             {t('home.feedback')}
           </a>
         </div>
-
         <div style={{ height: 40 }} />
       </div>
 
@@ -727,26 +627,26 @@ export default function OwnerPage() {
       {showPinSetup && profile && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('pinSetup.title')}</h3>
-            <p style={{ fontSize: 14, color: 'var(--muted-d)', lineHeight: 1.5, marginBottom: 20 }}>
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+            }}>
+              Security
+            </div>
+            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+              {t('pinSetup.title')}
+            </h3>
+            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
               {t('pinSetup.subtitle')}
             </p>
-            <input
-              className="input-dark"
-              type="number"
-              inputMode="numeric"
-              placeholder={t('pinSetup.placeholder')}
+            <label className="field-label">PIN</label>
+            <input className="input-dark" type="number" inputMode="numeric" placeholder={t('pinSetup.placeholder')}
               value={pinSetupInput}
               onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()}
-              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()} autoFocus
             />
-            <button
-              className="btn-gold"
-              onClick={handleSavePin}
-              disabled={pinSetupInput.length < 4 || savingPin}
-              style={{ marginTop: 16 }}
-            >
+            <button className="btn-gold" onClick={handleSavePin} disabled={pinSetupInput.length < 4 || savingPin} style={{ marginTop: 20 }}>
               <span>{savingPin ? t('common.saving') : t('pinSetup.saveButton')}</span>
               <span>&rarr;</span>
             </button>
@@ -758,28 +658,29 @@ export default function OwnerPage() {
       {showUsernameSetup && profile && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('usernameSetup.title')}</h3>
-            <p style={{ fontSize: 14, color: 'var(--muted-d)', lineHeight: 1.5, marginBottom: 20 }}>
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+            }}>
+              Your identity
+            </div>
+            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+              {t('usernameSetup.title')}
+            </h3>
+            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
               {t('usernameSetup.subtitle')}
             </p>
-            <input
-              className="input-dark"
-              type="text"
-              placeholder={t('usernameSetup.placeholder')}
+            <label className="field-label">Username</label>
+            <input className="input-dark" type="text" placeholder={t('usernameSetup.placeholder')}
               value={usernameSetupInput}
               onChange={(e) => { setUsernameSetupInput(e.target.value); setUsernameSetupError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
-              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()} autoFocus
             />
             {usernameSetupError && (
-              <p style={{ color: 'var(--terra)', fontSize: 14, marginTop: 8 }}>{usernameSetupError}</p>
+              <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{usernameSetupError}</p>
             )}
-            <button
-              className="btn-gold"
-              onClick={handleSaveUsername}
-              disabled={!usernameSetupInput.trim() || savingUsername}
-              style={{ marginTop: 16 }}
-            >
+            <button className="btn-gold" onClick={handleSaveUsername} disabled={!usernameSetupInput.trim() || savingUsername} style={{ marginTop: 20 }}>
               <span>{savingUsername ? t('common.saving') : t('usernameSetup.saveButton')}</span>
               <span>&rarr;</span>
             </button>
@@ -787,72 +688,93 @@ export default function OwnerPage() {
         </div>
       )}
 
-      {/* Name prompt (profile creation) */}
+      {/* Profile creation (name / username / pin steps) */}
       {showNamePrompt && (
         <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); setOnboardingStep('name'); }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
+
             {onboardingStep === 'name' && (
               <>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('onboarding.nameStep.title')}</h3>
-                <p style={{ fontSize: 14, color: 'var(--muted-d)', lineHeight: 1.5, marginBottom: 20 }}>
+                <div style={{
+                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+                }}>
+                  Step 1 of 3
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.nameStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.nameStep.subtitle')}
                 </p>
-                <input
-                  className="input-dark"
-                  type="text"
-                  placeholder={t('onboarding.nameStep.placeholder')}
-                  value={nameInput}
-                  onChange={(e) => setNameInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()}
-                  autoFocus
+                <label className="field-label">Your name</label>
+                <input className="input-dark" type="text" placeholder={t('onboarding.nameStep.placeholder')}
+                  value={nameInput} onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()} autoFocus
                 />
-                <button className="btn-gold" onClick={handleOnboardingName} disabled={!nameInput.trim()} style={{ marginTop: 16 }}>
+                <button className="btn-gold" onClick={handleOnboardingName} disabled={!nameInput.trim()} style={{ marginTop: 20 }}>
                   <span>{t('onboarding.nameStep.continue')}</span>
                   <span>&rarr;</span>
                 </button>
               </>
             )}
+
             {onboardingStep === 'username' && (
               <>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('onboarding.usernameStep.title')}</h3>
-                <p style={{ fontSize: 14, color: 'var(--muted-d)', lineHeight: 1.5, marginBottom: 20 }}>
+                <div style={{
+                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+                }}>
+                  Step 2 of 3
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.usernameStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.usernameStep.subtitle')}
                 </p>
-                <input
-                  className="input-dark"
-                  type="text"
-                  placeholder={t('onboarding.usernameStep.placeholder')}
+                <label className="field-label">Username</label>
+                <input className="input-dark" type="text" placeholder={t('onboarding.usernameStep.placeholder')}
                   value={onboardingUsername}
                   onChange={(e) => { setOnboardingUsername(e.target.value); setOnboardingUsernameError(''); }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()}
-                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()} autoFocus
                 />
                 {onboardingUsernameError && (
-                  <p style={{ color: 'var(--terra)', fontSize: 14, marginTop: 8 }}>{onboardingUsernameError}</p>
+                  <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{onboardingUsernameError}</p>
                 )}
-                <button className="btn-gold" onClick={handleOnboardingUsername} disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 16 }}>
+                <button className="btn-gold" onClick={handleOnboardingUsername}
+                  disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 20 }}>
                   <span>{checkingUsername ? t('common.checking') : t('onboarding.usernameStep.continue')}</span>
                   <span>&rarr;</span>
                 </button>
               </>
             )}
+
             {onboardingStep === 'pin' && (
               <>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('onboarding.pinStep.title')}</h3>
-                <p style={{ fontSize: 14, color: 'var(--muted-d)', lineHeight: 1.5, marginBottom: 20 }}>
+                <div style={{
+                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+                }}>
+                  Step 3 of 3
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.pinStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
                   {t('onboarding.pinStep.subtitle')}
                 </p>
-                <input
-                  className="input-dark"
-                  type="number"
-                  inputMode="numeric"
-                  placeholder={t('onboarding.pinStep.placeholder')}
+                <label className="field-label">PIN</label>
+                <input className="input-dark" type="number" inputMode="numeric" placeholder={t('onboarding.pinStep.placeholder')}
                   value={pinSetupInput}
                   onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
-                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()} autoFocus
                 />
-                <button className="btn-gold" onClick={createProfileFromName} disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 16 }}>
+                <button className="btn-gold" onClick={createProfileFromName}
+                  disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 20 }}>
                   <span>{creating ? t('common.creating') : t('onboarding.pinStep.createProfile')}</span>
                   <span>&rarr;</span>
                 </button>
@@ -862,14 +784,14 @@ export default function OwnerPage() {
         </div>
       )}
 
-      {/* Phone prompt */}
       {showPhonePrompt && <PhonePrompt onSubmit={handlePhoneSubmit} onSkip={handlePhoneSkip} />}
 
-      {/* Share Suruwe sheet */}
       {showShareSheet && (
         <div className="modal-overlay" onClick={() => setShowShareSheet(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: 6, fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300 }}>{t('shareSuruwe.heading')}</h3>
+            <h3 style={{ marginBottom: 6, fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, color: 'var(--cream)' }}>
+              {t('shareSuruwe.heading')}
+            </h3>
             <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, fontStyle: 'italic', color: 'var(--gold)', marginBottom: 20 }}>
               {t('shareSuruwe.subheading')}
             </p>
@@ -880,11 +802,8 @@ export default function OwnerPage() {
               <span>{t('shareSuruwe.shareButton')}</span>
               <span>&rarr;</span>
             </button>
-            <button
-              className="btn-ghost"
-              onClick={() => setShowShareSheet(false)}
-              style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}
-            >
+            <button className="btn-ghost" onClick={() => setShowShareSheet(false)}
+              style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}>
               {t('common.notNow')}
             </button>
           </div>
@@ -894,10 +813,8 @@ export default function OwnerPage() {
   );
 }
 
-// ── Swipeable order card (redesigned) ──
-function SwipeableOrderCard({
-  order, onTap, onDelete,
-}: { order: Order; onTap: () => void; onDelete: () => void; }) {
+// ── Swipeable order card ──
+function SwipeableOrderCard({ order, onTap, onDelete }: { order: Order; onTap: () => void; onDelete: () => void }) {
   const t = useTranslations();
   const [offsetX, setOffsetX] = useState(0);
   const [startX, setStartX] = useState(0);
@@ -907,55 +824,34 @@ function SwipeableOrderCard({
   const deleteThreshold = -80;
 
   const handleTouchStart = (e: React.TouchEvent) => { setStartX(e.touches[0].clientX); setSwiping(true); };
-  const handleTouchMove = (e: React.TouchEvent) => { if (!swiping) return; const diff = e.touches[0].clientX - startX; if (diff < 0) setOffsetX(Math.max(diff, -120)); };
-  const handleTouchEnd = () => { setSwiping(false); if (offsetX < deleteThreshold) { setOffsetX(-120); } else { setOffsetX(0); } };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!swiping) return;
+    const diff = e.touches[0].clientX - startX;
+    if (diff < 0) setOffsetX(Math.max(diff, -120));
+  };
+  const handleTouchEnd = () => {
+    setSwiping(false);
+    if (offsetX < deleteThreshold) setOffsetX(-120);
+    else setOffsetX(0);
+  };
   const confirmDelete = async () => { setDeleting(true); await onDelete(); };
 
-  // Status dot color
-  const dotColor = order.status === 'draft'
-    ? 'var(--cream-3)'
-    : order.status === 'sent'
-      ? 'var(--gold)'
-      : 'var(--forest)';
-
-  // Status text
-  const statusText = order.status === 'draft'
-    ? 'Draft'
-    : order.status === 'sent'
-      ? 'Sent \u00B7 Awaiting tailor'
-      : getStatusLabel(order.status, t);
+  const dotColor = order.status === 'draft' ? 'var(--cream-3)' : order.status === 'sent' ? 'var(--gold)' : 'var(--forest)';
+  const statusText = order.status === 'draft' ? 'Draft' : order.status === 'sent' ? 'Sent \u00B7 Awaiting tailor' : getStatusLabel(order.status, t);
 
   if (showConfirm) {
     return (
-      <div style={{
-        background: 'white', border: '0.5px solid rgba(20,16,12,0.07)',
-        borderRadius: 12, padding: '16px', textAlign: 'center',
-      }}>
-        <p style={{ fontSize: 14, marginBottom: 12, color: 'var(--ink-soft)' }}>
-          {t('orderCard.deleteConfirm')}
-        </p>
+      <div style={{ background: 'white', border: '0.5px solid rgba(20,16,12,0.07)', borderRadius: 12, padding: 16, textAlign: 'center' }}>
+        <p style={{ fontSize: 14, marginBottom: 12, color: 'var(--ink-soft)' }}>{t('orderCard.deleteConfirm')}</p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button
-            onClick={() => setShowConfirm(false)}
-            style={{
-              padding: '8px 20px', fontSize: 13, fontFamily: 'var(--font-body)',
-              background: 'var(--cream-2)', border: 'none', borderRadius: 6,
-              color: 'var(--ink)', cursor: 'pointer',
-            }}
-          >
-            {t('orderCard.deleteCancel')}
-          </button>
-          <button
-            onClick={confirmDelete}
-            disabled={deleting}
-            style={{
-              padding: '8px 20px', fontSize: 13, fontFamily: 'var(--font-body)',
-              background: 'var(--terra)', border: 'none', borderRadius: 6,
-              color: 'white', cursor: 'pointer',
-            }}
-          >
-            {deleting ? t('common.deleting') : t('orderCard.deleteConfirmButton')}
-          </button>
+          <button onClick={() => setShowConfirm(false)} style={{
+            padding: '8px 20px', fontSize: 13, fontFamily: 'var(--font-body)',
+            background: 'var(--cream-2)', border: 'none', borderRadius: 6, color: 'var(--ink)', cursor: 'pointer',
+          }}>{t('orderCard.deleteCancel')}</button>
+          <button onClick={confirmDelete} disabled={deleting} style={{
+            padding: '8px 20px', fontSize: 13, fontFamily: 'var(--font-body)',
+            background: 'var(--terra)', border: 'none', borderRadius: 6, color: 'white', cursor: 'pointer',
+          }}>{deleting ? t('common.deleting') : t('orderCard.deleteConfirmButton')}</button>
         </div>
       </div>
     );
@@ -965,64 +861,39 @@ function SwipeableOrderCard({
     <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 12 }}>
       <div style={{
         position: 'absolute', right: 0, top: 0, bottom: 0, width: 120,
-        background: 'var(--terra)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        borderRadius: 12,
+        background: 'var(--terra)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12,
       }}>
         <button onClick={() => setShowConfirm(true)} style={{
-          background: 'none', border: 'none', color: '#fff', fontSize: 13,
-          fontWeight: 600, cursor: 'pointer', padding: '8px 16px', fontFamily: 'inherit',
-        }}>
-          {t('common.delete')}
-        </button>
+          background: 'none', border: 'none', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '8px 16px', fontFamily: 'inherit',
+        }}>{t('common.delete')}</button>
       </div>
       <div
         onClick={() => { if (offsetX === 0) onTap(); else setOffsetX(0); }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}
         style={{
-          transform: `translateX(${offsetX}px)`,
-          transition: swiping ? 'none' : 'transform 0.2s ease',
-          position: 'relative', zIndex: 1,
-          background: 'white', border: '0.5px solid rgba(20,16,12,0.07)',
-          borderRadius: 12, padding: '14px 16px',
-          display: 'flex', alignItems: 'flex-start', gap: 12,
-          cursor: 'pointer',
+          transform: `translateX(${offsetX}px)`, transition: swiping ? 'none' : 'transform 0.2s ease',
+          position: 'relative', zIndex: 1, background: 'white', border: '0.5px solid rgba(20,16,12,0.07)',
+          borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer',
         }}
       >
         <div style={{
-          width: 6, height: 6, borderRadius: '50%', marginTop: 5, flexShrink: 0,
-          background: dotColor,
+          width: 6, height: 6, borderRadius: '50%', marginTop: 5, flexShrink: 0, background: dotColor,
           border: order.status === 'draft' ? '1px solid var(--cream-3)' : 'none',
         }} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{
-            fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600,
-            color: 'var(--ink)', marginBottom: 3,
-          }}>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, color: 'var(--ink)', marginBottom: 3 }}>
             {order.description || 'Untitled order'}
           </div>
-          <div style={{
-            fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300,
-            color: 'var(--ink-soft)',
-          }}>
-            {statusText}
-          </div>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 300, color: 'var(--ink-soft)' }}>{statusText}</div>
         </div>
-        <span style={{
-          color: 'var(--cream-3)', fontSize: 14, flexShrink: 0, paddingTop: 1,
-        }}>
-          &rsaquo;
-        </span>
+        <span style={{ color: 'var(--cream-3)', fontSize: 14, flexShrink: 0, paddingTop: 1 }}>&rsaquo;</span>
       </div>
     </div>
   );
 }
 
 // ── Measurements editor wrapper ──
-function MeasurementsEditorWrapper({
-  profile, requestProfile, pendingAction, onActionConsumed, onSave,
-}: {
+function MeasurementsEditorWrapper({ profile, requestProfile, pendingAction, onActionConsumed, onSave }: {
   profile: Profile | null;
   requestProfile: () => void;
   pendingAction: 'save-measurements' | 'send-order' | null;
@@ -1035,36 +906,18 @@ function MeasurementsEditorWrapper({
   const [measurementNotes, setMeasurementNotes] = useState(profile?.measurement_notes || '');
   const [saving, setSaving] = useState(false);
 
-  const doSave = async () => {
-    setSaving(true);
-    await onSave(measurements, gender, unit, measurementNotes);
-    setSaving(false);
-  };
-
-  const handleSave = () => {
-    if (!profile) { requestProfile(); return; }
-    doSave();
-  };
+  const doSave = async () => { setSaving(true); await onSave(measurements, gender, unit, measurementNotes); setSaving(false); };
+  const handleSave = () => { if (!profile) { requestProfile(); return; } doSave(); };
 
   useEffect(() => {
-    if (profile && pendingAction === 'save-measurements') {
-      onActionConsumed();
-      doSave();
-    }
+    if (profile && pendingAction === 'save-measurements') { onActionConsumed(); doSave(); }
   }, [profile, pendingAction]);
 
   return (
     <MeasurementsEditor
-      gender={gender}
-      unit={unit}
-      measurements={measurements}
-      measurementNotes={measurementNotes}
-      onGenderChange={setGender}
-      onUnitChange={setUnit}
-      onMeasurementsChange={setMeasurements}
-      onNotesChange={setMeasurementNotes}
-      onSave={handleSave}
-      saving={saving}
+      gender={gender} unit={unit} measurements={measurements} measurementNotes={measurementNotes}
+      onGenderChange={setGender} onUnitChange={setUnit} onMeasurementsChange={setMeasurements}
+      onNotesChange={setMeasurementNotes} onSave={handleSave} saving={saving}
     />
   );
 }
