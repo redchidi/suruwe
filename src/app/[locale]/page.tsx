@@ -356,6 +356,164 @@ export default function OwnerPage() {
     return t('dashboard.greeting.evening');
   };
 
+  // ── Modals (rendered from every view via renderModals) ──
+  const renderModals = () => (
+    <>
+      {showPinSetup && profile && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+            }}>
+              {t('profileCreation.security')}
+            </div>
+            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+              {t('pinSetup.title')}
+            </h3>
+            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
+              {t('pinSetup.subtitle')}
+            </p>
+            <label className="field-label">{t('profileCreation.pinLabel')}</label>
+            <input
+              className="input-dark" type="number" inputMode="numeric"
+              placeholder={t('pinSetup.placeholder')} value={pinSetupInput}
+              onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()} autoFocus
+            />
+            <button className="btn-gold" onClick={handleSavePin} disabled={pinSetupInput.length < 4 || savingPin} style={{ marginTop: 20 }}>
+              <span>{savingPin ? t('common.saving') : t('pinSetup.saveButton')}</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showUsernameSetup && profile && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div style={{
+              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
+              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
+            }}>
+              {t('profileCreation.yourIdentity')}
+            </div>
+            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+              {t('usernameSetup.title')}
+            </h3>
+            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
+              {t('usernameSetup.subtitle')}
+            </p>
+            <label className="field-label">{t('profileCreation.usernameLabel')}</label>
+            <input
+              className="input-dark" type="text"
+              placeholder={t('usernameSetup.placeholder')} value={usernameSetupInput}
+              onChange={(e) => { setUsernameSetupInput(e.target.value); setUsernameSetupError(''); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()} autoFocus
+            />
+            {usernameSetupError && (
+              <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{usernameSetupError}</p>
+            )}
+            <button className="btn-gold" onClick={handleSaveUsername} disabled={!usernameSetupInput.trim() || savingUsername} style={{ marginTop: 20 }}>
+              <span>{savingUsername ? t('common.saving') : t('usernameSetup.saveButton')}</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showNamePrompt && (
+        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); setOnboardingStep('name'); }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            {onboardingStep === 'name' && (
+              <>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: 'var(--gold)', marginBottom: 14, opacity: 0.8 }}>
+                  {t('profileCreation.stepOf', { step: 1, total: 3 })}
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.nameStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
+                  {t('onboarding.nameStep.subtitle')}
+                </p>
+                <label className="field-label">{t('profileCreation.nameLabel')}</label>
+                <input className="input-dark" type="text" placeholder={t('onboarding.nameStep.placeholder')} value={nameInput} onChange={(e) => setNameInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()} autoFocus />
+                <button className="btn-gold" onClick={handleOnboardingName} disabled={!nameInput.trim()} style={{ marginTop: 20 }}>
+                  <span>{t('onboarding.nameStep.continue')}</span><span>&rarr;</span>
+                </button>
+              </>
+            )}
+            {onboardingStep === 'username' && (
+              <>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: 'var(--gold)', marginBottom: 14, opacity: 0.8 }}>
+                  {t('profileCreation.stepOf', { step: 2, total: 3 })}
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.usernameStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
+                  {t('onboarding.usernameStep.subtitle')}
+                </p>
+                <label className="field-label">{t('profileCreation.usernameLabel')}</label>
+                <input className="input-dark" type="text" placeholder={t('onboarding.usernameStep.placeholder')} value={onboardingUsername} onChange={(e) => { setOnboardingUsername(e.target.value); setOnboardingUsernameError(''); }} onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()} autoFocus />
+                {onboardingUsernameError && (
+                  <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{onboardingUsernameError}</p>
+                )}
+                <button className="btn-gold" onClick={handleOnboardingUsername} disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 20 }}>
+                  <span>{checkingUsername ? t('common.checking') : t('onboarding.usernameStep.continue')}</span><span>&rarr;</span>
+                </button>
+              </>
+            )}
+            {onboardingStep === 'pin' && (
+              <>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: 'var(--gold)', marginBottom: 14, opacity: 0.8 }}>
+                  {t('profileCreation.stepOf', { step: 3, total: 3 })}
+                </div>
+                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
+                  {t('onboarding.pinStep.title')}
+                </h3>
+                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
+                  {t('onboarding.pinStep.subtitle')}
+                </p>
+                <label className="field-label">{t('profileCreation.pinLabel')}</label>
+                <input className="input-dark" type="number" inputMode="numeric" placeholder={t('onboarding.pinStep.placeholder')} value={pinSetupInput} onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }} onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()} autoFocus />
+                <button className="btn-gold" onClick={createProfileFromName} disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 20 }}>
+                  <span>{creating ? t('common.creating') : t('onboarding.pinStep.createProfile')}</span><span>&rarr;</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showPhonePrompt && <PhonePrompt onSubmit={handlePhoneSubmit} onSkip={handlePhoneSkip} />}
+
+      {showShareSheet && (
+        <div className="modal-overlay" onClick={() => setShowShareSheet(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginBottom: 6, fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, color: 'var(--cream)' }}>
+              {t('shareSuruwe.heading')}
+            </h3>
+            <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, fontStyle: 'italic', color: 'var(--gold)', marginBottom: 20 }}>
+              {t('shareSuruwe.subheading')}
+            </p>
+            <div className="wa-preview" style={{ marginBottom: 24 }}>
+              {t('shareSuruwe.message')}{'\n\n'}https://suruwe.vercel.app
+            </div>
+            <button className="btn-gold" onClick={confirmShareSuruwe} style={{ marginBottom: 8 }}>
+              <span>{t('shareSuruwe.shareButton')}</span><span>&rarr;</span>
+            </button>
+            <button className="btn-ghost" onClick={() => setShowShareSheet(false)} style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}>
+              {t('common.notNow')}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   // ── RENDER ──
 
   if (loading || appState === 'loading') {
@@ -393,6 +551,7 @@ export default function OwnerPage() {
   // ── NEW ORDER FLOW (owns its own layout) ──
   if (view === 'new-order') {
     return (
+      <>
       <NewOrderFlow
         profile={profile}
         hasPhotos={photos.length > 0}
@@ -405,12 +564,15 @@ export default function OwnerPage() {
         onActionConsumed={() => setPendingAction(null)}
         draftOrder={draftOrder}
       />
+      {renderModals()}
+      </>
     );
   }
 
   // Order Detail
   if (view === 'order-detail' && selectedOrder && profile) {
     return (
+      <>
       <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
         <OrderDetail
           order={selectedOrder}
@@ -423,12 +585,15 @@ export default function OwnerPage() {
           onDelete={() => handleDeleteOrder(selectedOrder.id)}
         />
       </div>
+      {renderModals()}
+      </>
     );
   }
 
   // ── EDIT MEASUREMENTS (charcoal header + cream body) ──
   if (view === 'edit-measurements') {
     return (
+      <>
       <div style={{ background: 'var(--cream)', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ background: 'var(--charcoal)', padding: '44px 24px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -463,6 +628,8 @@ export default function OwnerPage() {
           />
         </div>
       </div>
+      {renderModals()}
+      </>
     );
   }
 
@@ -700,211 +867,8 @@ export default function OwnerPage() {
         <div style={{ height: 40 }} />
       </div>
 
-      {/* ── MODALS ── */}
-
-      {/* PIN setup for returning users */}
-      {showPinSetup && profile && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
-              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
-            }}>
-              {t('profileCreation.security')}
-            </div>
-            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
-              {t('pinSetup.title')}
-            </h3>
-            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
-              {t('pinSetup.subtitle')}
-            </p>
-            <label className="field-label">{t('profileCreation.pinLabel')}</label>
-            <input
-              className="input-dark"
-              type="number"
-              inputMode="numeric"
-              placeholder={t('pinSetup.placeholder')}
-              value={pinSetupInput}
-              onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSavePin()}
-              autoFocus
-            />
-            <button className="btn-gold" onClick={handleSavePin} disabled={pinSetupInput.length < 4 || savingPin} style={{ marginTop: 20 }}>
-              <span>{savingPin ? t('common.saving') : t('pinSetup.saveButton')}</span>
-              <span>&rarr;</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Username setup */}
-      {showUsernameSetup && profile && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div style={{
-              fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.2em', textTransform: 'uppercase' as const,
-              color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
-            }}>
-              {t('profileCreation.yourIdentity')}
-            </div>
-            <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
-              {t('usernameSetup.title')}
-            </h3>
-            <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
-              {t('usernameSetup.subtitle')}
-            </p>
-            <label className="field-label">{t('profileCreation.usernameLabel')}</label>
-            <input
-              className="input-dark"
-              type="text"
-              placeholder={t('usernameSetup.placeholder')}
-              value={usernameSetupInput}
-              onChange={(e) => { setUsernameSetupInput(e.target.value); setUsernameSetupError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
-              autoFocus
-            />
-            {usernameSetupError && (
-              <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{usernameSetupError}</p>
-            )}
-            <button className="btn-gold" onClick={handleSaveUsername} disabled={!usernameSetupInput.trim() || savingUsername} style={{ marginTop: 20 }}>
-              <span>{savingUsername ? t('common.saving') : t('usernameSetup.saveButton')}</span>
-              <span>&rarr;</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Profile creation (name / username / pin steps) */}
-      {showNamePrompt && (
-        <div className="modal-overlay" onClick={() => { setShowNamePrompt(false); setPendingAction(null); setOnboardingStep('name'); }}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            {onboardingStep === 'name' && (
-              <>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
-                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
-                }}>
-                  {t('profileCreation.stepOf', { step: 1, total: 3 })}
-                </div>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
-                  {t('onboarding.nameStep.title')}
-                </h3>
-                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
-                  {t('onboarding.nameStep.subtitle')}
-                </p>
-                <label className="field-label">{t('profileCreation.nameLabel')}</label>
-                <input
-                  className="input-dark" type="text"
-                  placeholder={t('onboarding.nameStep.placeholder')}
-                  value={nameInput}
-                  onChange={(e) => setNameInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingName()}
-                  autoFocus
-                />
-                <button className="btn-gold" onClick={handleOnboardingName} disabled={!nameInput.trim()} style={{ marginTop: 20 }}>
-                  <span>{t('onboarding.nameStep.continue')}</span>
-                  <span>&rarr;</span>
-                </button>
-              </>
-            )}
-            {onboardingStep === 'username' && (
-              <>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
-                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
-                }}>
-                  {t('profileCreation.stepOf', { step: 2, total: 3 })}
-                </div>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
-                  {t('onboarding.usernameStep.title')}
-                </h3>
-                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
-                  {t('onboarding.usernameStep.subtitle')}
-                </p>
-                <label className="field-label">{t('profileCreation.usernameLabel')}</label>
-                <input
-                  className="input-dark" type="text"
-                  placeholder={t('onboarding.usernameStep.placeholder')}
-                  value={onboardingUsername}
-                  onChange={(e) => { setOnboardingUsername(e.target.value); setOnboardingUsernameError(''); }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleOnboardingUsername()}
-                  autoFocus
-                />
-                {onboardingUsernameError && (
-                  <p style={{ color: 'var(--terra)', fontSize: 13, marginTop: 8 }}>{onboardingUsernameError}</p>
-                )}
-                <button className="btn-gold" onClick={handleOnboardingUsername} disabled={!onboardingUsername.trim() || checkingUsername} style={{ marginTop: 20 }}>
-                  <span>{checkingUsername ? t('common.checking') : t('onboarding.usernameStep.continue')}</span>
-                  <span>&rarr;</span>
-                </button>
-              </>
-            )}
-            {onboardingStep === 'pin' && (
-              <>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600,
-                  letterSpacing: '0.2em', textTransform: 'uppercase' as const,
-                  color: 'var(--gold)', marginBottom: 14, opacity: 0.8,
-                }}>
-                  {t('profileCreation.stepOf', { step: 3, total: 3 })}
-                </div>
-                <h3 style={{ marginBottom: 8, fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 300, color: 'var(--cream)' }}>
-                  {t('onboarding.pinStep.title')}
-                </h3>
-                <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--muted-d)', lineHeight: 1.6, marginBottom: 24 }}>
-                  {t('onboarding.pinStep.subtitle')}
-                </p>
-                <label className="field-label">{t('profileCreation.pinLabel')}</label>
-                <input
-                  className="input-dark" type="number" inputMode="numeric"
-                  placeholder={t('onboarding.pinStep.placeholder')}
-                  value={pinSetupInput}
-                  onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setPinSetupInput(val); }}
-                  onKeyDown={(e) => e.key === 'Enter' && createProfileFromName()}
-                  autoFocus
-                />
-                <button className="btn-gold" onClick={createProfileFromName} disabled={pinSetupInput.length < 4 || creating} style={{ marginTop: 20 }}>
-                  <span>{creating ? t('common.creating') : t('onboarding.pinStep.createProfile')}</span>
-                  <span>&rarr;</span>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {showPhonePrompt && <PhonePrompt onSubmit={handlePhoneSubmit} onSkip={handlePhoneSkip} />}
-
-      {showShareSheet && (
-        <div className="modal-overlay" onClick={() => setShowShareSheet(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: 6, fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, color: 'var(--cream)' }}>
-              {t('shareSuruwe.heading')}
-            </h3>
-            <p style={{ fontSize: 18, fontFamily: 'var(--font-display)', fontWeight: 300, fontStyle: 'italic', color: 'var(--gold)', marginBottom: 20 }}>
-              {t('shareSuruwe.subheading')}
-            </p>
-            <div className="wa-preview" style={{ marginBottom: 24 }}>
-              {t('shareSuruwe.message')}{'\n\n'}https://suruwe.vercel.app
-            </div>
-            <button className="btn-gold" onClick={confirmShareSuruwe} style={{ marginBottom: 8 }}>
-              <span>{t('shareSuruwe.shareButton')}</span>
-              <span>&rarr;</span>
-            </button>
-            <button
-              className="btn-ghost"
-              onClick={() => setShowShareSheet(false)}
-              style={{ display: 'block', width: '100%', textAlign: 'center', color: 'var(--muted-d)', marginTop: 8 }}
-            >
-              {t('common.notNow')}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ── MODALS (rendered via renderModals for all views) ── */}
+      {renderModals()}
     </div>
   );
 }
