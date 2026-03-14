@@ -1020,7 +1020,11 @@ function MeasurementsEditorWrapper({ profile, requestProfile, pendingAction, onA
     if (profile && pendingAction === 'save-measurements') {
       onActionConsumed();
       setSaving(true);
-      onSave(measurements, gender, unit, measurementNotes).then(() => setSaving(false));
+      const doReplay = async () => {
+        await onSave(measurements, gender, unit, measurementNotes);
+        setSaving(false);
+      };
+      doReplay();
     }
   }, [profile, pendingAction]);
 
