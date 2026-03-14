@@ -181,7 +181,20 @@ export default function NewOrderFlow({
 
   useEffect(() => {
     if (!profile || !pendingAction) return;
-    if (pendingAction === 'save-measurements') { onActionConsumed(); doSaveMeasurements(); }
+    if (pendingAction === 'save-measurements') {
+      onActionConsumed();
+      setMeasurementsSaving(true);
+      supabase.from('profiles').update({
+        measurements: localMeasurements,
+        gender: localGender,
+        measurement_unit: localUnit,
+        measurements_updated_at: new Date().toISOString(),
+      }).eq('id', profile.id).select().single().then(({ data }) => {
+        if (data) onProfileUpdate(data as Profile);
+        setMeasurementsSaving(false);
+        setStep(4);
+      });
+    }
     else if (pendingAction === 'send-order') { onActionConsumed(); if (sendMode === 'share') { doShareOrder(profile); } else { doSendOrder(profile); } }
   }, [profile, pendingAction]);
 
@@ -288,15 +301,15 @@ export default function NewOrderFlow({
   const stepConfig: Record<number, { headline: JSX.Element; chips: JSX.Element }> = {
     1: {
       headline: <>{locale === 'fr' ? 'Dis-nous ce que tu fais ' : 'Tell us what you\u2019re '}<span style={{ color: 'var(--gold-pale)' }}>{locale === 'fr' ? 'confectionner.' : 'making.'}</span></>,
-      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-active">{t('orderFlow.review.stepDetails')}</div><div className="step-chip step-chip-todo">{t('orderFlow.review.stepNotes')}</div><div className="step-chip step-chip-todo">{t('orderFlow.review.stepReview')}</div></div>,
+      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-active">{t('orderFlow.review.stepDetails')}</div><div className="step-chip step-chip-todo" style={{ cursor: 'pointer' }} onClick={() => setStep(2)}>{t('orderFlow.review.stepNotes')}</div><div className="step-chip step-chip-todo" style={{ cursor: 'pointer' }} onClick={() => setStep(3)}>{t('orderFlow.review.stepReview')}</div></div>,
     },
     2: {
       headline: <>{locale === 'fr' ? 'Comment doit-il ' : 'How should it '}<span style={{ color: 'var(--gold-pale)' }}>{locale === 'fr' ? 'tomber ?' : 'fit?'}</span></>,
-      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div><div className="step-chip step-chip-active">{t('orderFlow.review.stepNotes')}</div><div className="step-chip step-chip-todo">{t('orderFlow.review.stepReview')}</div></div>,
+      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div><div className="step-chip step-chip-active">{t('orderFlow.review.stepNotes')}</div><div className="step-chip step-chip-todo" style={{ cursor: 'pointer' }} onClick={() => setStep(3)}>{t('orderFlow.review.stepReview')}</div></div>,
     },
     3: {
       headline: <>{locale === 'fr' ? 'Tes ' : 'Your '}<span style={{ color: 'var(--gold-pale)' }}>{locale === 'fr' ? 'mensurations.' : 'measurements.'}</span></>,
-      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(2)}>{t('orderFlow.review.stepNotes')} &#10003;</div><div className="step-chip step-chip-todo">{t('orderFlow.review.stepReview')}</div></div>,
+      chips: <div className="step-chips" style={{ marginTop: 14 }}><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(1)}>{t('orderFlow.review.stepDetails')} &#10003;</div><div className="step-chip step-chip-done" style={{ cursor: 'pointer' }} onClick={() => setStep(2)}>{t('orderFlow.review.stepNotes')} &#10003;</div><div className="step-chip step-chip-todo" style={{ cursor: 'pointer' }} onClick={() => setStep(4)}>{t('orderFlow.review.stepReview')}</div></div>,
     },
   };
 

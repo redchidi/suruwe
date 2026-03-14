@@ -258,6 +258,10 @@ export default function OwnerPage() {
   const handleSignOut = () => {
     localStorage.removeItem(PROFILE_KEY);
     setProfile(null);
+    setPhotos([]);
+    setOrders([]);
+    setSelectedOrder(null);
+    setDraftOrder(null);
     setAppState('return');
   };
 
@@ -1015,7 +1019,8 @@ function MeasurementsEditorWrapper({ profile, requestProfile, pendingAction, onA
   useEffect(() => {
     if (profile && pendingAction === 'save-measurements') {
       onActionConsumed();
-      doSave();
+      setSaving(true);
+      onSave(measurements, gender, unit, measurementNotes).then(() => setSaving(false));
     }
   }, [profile, pendingAction]);
 
