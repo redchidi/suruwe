@@ -295,9 +295,9 @@ export default function OwnerPage() {
   const confirmShareSuruwe = () => {
     const text = t('shareSuruwe.message');
     if (navigator.share) {
-      navigator.share({ title: t('nav.logo'), text, url: 'https://suruwe.vercel.app' }).catch(() => {});
+      navigator.share({ title: t('nav.logo'), text, url: 'https://suruwe.com' }).catch(() => {});
     } else {
-      openWhatsApp(`${text}\n\nhttps://suruwe.vercel.app`);
+      openWhatsApp(`${text}\n\nhttps://suruwe.com`);
     }
     setShowShareSheet(false);
   };
@@ -500,7 +500,7 @@ export default function OwnerPage() {
               {t('shareSuruwe.subheading')}
             </p>
             <div className="wa-preview" style={{ marginBottom: 24 }}>
-              {t('shareSuruwe.message')}{'\n\n'}https://suruwe.vercel.app
+              {t('shareSuruwe.message')}{'\n\n'}https://suruwe.com
             </div>
             <button className="btn-gold" onClick={confirmShareSuruwe} style={{ marginBottom: 8 }}>
               <span>{t('shareSuruwe.shareButton')}</span><span>&rarr;</span>

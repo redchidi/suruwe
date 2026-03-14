@@ -79,7 +79,7 @@ export default function OrderViewClient({
           color: 'var(--charcoal)', background: 'var(--gold)',
           padding: '14px 24px', borderRadius: 6, textDecoration: 'none',
         }}>
-          {t('tailorView.footerCreate')} suruwe.vercel.app
+          {t('tailorView.footerCreate')} suruwe.com
         </a>
       </div>
     );
@@ -116,7 +116,7 @@ export default function OrderViewClient({
             color: 'var(--ink-soft)',
           }}>
             via{' '}
-            <a href="https://suruwe.vercel.app" style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 500 }}>
+            <a href="https://suruwe.com" style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 500 }}>
               Suruwe
             </a>
           </div>
@@ -335,11 +335,11 @@ export default function OrderViewClient({
             letterSpacing: '0.26em', textTransform: 'uppercase' as const,
             color: 'var(--gold)', marginBottom: 6,
           }}>
-            <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
+            <a href="https://suruwe.com" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
           </div>
           <p style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 300 }}>
             {t('tailorView.footerTagline')}{' '}
-            <a href="https://suruwe.vercel.app" style={{ color: 'var(--gold)', textDecoration: 'none' }}>suruwe.vercel.app</a>
+            <a href="https://suruwe.com" style={{ color: 'var(--gold)', textDecoration: 'none' }}>suruwe.com</a>
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import './globals.css';
 
-const OG_IMAGE = 'https://suruwe.vercel.app/og-image.png';
+const OG_IMAGE = 'https://suruwe.com/og-image.png';
 
 export const metadata: Metadata = {
   title: 'Suruwe: What you ordered is what you get.',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description: 'Send your tailor your measurements, photos, and fit notes in one link. No more wahala.',
     type: 'website',
     siteName: 'Suruwe',
-    url: 'https://suruwe.vercel.app',
+    url: 'https://suruwe.com',
     images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: 'Suruwe: What you ordered is what you get.' }],
   },
   twitter: {

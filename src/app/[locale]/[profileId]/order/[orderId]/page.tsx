@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://suruwe.vercel.app';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://suruwe.com';
 
 interface Props {
   params: { locale: string; profileId: string; orderId: string };

@@ -201,8 +201,8 @@ export default function NewOrderFlow({
   const handleShareSuruwe = () => { setShowSharePreview(true); };
   const confirmShareSuruwe = () => {
     const text = t('shareSuruwe.message');
-    if (navigator.share) { navigator.share({ title: 'Suruwe', text, url: 'https://suruwe.vercel.app' }).catch(() => {}); }
-    else { openWhatsApp(`${text}\n\nhttps://suruwe.vercel.app`); }
+    if (navigator.share) { navigator.share({ title: 'Suruwe', text, url: 'https://suruwe.com' }).catch(() => {}); }
+    else { openWhatsApp(`${text}\n\nhttps://suruwe.com`); }
     setShowSharePreview(false);
   };
 

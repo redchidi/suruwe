@@ -31,7 +31,7 @@
   "home": {
     "tagline": "What you ordered is what you get.",
     "subtitle": "Share your measurements, photos, and fit notes with your tailor in one link.",
-    "profileUrl": "suruwe.vercel.app/{slug}",
+    "profileUrl": "suruwe.com/{slug}",
     "newOrder": "New Order",
     "alreadyHaveProfile": "I already have a profile",
     "shareSuruwe": "Share Suruwe",

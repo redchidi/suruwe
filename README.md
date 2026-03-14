@@ -122,7 +122,7 @@ Before clicking Deploy, expand the **Environment Variables** section. Add these 
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL from Step 1.2 (e.g. `https://abcdefg.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key from Step 1.2 (the long `eyJ...` string) |
-| `NEXT_PUBLIC_APP_URL` | `https://suruwe.com` (or your custom domain, or your Vercel URL like `https://suruwe.vercel.app` if you do not have a custom domain yet) |
+| `NEXT_PUBLIC_APP_URL` | `https://suruwe.com` (or your custom domain, or your Vercel URL like `https://suruwe.com` if you do not have a custom domain yet) |
 
 For each variable:
 1. Type the variable name in the "Key" field.

@@ -100,7 +100,7 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
         <h1>{t('tailorView.notFound')}</h1>
         <p>{t('tailorView.notFoundDesc')}</p>
         <a href="/" className="btn btn-primary" style={{ marginTop: 24 }}>
-          {t('tailorView.footerCreate')} suruwe.vercel.app
+          {t('tailorView.footerCreate')} suruwe.com
         </a>
       </div>
     );
@@ -315,11 +315,11 @@ export default function ProfileViewClient({ params }: { params: { profileId: str
       {/* Footer */}
       <div className="tailor-footer">
         <div className="logo">
-          <a href="https://suruwe.vercel.app" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
+          <a href="https://suruwe.com" style={{ color: 'inherit', textDecoration: 'none' }}>Suruwe</a>
         </div>
         <p>
           {t('tailorView.footerCreate')}{' '}
-          <a href="https://suruwe.vercel.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.vercel.app</a>
+          <a href="https://suruwe.com" style={{ color: 'var(--accent)', textDecoration: 'none' }}>suruwe.com</a>
         </p>
       </div>
 

@@ -31,7 +31,7 @@
   "home": {
     "tagline": "Ce que tu commandes, c'est ce que tu reçois.",
     "subtitle": "Partage tes mensurations, photos et notes de coupe avec ton tailleur en un seul lien.",
-    "profileUrl": "suruwe.vercel.app/{slug}",
+    "profileUrl": "suruwe.com/{slug}",
     "newOrder": "Nouvelle commande",
     "alreadyHaveProfile": "J'ai déjà un profil",
     "shareSuruwe": "Partager Suruwe",
