@@ -8,5 +8,6 @@ export default createMiddleware({
 });
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|\..*).*)'],
+  // Exclude: api routes, Next.js internals, dotfiles, and PWA files
+  matcher: ['/((?!api|_next|_vercel|sw\\.js|manifest\\.json|\\..*).*)'],
 };
