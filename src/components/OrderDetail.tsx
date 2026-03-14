@@ -309,8 +309,7 @@ export default function OrderDetail({ order, profile, onBack, onOrderUpdate, onD
         }}>
           <DetailRow label={t('orderDetail.tailorNameLabel')} value={`${order.tailor_name}${order.tailor_city ? `, ${order.tailor_city}` : ''}`} />
           {order.deadline && <DetailRow label={locale === 'fr' ? 'Date limite' : 'Need by'} value={formatDate(order.deadline)} />}
-          <DetailRow label={locale === 'fr' ? 'Envoy\u00e9' : 'Sent'} value={formatDate(order.created_at)} last={!order.fit_notes} />
-          {order.viewed_at && <DetailRow label={locale === 'fr' ? 'Ouvert par le tailleur' : 'Opened by tailor'} value={formatDate(order.viewed_at)} valueColor="var(--forest)" last />}
+          <DetailRow label={locale === 'fr' ? 'Envoy\u00e9' : 'Sent'} value={formatDate(order.created_at)} last />
         </div>
 
         {/* Fit notes */}
