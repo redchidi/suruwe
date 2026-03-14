@@ -573,18 +573,16 @@ export default function OwnerPage() {
   if (view === 'order-detail' && selectedOrder && profile) {
     return (
       <>
-      <div className="app-shell" style={{ paddingTop: 16, paddingBottom: 40 }}>
-        <OrderDetail
-          order={selectedOrder}
-          profile={profile}
-          onBack={() => { setSelectedOrder(null); setView('home'); }}
-          onOrderUpdate={(updated) => {
-            setOrders(orders.map((o) => (o.id === updated.id ? updated : o)));
-            setSelectedOrder(updated);
-          }}
-          onDelete={() => handleDeleteOrder(selectedOrder.id)}
-        />
-      </div>
+      <OrderDetail
+        order={selectedOrder}
+        profile={profile}
+        onBack={() => { setSelectedOrder(null); setView('home'); }}
+        onOrderUpdate={(updated) => {
+          setOrders(orders.map((o) => (o.id === updated.id ? updated : o)));
+          setSelectedOrder(updated);
+        }}
+        onDelete={() => handleDeleteOrder(selectedOrder.id)}
+      />
       {renderModals()}
       </>
     );
