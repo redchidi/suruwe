@@ -8,6 +8,7 @@ import { uploadImage } from '@/lib/upload';
 import { generateOrderMessage, generateOrderShareMessage, openWhatsApp } from '@/lib/whatsapp';
 import { formatRelativeDate } from '@/lib/utils';
 import MeasurementsEditor from './MeasurementsEditor';
+import ReferenceImagePicker from './ReferenceImagePicker';
 import {
   ArrowLeftIcon, WhatsAppIcon, EyeIcon, EyeOffIcon, XIcon, PlusIcon, ImageIcon,
 } from './Icons';
@@ -54,6 +55,7 @@ export default function NewOrderFlow({
   const [feedbackSent, setFeedbackSent] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const fabricFileRef = useRef<HTMLInputElement>(null);
+  const [aiGenerationsUsed, setAiGenerationsUsed] = useState(0);
 
   const [tailorHistory, setTailorHistory] = useState<TailorHistory[]>([]);
   const [showTailorSuggestions, setShowTailorSuggestions] = useState(false);
@@ -88,6 +90,16 @@ export default function NewOrderFlow({
   };
 
   const filteredTailors = tailorHistory.filter((th) => th.name.toLowerCase().includes(tailorName.toLowerCase().trim()));
+
+  const handleRefFilesSelected = (files: File[], previews: string[]) => {
+    const newAttachments = files.map((file, i) => ({
+      file,
+      url: '',
+      visible: true,
+      preview: previews[i],
+    }));
+    setAttachments((prev) => [...prev, ...newAttachments]);
+  };
 
   const handleAttachmentAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -369,7 +381,12 @@ export default function NewOrderFlow({
                     <button onClick={() => removeAttachment(i)} style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'var(--charcoal)', color: 'var(--cream)', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
                   </div>
                 ))}
-                <button onClick={() => fileRef.current?.click()} style={{ width: 56, height: 56, borderRadius: 8, background: 'transparent', border: '0.5px dashed rgba(20,16,12,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'var(--ink-soft)', opacity: 0.4, cursor: 'pointer' }}>+</button>
+                <ReferenceImagePicker
+                    onFilesSelected={handleRefFilesSelected}
+                    generationsUsed={aiGenerationsUsed}
+                    onGenerationUsed={() => setAiGenerationsUsed((n) => n + 1)}
+                    maxGenerations={3}
+                  />
               </div>
             </FormField>
           </>
