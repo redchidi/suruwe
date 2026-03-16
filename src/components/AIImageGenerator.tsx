@@ -93,7 +93,7 @@ export default function AIImageGenerator({
         ia[i] = byteString.charCodeAt(i);
       }
       const blob = new Blob([ab], { type: 'image/png' });
-      const file = new File([blob], \`ai-reference-\${Date.now()}.png\`, {
+      const file = new File([blob], `ai-reference-${Date.now()}.png`, {
         type: 'image/png',
       });
 
