@@ -35,12 +35,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If a reference image is provided, use GPT-4o image generation
     if (referenceImage) {
       return await generateWithReference(prompt.trim(), referenceImage);
     }
 
-    // Otherwise use DALL-E 3 for text-only generation
     return await generateTextOnly(prompt.trim());
   } catch (error) {
     console.error('Generate image error:', error);
@@ -104,45 +102,30 @@ async function generateTextOnly(prompt: string) {
 }
 
 async function generateWithReference(prompt: string, referenceImageB64: string) {
-  const enhancedPrompt = `You are a fashion design assistant. The user has provided a reference image (it could be a fabric swatch, a style they like, or an existing garment). Based on this reference image and their description, generate a new fashion design reference image suitable for a tailor.
+  const enhancedPrompt = `Fashion design reference image based on the uploaded reference. ${prompt}. Create a new garment design inspired by the reference image. Show the garment on a clean background, full view, suitable as a reference image for a tailor.`;
 
-User's description: ${prompt}
+  // Convert base64 to a Blob for the multipart form
+  const imageBytes = Buffer.from(referenceImageB64, 'base64');
+  const imageBlob = new Blob([imageBytes], { type: 'image/png' });
 
-Generate a clear, full-view image of the described garment on a clean background. Use the reference image to inform the style, pattern, fabric, or silhouette as appropriate.`;
+  const formData = new FormData();
+  formData.append('model', 'gpt-image-1');
+  formData.append('prompt', enhancedPrompt);
+  formData.append('image[]', imageBlob, 'reference.png');
+  formData.append('size', '1024x1024');
+  formData.append('quality', 'medium');
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${OPENAI_API_KEY}`,
     },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: enhancedPrompt,
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/jpeg;base64,${referenceImageB64}`,
-                detail: 'low',
-              },
-            },
-          ],
-        },
-      ],
-      modalities: ['text', 'image'],
-    }),
+    body: formData,
   });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    console.error('OpenAI GPT-4o error:', err);
+    console.error('OpenAI gpt-image-1 edits error:', err);
 
     if (err?.error?.code === 'content_policy_violation') {
       return NextResponse.json(
@@ -158,28 +141,17 @@ Generate a clear, full-view image of the described garment on a clean background
   }
 
   const data = await response.json();
-  
-  // GPT-4o returns images in the content array
-  const imageContent = data.choices?.[0]?.message?.content;
-  
-  if (Array.isArray(imageContent)) {
-    const imageBlock = imageContent.find((block: any) => block.type === 'image_url');
-    if (imageBlock?.image_url?.url) {
-      // Extract base64 from data URL
-      const b64Match = imageBlock.image_url.url.match(/base64,(.+)/);
-      if (b64Match) {
-        return NextResponse.json({
-          image: b64Match[1],
-          revised_prompt: null,
-        });
-      }
-    }
+  const b64 = data.data?.[0]?.b64_json;
+
+  if (!b64) {
+    return NextResponse.json(
+      { error: 'No image was returned. Please try again.' },
+      { status: 502 }
+    );
   }
 
-  // Fallback: check if there's a different response format
-  console.error('Unexpected GPT-4o response structure:', JSON.stringify(data).slice(0, 500));
-  return NextResponse.json(
-    { error: 'No image was returned. Please try again.' },
-    { status: 502 }
-  );
+  return NextResponse.json({
+    image: b64,
+    revised_prompt: null,
+  });
 }
