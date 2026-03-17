@@ -77,7 +77,7 @@
       "neck": "E. Neck",
       "armhole": "F. Armhole",
       "belly": "f. Belly",
-      "sleeve": "D. Sleeve Length",
+      "sleeve": "D. Short Sleeve",
       "bicep": "G. Bicep",
       "wrist": "Wrist",
       "outseam": "G. Trouser Length",
@@ -86,7 +86,11 @@
       "thigh": "J. Thigh",
       "knee": "K. Knee",
       "ankle": "L. Ankle",
-      "inseam": "M. Inseam"
+      "inseam": "M. Inseam",
+      "back_width": "Across Back",
+      "nape_to_waist": "Nape to Waist",
+      "long_sleeve": "Long Sleeve",
+      "crotch_depth": "Crotch Depth"
     },
     "female": {
       "bodice_length": "N. Bodice Length",
@@ -95,7 +99,7 @@
       "shoulder": "Q. Shoulder",
       "armhole": "S. Armhole",
       "belly": "V. Belly",
-      "sleeve": "R. Sleeve Length",
+      "sleeve": "R. Short Sleeve",
       "bicep": "T. Bicep",
       "wrist": "U. Wrist",
       "across_front": "AF. Across Front",
@@ -109,7 +113,12 @@
       "ankle": "AB. Ankle",
       "inseam": "AC. Inseam",
       "crotch_depth": "AD. Crotch Depth",
-      "bottom_length": "AE. Bottom Length"
+      "bottom_length": "AE. Bottom Length",
+      "back_width": "Across Back",
+      "bust_point": "Bust Point Distance",
+      "back_waist_length": "Back Waist Length",
+      "long_sleeve": "Long Sleeve",
+      "across_back": "Across Back"
     }
   },
   "orders": {

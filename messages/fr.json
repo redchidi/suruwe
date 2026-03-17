@@ -77,7 +77,7 @@
       "neck": "E. Cou",
       "armhole": "F. Emmanchure",
       "belly": "f. Ventre",
-      "sleeve": "D. Longueur de manche",
+      "sleeve": "D. Manche courte",
       "bicep": "G. Biceps",
       "wrist": "Poignet",
       "outseam": "G. Longueur du pantalon",
@@ -86,7 +86,11 @@
       "thigh": "J. Cuisse",
       "knee": "K. Genou",
       "ankle": "L. Cheville",
-      "inseam": "M. Entrejambe"
+      "inseam": "M. Entrejambe",
+      "back_width": "Largeur du dos",
+      "nape_to_waist": "Nuque à taille",
+      "long_sleeve": "Manche longue",
+      "crotch_depth": "Profondeur d'entrejambe"
     },
     "female": {
       "bodice_length": "N. Longueur du corsage",
@@ -95,7 +99,7 @@
       "shoulder": "Q. Épaule",
       "armhole": "S. Emmanchure",
       "belly": "V. Ventre",
-      "sleeve": "R. Longueur de manche",
+      "sleeve": "R. Manche courte",
       "bicep": "T. Biceps",
       "wrist": "U. Poignet",
       "across_front": "AF. Largeur devant",
@@ -109,7 +113,12 @@
       "ankle": "AB. Cheville",
       "inseam": "AC. Entrejambe",
       "crotch_depth": "AD. Profondeur de l'entrejambe",
-      "bottom_length": "AE. Longueur du bas"
+      "bottom_length": "AE. Longueur du bas",
+      "back_width": "Largeur du dos",
+      "bust_point": "Distance pointe de buste",
+      "back_waist_length": "Longueur dos taille",
+      "long_sleeve": "Manche longue",
+      "across_back": "Largeur du dos"
     }
   },
   "orders": {

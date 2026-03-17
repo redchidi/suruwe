@@ -68,8 +68,11 @@ export const MALE_MEASUREMENTS: MeasurementField[] = [
   { key: 'neck', label: 'E. Neck', section: 'Upper Body', sectionKey: 'upperBody' },
   { key: 'armhole', label: 'F. Armhole', section: 'Upper Body', sectionKey: 'upperBody' },
   { key: 'belly', label: 'f. Belly', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'back_width', label: 'Across Back', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'nape_to_waist', label: 'Nape to Waist', section: 'Upper Body', sectionKey: 'upperBody' },
   // Arms
-  { key: 'sleeve', label: 'D. Sleeve Length', section: 'Arms', sectionKey: 'arms' },
+  { key: 'sleeve', label: 'D. Short Sleeve', section: 'Arms', sectionKey: 'arms' },
+  { key: 'long_sleeve', label: 'Long Sleeve', section: 'Arms', sectionKey: 'arms' },
   { key: 'bicep', label: 'G. Bicep', section: 'Arms', sectionKey: 'arms' },
   { key: 'wrist', label: 'Wrist', section: 'Arms', sectionKey: 'arms' },
   // Lower body (Male Trousers / Bottom Guide)
@@ -80,6 +83,7 @@ export const MALE_MEASUREMENTS: MeasurementField[] = [
   { key: 'knee', label: 'K. Knee', section: 'Lower Body', sectionKey: 'lowerBody' },
   { key: 'ankle', label: 'L. Ankle', section: 'Lower Body', sectionKey: 'lowerBody' },
   { key: 'inseam', label: 'M. Inseam', section: 'Lower Body', sectionKey: 'lowerBody' },
+  { key: 'crotch_depth', label: 'Crotch Depth', section: 'Lower Body', sectionKey: 'lowerBody' },
 ];
 
 // Women's measurements grouped by body section
@@ -92,12 +96,17 @@ export const FEMALE_MEASUREMENTS: MeasurementField[] = [
   { key: 'shoulder', label: 'Q. Shoulder', section: 'Upper Body', sectionKey: 'upperBody' },
   { key: 'armhole', label: 'S. Armhole', section: 'Upper Body', sectionKey: 'upperBody' },
   { key: 'belly', label: 'V. Belly', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'back_width', label: 'Across Back', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'bust_point', label: 'Bust Point Distance', section: 'Upper Body', sectionKey: 'upperBody' },
+  { key: 'back_waist_length', label: 'Back Waist Length', section: 'Upper Body', sectionKey: 'upperBody' },
   // Arms
-  { key: 'sleeve', label: 'R. Sleeve Length', section: 'Arms', sectionKey: 'arms' },
+  { key: 'sleeve', label: 'R. Short Sleeve', section: 'Arms', sectionKey: 'arms' },
+  { key: 'long_sleeve', label: 'Long Sleeve', section: 'Arms', sectionKey: 'arms' },
   { key: 'bicep', label: 'T. Bicep', section: 'Arms', sectionKey: 'arms' },
   { key: 'wrist', label: 'U. Wrist', section: 'Arms', sectionKey: 'arms' },
   // Full body (common for dresses, gowns, iro & buba)
   { key: 'across_front', label: 'AF. Across Front', section: 'Full Body', sectionKey: 'fullBody' },
+  { key: 'across_back', label: 'Across Back', section: 'Full Body', sectionKey: 'fullBody' },
   { key: 'shoulder_to_waist', label: 'AG. Shoulder to Waist', section: 'Full Body', sectionKey: 'fullBody' },
   { key: 'shoulder_to_floor', label: 'AH. Shoulder to Floor', section: 'Full Body', sectionKey: 'fullBody' },
   // Lower body (Female Bottom Guide)
