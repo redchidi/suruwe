@@ -375,6 +375,7 @@ export default function MeasurementsEditor({
         <MeasurementImport
           gender={gender}
           unit={unit}
+          existingMeasurements={measurements}
           onImport={handleImport}
           onClose={() => setShowImport(false)}
         />

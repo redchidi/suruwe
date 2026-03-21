@@ -6,6 +6,7 @@ import { MeasurementUnit, Gender, getMeasurementFields } from '@/types';
 interface MeasurementImportProps {
   gender: Gender;
   unit: MeasurementUnit;
+  existingMeasurements: Record<string, number>;
   onImport: (measurements: Record<string, number>, unit?: MeasurementUnit) => void;
   onClose: () => void;
 }
@@ -15,6 +16,7 @@ type ImportState = 'idle' | 'extracting' | 'review' | 'error';
 export default function MeasurementImport({
   gender,
   unit,
+  existingMeasurements,
   onImport,
   onClose,
 }: MeasurementImportProps) {
@@ -465,61 +467,128 @@ export default function MeasurementImport({
                 fontWeight: 300,
                 color: 'var(--ink-soft)',
                 lineHeight: 1.6,
-                marginBottom: 20,
+                marginBottom: 16,
                 fontFamily: 'var(--font-body)',
               }}
             >
               {reviewFields.length} measurement
-              {reviewFields.length !== 1 ? 's' : ''} found. Correct anything
-              that looks wrong before saving.
+              {reviewFields.length !== 1 ? 's' : ''} found. The current value
+              is shown on the left. Correct the incoming value on the right
+              before saving.
             </p>
 
+            {/* Column headers */}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '10px 12px',
+                gridTemplateColumns: '1fr 28px 1fr',
+                gap: '0 8px',
+                marginBottom: 8,
+                padding: '0 4px',
+              }}
+            >
+              <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-soft)', opacity: 0.4, fontFamily: 'var(--font-body)', textAlign: 'center' }}>Current</div>
+              <div />
+              <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', opacity: 0.7, fontFamily: 'var(--font-body)', textAlign: 'center' }}>Incoming</div>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
                 marginBottom: 24,
               }}
             >
-              {reviewFields.map((field) => (
-                <div key={field.key}>
-                  <label
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 10,
-                      fontWeight: 600,
-                      letterSpacing: '0.14em',
-                      textTransform: 'uppercase',
-                      color: 'var(--ink-soft)',
-                      opacity: 0.6,
-                      display: 'block',
-                      marginBottom: 6,
-                    }}
-                  >
-                    {field.label.replace(/^[A-Za-z]+\.\s*/, '')}
-                  </label>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    step="0.5"
-                    value={extracted[field.key] ?? ''}
-                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                    className="input-cream"
-                    style={{
-                      padding: '10px 12px',
-                      fontSize: 14,
-                      textAlign: 'center',
-                      width: '100%',
-                      background: 'rgba(184,146,74,0.06)',
-                      border: '0.5px solid rgba(184,146,74,0.3)',
-                      borderRadius: 8,
-                      fontFamily: 'var(--font-body)',
-                      color: 'var(--ink)',
-                    }}
-                  />
-                </div>
-              ))}
+              {reviewFields.map((field) => {
+                const currentVal = existingMeasurements[field.key];
+                const hasExisting = currentVal !== undefined;
+                const incomingVal = extracted[field.key];
+                const isChanged = hasExisting && currentVal !== incomingVal;
+
+                return (
+                  <div key={field.key}>
+                    {/* Field label */}
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 10,
+                        fontWeight: 600,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'var(--ink-soft)',
+                        opacity: 0.5,
+                        marginBottom: 5,
+                      }}
+                    >
+                      {field.label.replace(/^[A-Za-z]+\.\s*/, '')}
+                    </div>
+
+                    {/* Before → After row */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 28px 1fr',
+                        gap: '0 8px',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {/* Current value — read only */}
+                      <div
+                        style={{
+                          padding: '10px 12px',
+                          fontSize: 14,
+                          textAlign: 'center',
+                          background: 'var(--cream-2)',
+                          border: '0.5px solid rgba(20,16,12,0.08)',
+                          borderRadius: 8,
+                          fontFamily: 'var(--font-body)',
+                          color: hasExisting ? 'var(--ink-soft)' : 'rgba(20,16,12,0.2)',
+                          fontWeight: hasExisting ? 400 : 300,
+                        }}
+                      >
+                        {hasExisting ? currentVal : 'Empty'}
+                      </div>
+
+                      {/* Arrow */}
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          fontSize: 14,
+                          color: isChanged ? 'var(--gold)' : 'var(--cream-3)',
+                          fontWeight: 400,
+                        }}
+                      >
+                        →
+                      </div>
+
+                      {/* Incoming value — editable */}
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.5"
+                        value={incomingVal ?? ''}
+                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        className="input-cream"
+                        style={{
+                          padding: '10px 12px',
+                          fontSize: 14,
+                          textAlign: 'center',
+                          width: '100%',
+                          background: isChanged ? 'rgba(184,146,74,0.08)' : 'white',
+                          border: isChanged
+                            ? '0.5px solid rgba(184,146,74,0.4)'
+                            : '0.5px solid rgba(20,16,12,0.1)',
+                          borderRadius: 8,
+                          fontFamily: 'var(--font-body)',
+                          color: 'var(--ink)',
+                          fontWeight: isChanged ? 600 : 400,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <button
