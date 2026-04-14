@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Profile, Order, OrderAttachment, getMeasurementFields } from '@/types';
@@ -10,7 +9,13 @@ import { formatRelativeDate } from '@/lib/utils';
 import MeasurementsEditor from './MeasurementsEditor';
 import ReferenceImagePicker from './ReferenceImagePicker';
 import {
-  ArrowLeftIcon, WhatsAppIcon, EyeIcon, EyeOffIcon, XIcon, PlusIcon, ImageIcon,
+  ArrowLeftIcon,
+  WhatsAppIcon,
+  EyeIcon,
+  EyeOffIcon,
+  XIcon,
+  PlusIcon,
+  ImageIcon,
 } from './Icons';
 
 interface NewOrderFlowProps {
@@ -26,16 +31,33 @@ interface NewOrderFlowProps {
   draftOrder?: Order | null;
 }
 
-interface AttachmentLocal { file?: File; url: string; visible: boolean; preview: string; }
-interface TailorHistory { name: string; phone: string | null; city: string; }
+interface AttachmentLocal {
+  file?: File;
+  url: string;
+  visible: boolean;
+  preview: string;
+}
+
+interface TailorHistory {
+  name: string;
+  phone: string | null;
+  city: string;
+}
 
 export default function NewOrderFlow({
-  profile, hasPhotos, onClose, onOrderCreated, onDraftSaved, onProfileUpdate,
-  requestProfile, pendingAction, onActionConsumed, draftOrder,
+  profile,
+  hasPhotos,
+  onClose,
+  onOrderCreated,
+  onDraftSaved,
+  onProfileUpdate,
+  requestProfile,
+  pendingAction,
+  onActionConsumed,
+  draftOrder,
 }: NewOrderFlowProps) {
   const t = useTranslations();
   const locale = useLocale();
-
   const [step, setStep] = useState(1);
   const [tailorName, setTailorName] = useState(draftOrder?.tailor_name || '');
   const [tailorPhone, setTailorPhone] = useState(draftOrder?.tailor_phone || '');
@@ -53,13 +75,12 @@ export default function NewOrderFlow({
   const [sendMode, setSendMode] = useState<'direct' | 'share' | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [step1Error, setStep1Error] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const fabricFileRef = useRef<HTMLInputElement>(null);
   const [aiGenerationsUsed, setAiGenerationsUsed] = useState(0);
-
   const [tailorHistory, setTailorHistory] = useState<TailorHistory[]>([]);
   const [showTailorSuggestions, setShowTailorSuggestions] = useState(false);
-
   const [localMeasurements, setLocalMeasurements] = useState(profile?.measurements || {});
   const [localGender, setLocalGender] = useState(profile?.gender || 'male');
   const [localUnit, setLocalUnit] = useState(profile?.measurement_unit || 'inches');
@@ -67,9 +88,12 @@ export default function NewOrderFlow({
   const totalSteps = 4;
   const hasMeasurements = profile ? Object.keys(profile.measurements).length > 0 : false;
   const measurementsStale = profile?.measurements_updated_at
-    ? (Date.now() - new Date(profile?.measurements_updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000 : false;
+    ? (Date.now() - new Date(profile?.measurements_updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000
+    : false;
 
-  useEffect(() => { if (profile) loadTailorHistory(); }, [profile]);
+  useEffect(() => {
+    if (profile) loadTailorHistory();
+  }, [profile]);
 
   const loadTailorHistory = async () => {
     const { data } = await supabase.from('orders').select('tailor_name, tailor_phone, tailor_city')
@@ -79,17 +103,25 @@ export default function NewOrderFlow({
       const unique: TailorHistory[] = [];
       for (const row of data) {
         const key = row.tailor_name.toLowerCase().trim();
-        if (!seen.has(key)) { seen.add(key); unique.push({ name: row.tailor_name, phone: row.tailor_phone || null, city: row.tailor_city || '' }); }
+        if (!seen.has(key)) {
+          seen.add(key);
+          unique.push({ name: row.tailor_name, phone: row.tailor_phone || null, city: row.tailor_city || '' });
+        }
       }
       setTailorHistory(unique);
     }
   };
 
   const selectTailor = (tailor: TailorHistory) => {
-    setTailorName(tailor.name); setTailorPhone(tailor.phone || ''); setTailorCity(tailor.city); setShowTailorSuggestions(false);
+    setTailorName(tailor.name);
+    setTailorPhone(tailor.phone || '');
+    setTailorCity(tailor.city);
+    setShowTailorSuggestions(false);
   };
 
-  const filteredTailors = tailorHistory.filter((th) => th.name.toLowerCase().includes(tailorName.toLowerCase().trim()));
+  const filteredTailors = tailorHistory.filter((th) =>
+    th.name.toLowerCase().includes(tailorName.toLowerCase().trim())
+  );
 
   const handleRefFilesSelected = (files: File[], previews: string[]) => {
     const newAttachments = files.map((file, i) => ({
@@ -112,11 +144,21 @@ export default function NewOrderFlow({
     if (fabricFileRef.current) fabricFileRef.current.value = '';
   };
 
-  const toggleVisibility = (index: number) => { setAttachments((prev) => prev.map((a, i) => (i === index ? { ...a, visible: !a.visible } : a))); };
-  const removeAttachment = (index: number) => { setAttachments((prev) => prev.filter((_, i) => i !== index)); };
+  const toggleVisibility = (index: number) => {
+    setAttachments((prev) =>
+      prev.map((a, i) => (i === index ? { ...a, visible: !a.visible } : a))
+    );
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const saveMeasurements = async () => {
-    if (!profile) { requestProfile('save-measurements'); return; }
+    if (!profile) {
+      requestProfile('save-measurements');
+      return;
+    }
     doSaveMeasurements();
   };
 
@@ -125,45 +167,70 @@ export default function NewOrderFlow({
     setMeasurementsSaving(true);
     try {
       const { data } = await supabase.from('profiles').update({
-        measurements: localMeasurements, gender: localGender, measurement_unit: localUnit,
+        measurements: localMeasurements,
+        gender: localGender,
+        measurement_unit: localUnit,
         measurements_updated_at: new Date().toISOString(),
       }).eq('id', profile!.id).select().single();
       if (data) onProfileUpdate(data as Profile);
-    } finally { setMeasurementsSaving(false); setStep(4); }
+    } finally {
+      setMeasurementsSaving(false);
+      setStep(4);
+    }
   };
 
   const createOrder = async (p: Profile): Promise<Order | null> => {
     setSaving(true);
     let order: Order | null = null;
     const combinedFitNotes = [fitNotes, fabricNotes].filter(Boolean).join('\n\n');
-
     if (draftOrder) {
       const { data, error } = await supabase.from('orders').update({
-        tailor_name: tailorName || 'My Tailor', tailor_phone: tailorPhone || null, tailor_city: tailorCity,
-        description, fit_notes: combinedFitNotes, deadline: deadline || null, status: 'sent',
+        tailor_name: tailorName || 'My Tailor',
+        tailor_phone: tailorPhone || null,
+        tailor_city: tailorCity,
+        description,
+        fit_notes: combinedFitNotes,
+        deadline: deadline || null,
+        status: 'sent',
       }).eq('id', draftOrder.id).select().single();
       if (error || !data) { setSaving(false); return null; }
       order = data as Order;
     } else {
       const { data, error } = await supabase.from('orders').insert({
-        profile_id: p.id, tailor_name: tailorName || 'My Tailor', tailor_phone: tailorPhone || null,
-        tailor_city: tailorCity, description, fit_notes: combinedFitNotes, deadline: deadline || null, status: 'sent',
+        profile_id: p.id,
+        tailor_name: tailorName || 'My Tailor',
+        tailor_phone: tailorPhone || null,
+        tailor_city: tailorCity,
+        description,
+        fit_notes: combinedFitNotes,
+        deadline: deadline || null,
+        status: 'sent',
       }).select().single();
       if (error || !data) { setSaving(false); return null; }
       order = data as Order;
     }
-
     for (const att of attachments) {
       if (att.file) {
         const url = await uploadImage(att.file, `orders/${order.id}`);
-        if (url) { await supabase.from('order_attachments').insert({ order_id: order.id, url, type: 'inspiration', visible_to_tailor: att.visible }); }
+        if (url) {
+          await supabase.from('order_attachments').insert({
+            order_id: order.id,
+            url,
+            type: 'inspiration',
+            visible_to_tailor: att.visible,
+          });
+        }
       }
     }
     return order as Order;
   };
 
   const handleSendOrder = async () => {
-    if (!profile) { setSendMode('direct'); requestProfile('send-order'); return; }
+    if (!profile) {
+      setSendMode('direct');
+      requestProfile('send-order');
+      return;
+    }
     doSendOrder(profile);
   };
 
@@ -174,11 +241,17 @@ export default function NewOrderFlow({
     const message = generateOrderMessage(updatedProfile, order, locale);
     const phone = tailorPhone ? tailorPhone.replace(/[\s\-\(\)]/g, '') : undefined;
     openWhatsApp(message, phone);
-    setSentOrder(order); setSent(true); setSaving(false);
+    setSentOrder(order);
+    setSent(true);
+    setSaving(false);
   };
 
   const handleShareOrder = async () => {
-    if (!profile) { setSendMode('share'); requestProfile('send-order'); return; }
+    if (!profile) {
+      setSendMode('share');
+      requestProfile('send-order');
+      return;
+    }
     doShareOrder(profile);
   };
 
@@ -188,7 +261,9 @@ export default function NewOrderFlow({
     const updatedProfile = { ...p, measurements: localMeasurements };
     const message = generateOrderShareMessage(updatedProfile, order, locale);
     openWhatsApp(message);
-    setSentOrder(order); setSent(true); setSaving(false);
+    setSentOrder(order);
+    setSent(true);
+    setSaving(false);
   };
 
   useEffect(() => {
@@ -206,15 +281,25 @@ export default function NewOrderFlow({
         setMeasurementsSaving(false);
         setStep(4);
       });
+    } else if (pendingAction === 'send-order') {
+      onActionConsumed();
+      if (sendMode === 'share') {
+        doShareOrder(profile);
+      } else {
+        doSendOrder(profile);
+      }
     }
-    else if (pendingAction === 'send-order') { onActionConsumed(); if (sendMode === 'share') { doShareOrder(profile); } else { doSendOrder(profile); } }
   }, [profile, pendingAction]);
 
   const handleShareSuruwe = () => { setShowSharePreview(true); };
+
   const confirmShareSuruwe = () => {
     const text = t('shareSuruwe.message');
-    if (navigator.share) { navigator.share({ title: 'Suruwe', text, url: 'https://suruwe.com' }).catch(() => {}); }
-    else { openWhatsApp(`${text}\n\nhttps://suruwe.com`); }
+    if (navigator.share) {
+      navigator.share({ title: 'Suruwe', text, url: 'https://suruwe.com' }).catch(() => {});
+    } else {
+      openWhatsApp(`${text}\n\nhttps://suruwe.com`);
+    }
     setShowSharePreview(false);
   };
 
@@ -224,14 +309,24 @@ export default function NewOrderFlow({
     const combinedFitNotes = [fitNotes, fabricNotes].filter(Boolean).join('\n\n');
     if (draftOrder) {
       const { data } = await supabase.from('orders').update({
-        tailor_name: tailorName || 'My Tailor', tailor_phone: tailorPhone || null, tailor_city: tailorCity,
-        description, fit_notes: combinedFitNotes, deadline: deadline || null,
+        tailor_name: tailorName || 'My Tailor',
+        tailor_phone: tailorPhone || null,
+        tailor_city: tailorCity,
+        description,
+        fit_notes: combinedFitNotes,
+        deadline: deadline || null,
       }).eq('id', draftOrder.id).select().single();
       if (data) onDraftSaved(data as Order);
     } else {
       const { data } = await supabase.from('orders').insert({
-        profile_id: profile.id, tailor_name: tailorName || 'My Tailor', tailor_phone: tailorPhone || null,
-        tailor_city: tailorCity, description, fit_notes: combinedFitNotes, deadline: deadline || null, status: 'draft',
+        profile_id: profile.id,
+        tailor_name: tailorName || 'My Tailor',
+        tailor_phone: tailorPhone || null,
+        tailor_city: tailorCity,
+        description,
+        fit_notes: combinedFitNotes,
+        deadline: deadline || null,
+        status: 'draft',
       }).select().single();
       if (data) onDraftSaved(data as Order);
     }
@@ -242,7 +337,14 @@ export default function NewOrderFlow({
   const measurementCount = profile?.measurements ? Object.keys(profile.measurements).length : 0;
 
   if (sent && sentOrder) {
-    return <PostSendScreen order={sentOrder} tailorName={tailorName} profile={profile} feedbackText={feedbackText} setFeedbackText={setFeedbackText} feedbackSent={feedbackSent} setFeedbackSent={setFeedbackSent} showSharePreview={showSharePreview} setShowSharePreview={setShowSharePreview} handleShareSuruwe={handleShareSuruwe} confirmShareSuruwe={confirmShareSuruwe} onDone={() => onOrderCreated(sentOrder)} />;
+    return <PostSendScreen
+      order={sentOrder} tailorName={tailorName} profile={profile}
+      feedbackText={feedbackText} setFeedbackText={setFeedbackText}
+      feedbackSent={feedbackSent} setFeedbackSent={setFeedbackSent}
+      showSharePreview={showSharePreview} setShowSharePreview={setShowSharePreview}
+      handleShareSuruwe={handleShareSuruwe} confirmShareSuruwe={confirmShareSuruwe}
+      onDone={() => onOrderCreated(sentOrder)}
+    />;
   }
 
   // ── STEP 4: REVIEW ──
@@ -343,11 +445,29 @@ export default function NewOrderFlow({
         {step === 1 && (
           <>
             <FormField label={t('orderFlow.step1.descriptionLabel')}>
-              <input className="input-cream" placeholder={t('orderFlow.step1.descriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} autoFocus />
+              <input
+                className="input-cream"
+                placeholder={t('orderFlow.step1.descriptionPlaceholder')}
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  if (e.target.value.trim()) setStep1Error(false);
+                }}
+                autoFocus
+                style={step1Error ? { borderColor: '#c0392b', outline: 'none' } : {}}
+              />
+              {step1Error && (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: '#c0392b', margin: '6px 0 0', fontWeight: 400 }}>
+                  {locale === 'fr' ? 'Donne un nom à ta commande avant de continuer.' : 'Give your order a name before continuing.'}
+                </p>
+              )}
             </FormField>
             <FormField label={t('orderFlow.step1.tailorNameLabel')}>
               <div style={{ position: 'relative' }}>
-                <input className="input-cream" placeholder={t('orderFlow.step1.tailorNamePlaceholder')} value={tailorName}
+                <input
+                  className="input-cream"
+                  placeholder={t('orderFlow.step1.tailorNamePlaceholder')}
+                  value={tailorName}
                   onChange={(e) => { setTailorName(e.target.value); setShowTailorSuggestions(e.target.value.length > 0 && tailorHistory.length > 0); }}
                   onFocus={() => { if (tailorHistory.length > 0) setShowTailorSuggestions(true); }}
                   onBlur={() => { setTimeout(() => setShowTailorSuggestions(false), 200); }}
@@ -381,12 +501,7 @@ export default function NewOrderFlow({
                     <button onClick={() => removeAttachment(i)} style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'var(--charcoal)', color: 'var(--cream)', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
                   </div>
                 ))}
-                <ReferenceImagePicker
-                    onFilesSelected={handleRefFilesSelected}
-                    generationsUsed={aiGenerationsUsed}
-                    onGenerationUsed={() => setAiGenerationsUsed((n) => n + 1)}
-                    maxGenerations={3}
-                  />
+                <ReferenceImagePicker onFilesSelected={handleRefFilesSelected} generationsUsed={aiGenerationsUsed} onGenerationUsed={() => setAiGenerationsUsed((n) => n + 1)} maxGenerations={3} />
               </div>
             </FormField>
           </>
@@ -447,7 +562,16 @@ export default function NewOrderFlow({
 
       {(step === 1 || step === 2) && (
         <div style={{ padding: '16px 22px 36px' }}>
-          <button className="btn-charcoal" disabled={step === 1 && !canProceedStep1} onClick={() => setStep(step + 1)}>
+          <button
+            className="btn-charcoal"
+            onClick={() => {
+              if (step === 1 && !canProceedStep1) {
+                setStep1Error(true);
+                return;
+              }
+              setStep(step + 1);
+            }}
+          >
             <span>{step === 1 ? t('orderFlow.step1.continueButton') : t('orderFlow.step2.continueButton')}</span>
             <span className="arrow">&rarr;</span>
           </button>
@@ -493,7 +617,11 @@ function PostSendScreen({ order, tailorName, profile, feedbackText, setFeedbackT
           <div style={{ background: 'var(--charcoal-2)', border: '0.5px solid var(--gold-bdr)', borderRadius: 10, padding: '14px 18px', textAlign: 'left', marginBottom: 24, width: '100%' }}>
             <p style={{ fontSize: 13, color: 'var(--muted-d)', lineHeight: 1.55, marginBottom: 12 }}>{t('orderFlow.postSend.feedbackPrompt')}</p>
             <textarea rows={2} placeholder={t('orderFlow.postSend.feedbackPlaceholder')} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} className="input-dark" style={{ resize: 'none', minHeight: 'auto', marginBottom: 12 }} />
-            <button className="btn-ghost-outline" onClick={async () => { if (!feedbackText.trim()) return; await supabase.from('feedback').insert({ profile_id: profile?.id || null, context: 'post_order', message: feedbackText.trim() }); setFeedbackSent(true); }} disabled={!feedbackText.trim()} style={{ fontSize: 11, padding: '10px 16px' }}>{t('orderFlow.postSend.feedbackSend')}</button>
+            <button className="btn-ghost-outline" onClick={async () => {
+              if (!feedbackText.trim()) return;
+              await supabase.from('feedback').insert({ profile_id: profile?.id || null, context: 'post_order', message: feedbackText.trim() });
+              setFeedbackSent(true);
+            }} disabled={!feedbackText.trim()} style={{ fontSize: 11, padding: '10px 16px' }}>{t('orderFlow.postSend.feedbackSend')}</button>
           </div>
         ) : (
           <p style={{ fontSize: 13, color: 'var(--muted-d)', marginBottom: 24, textAlign: 'center', opacity: 0.7 }}>{t('orderFlow.postSend.feedbackThanks')}</p>
