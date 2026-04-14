@@ -6,14 +6,12 @@ export function generateSlug(name: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .substring(0, 30);
-  
   // Add 4 random chars to avoid collisions
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   let suffix = '';
   for (let i = 0; i < 4; i++) {
     suffix += chars[Math.floor(Math.random() * chars.length)];
   }
-  
   return `${base}-${suffix}`;
 }
 
@@ -22,12 +20,14 @@ export function formatDate(dateString: string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  
+  if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+  }
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
